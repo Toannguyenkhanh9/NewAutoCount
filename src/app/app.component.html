@@ -1,0 +1,39 @@
+<div class="app-shell">
+  <!-- Header chỉ hiện khi đã login & không ở trang login -->
+  <mat-toolbar
+    class="app-toolbar"
+    *ngIf="(isAuthenticated$ | async) && !isLoginRoute"
+  >
+    <div class="brand">
+      <div class="brand-logo">AC</div>
+      <div class="brand-text">
+        <div class="brand-name">AutoCount</div>
+        <div class="brand-sub">Accounting Web</div>
+      </div>
+    </div>
+
+    <app-top-nav class="flex-fill"></app-top-nav>
+
+    <div class="user-area">
+      <button mat-icon-button [matMenuTriggerFor]="userMenu">
+        <mat-icon>account_circle</mat-icon>
+      </button>
+      <mat-menu #userMenu="matMenu">
+        <button mat-menu-item>
+          <mat-icon>person</mat-icon>
+          <span>My Profile</span>
+        </button>
+        <button mat-menu-item (click)="logout()">
+          <mat-icon>logout</mat-icon>
+          <span>Sign out</span>
+        </button>
+      </mat-menu>
+    </div>
+  </mat-toolbar>
+
+  <main class="app-content">
+    <div class="page-wrapper">
+      <router-outlet></router-outlet>
+    </div>
+  </main>
+</div>

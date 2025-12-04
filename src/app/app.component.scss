@@ -1,0 +1,85 @@
+:host {
+  display: block;
+  height: 100vh;
+}
+
+.app-shell {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background: #f5f7fb;
+  color: #1f2933;
+}
+
+/* Header / Toolbar */
+.app-toolbar {
+  display: flex;
+  gap: 24px;
+  padding: 0 24px;
+
+  /* nền xanh kiểu Xero */
+  background: #0077c8;
+  color: #ffffff;
+
+  border-bottom: none;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
+  height: 64px;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+/* logo trắng, chữ xanh hoặc ngược lại tùy bạn */
+.brand-logo {
+  width: 32px;
+  height: 32px;
+  border-radius: 999px;
+  background: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #0077c8;
+  font-weight: 700;
+  font-size: 16px;
+}
+
+.brand-text {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.2;
+}
+
+.brand-name {
+  font-weight: 600;
+  font-size: 15px;
+  color: #ffffff;
+}
+
+.brand-sub {
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.flex-fill {
+  flex: 1 1 auto;
+}
+
+.user-area {
+  display: flex;
+  align-items: center;
+}
+
+/* Content */
+.app-content {
+  flex: 1 1 auto;
+  overflow: auto;
+}
+
+.page-wrapper {
+  padding: 24px 24px 32px;
+  max-width: 1360px;
+  margin: 0 auto;
+}

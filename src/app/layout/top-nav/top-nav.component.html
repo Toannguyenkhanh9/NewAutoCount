@@ -1,0 +1,39 @@
+<!-- src/app/layout/top-nav/top-nav.component.html -->
+<nav class="top-nav">
+  <ng-container *ngFor="let item of navItems">
+    <!-- Item không có submenu -->
+    <button
+      *ngIf="!item.children"
+      mat-button
+      class="nav-item"
+      [routerLink]="item.path"
+      routerLinkActive="nav-item-active"
+      [routerLinkActiveOptions]="{ exact: true }"
+    >
+      <mat-icon class="nav-icon" *ngIf="item.icon">{{ item.icon }}</mat-icon>
+      <span>{{ item.label }}</span>
+    </button>
+
+    <!-- Item có submenu -->
+    <button
+      *ngIf="item.children"
+      mat-button
+      class="nav-item nav-item-has-children"
+      [matMenuTriggerFor]="menu"
+    >
+      <mat-icon class="nav-icon" *ngIf="item.icon">{{ item.icon }}</mat-icon>
+      <span>{{ item.label }}</span>
+      <mat-icon class="nav-chevron">expand_more</mat-icon>
+    </button>
+    <mat-menu #menu="matMenu">
+      <button
+        *ngFor="let child of item.children"
+        mat-menu-item
+        (click)="navigate(child.path)"
+        routerLinkActive="menu-item-active"
+      >
+        <span>{{ child.label }}</span>
+      </button>
+    </mat-menu>
+  </ng-container>
+</nav>
