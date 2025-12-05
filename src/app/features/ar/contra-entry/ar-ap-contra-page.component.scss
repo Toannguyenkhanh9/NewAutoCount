@@ -1,0 +1,358 @@
+/* Viền bảng gọn gàng */
+.table.bordered {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  th,
+  td {
+    border: 1px solid #e5e7eb; // màu xám nhạt
+    padding: 8px 10px;
+    background: #fff;
+  }
+  thead th {
+    background: #f8fafc;
+    font-weight: 600;
+  }
+  .center {
+    text-align: center;
+  }
+  .r {
+    text-align: right;
+  }
+}
+
+/* khi chưa cho phân bổ thì mờ phần knock */
+.knock-table.dim {
+  opacity: 0.6;
+  pointer-events: none;
+}
+.totals-grid {
+  margin: 10px 0 16px;
+  display: grid;
+  grid-template-columns: 1fr auto; /* label | number */
+  row-gap: 6px;
+  align-items: baseline;
+
+  .label {
+    text-align: right;
+    padding-right: 12px;
+    color: #475569;
+  }
+  .value {
+    min-width: 140px;
+    text-align: right;
+    font-weight: 600;
+    color: #0f172a;
+  }
+  .value.warn {
+    color: #b91c1c;
+  }
+  .knock-table .num,
+  .knock-table td.r input,
+  .pm-table td.r input {
+    text-align: center;
+  }
+}
+/* khung giống bảng dưới */
+.box {
+  background: #fff;
+  overflow: hidden;
+}
+
+/* bọc bảng để không tràn */
+.tablewrap {
+  padding:8px;
+  width: 100%;
+  overflow: auto;
+}
+
+/* bảng payment: giống knock-table */
+.pm-table {
+  width: 100%;
+  table-layout: fixed;        /* canh cột đều, không tràn */
+  border-collapse: separate;
+  border-spacing: 0;
+
+  th, td {
+    padding: 8px 10px;
+    vertical-align: middle;
+  }
+
+  th.r, td.r { text-align: right; }
+  th.c, td.c { text-align: center; }
+
+  input, select {
+    width: 100%;
+    box-sizing: border-box;
+  }
+}
+/* cột delete nhỏ gọn và canh giữa */
+.pm-table {
+  table-layout: fixed;
+
+  th.col-del,
+  td.col-del {
+    width: 65px;            /* vừa nút */
+    text-align: center;     /* canh giữa */
+    white-space: nowrap;
+  }
+
+  /* nút delete dạng icon nhỏ */
+  .btn.icon {
+    width: 28px;
+    height: 28px;
+    padding: 0;             /* gọn */
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;     /* cùng style với nút khác */
+    line-height: 1;
+  }
+}
+.knock-table td.withdisc input[type="checkbox"] { margin: 0; }
+/* ===== Totals (Amount / Unapplied) ===== */
+.totals-grid{
+  display: grid;
+  grid-template-columns: auto 160px; /* label | value */
+  align-items: center;
+  column-gap: 12px;
+  row-gap: 6px;
+}
+.totals-grid .label{
+  color: #334155;
+}
+.totals-grid .value{
+  justify-self: end;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+  min-width: 140px;
+
+  /* khung viền nổi bật */
+  padding: 6px 10px;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  background: #f8fafc;
+}
+.totals-grid .value.warn{
+  border-color: #ef4444;
+  background: #fff1f2;
+  color: #b91c1c;
+}
+
+/* ===== Knock-off title bold ===== */
+.knock-title{
+  font-weight: 700;
+}
+/* highlight nhẹ cho dòng quá hạn */
+.overdue-row td {
+  background: #fff1f2;      /* đỏ nhạt */
+}
+
+.overdue-row td,
+.overdue-row input {
+  /* chữ hơi đậm để nổi nhẹ */
+  color: #7f1d1d;           /* red-900 nhạt hơn có thể dùng #b91c1c */
+}
+/* Ẩn placeholder mm/dd/yyyy trên các trình duyệt WebKit khi chưa focus & chưa có giá trị */
+input.no-ph[type="date"]:not(:focus):invalid::-webkit-datetime-edit {
+  color: transparent;
+}
+/* Khi focus hoặc đã có giá trị thì hiện bình thường */
+input.no-ph[type="date"]:focus::-webkit-datetime-edit,
+input.no-ph[type="date"]:valid::-webkit-datetime-edit {
+  color: inherit;
+}
+/* FireFox: tắt màu khi chưa có giá trị */
+@supports (-moz-appearance: none) {
+  input.no-ph[type="date"]:not(:focus):invalid {
+    color: transparent;
+  }
+  input.no-ph[type="date"]:focus,
+  input.no-ph[type="date"]:valid {
+    color: inherit;
+  }
+}
+/* Cột delete nhỏ, canh giữa */
+.pm-table .col-del {
+  width: 64px;
+  text-align: center;
+}
+
+/* Nút delete kiểu hồng bo tròn */
+.btn.del {
+  --pink1: #ff6b8b;
+  --pink2: #ff3d61;
+
+  height: 36px;
+  width: 48px;
+  padding: 0;
+  border: 0;
+  border-radius: 12px;
+  color: #fff;
+  background: linear-gradient(180deg, var(--pink1) 0%, var(--pink2) 100%);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 0 rgba(0, 0, 0, .08) inset;
+  cursor: pointer;
+  transition: transform .05s ease, filter .15s ease;
+  line-height: 1;        /* để emoji nằm gọn giữa */
+  font-size: 16px;       /* cỡ icon 🗑 */
+}
+
+.btn.del:hover { filter: brightness(1.05); }
+.btn.del:active { transform: translateY(1px); }
+
+/* Trạng thái disabled nếu cần */
+.btn.del:disabled {
+  filter: grayscale(0.3) opacity(.6);
+  cursor: not-allowed;
+}
+.pager {
+  display: flex;
+  justify-content: flex-end; /* đẩy cụm phân trang sang phải */
+  padding: 8px 0;
+}
+
+.pager .nav {
+  margin-left: auto; /* phòng trường hợp có style khác ghi đè */
+}
+/* ô Outstanding có giá trị > 0 -> vàng nhạt, giữ màu chữ gốc */
+/* nếu bạn đang dùng class cho dòng quá hạn, giữ nhẹ nhàng như cũ */
+.overdue-row {
+  background: #fff1f2;   /* hồng nhạt (tùy bạn) */
+  color: #b91c1c;
+}
+.knock-table td.out-gt0 {/* xóa nền vàng cũ nếu còn */
+  color: #2563eb;                     /* blue-600 */                /* tùy chọn: đậm hơn chút cho dễ nhìn */
+}
+.cn-detail-pane {
+  margin-top: .5rem;
+  border: 1px solid #dfe6ef;
+  background: #f9fcff;
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.cn-detail-header {
+  background: #eaf3ff;
+  color: #2b5ea8;
+  font-weight: 600;
+  text-align: center;
+  padding: 6px 10px;
+  border-bottom: 1px solid #dfe6ef;
+}
+
+.cn-subgrid {
+  width: 100%;
+  border-collapse: collapse;
+
+  thead th {
+    background: #f2f6ff;
+    font-weight: 600;
+  }
+  th, td {
+    padding: 6px 10px;
+    border-bottom: 1px solid #eef2f6;
+  }
+  tfoot th {
+    background: #f7faff;
+  }
+}
+
+.table .text-end { text-align: right; }
+.table .text-center { text-align: center; }
+.table .text-muted { color: #6c757d; }
+.party { margin-left: 8px; font-weight: 600; opacity: .9; }
+.c { text-align:center; }
+.btn.xs { padding:4px 8px; font-size:12px; }
+.side-stack {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 6px;
+}
+.btn.xs { padding: 4px 10px; font-size: 12px; }
+.party { margin-left: 8px; font-weight: 600; opacity: .9; }
+.c { text-align: center; }
+/* Pay textbox: xám khi disabled – giống checkbox */
+.table td.r:has(input[formControlName="pay"][disabled]) {
+  background-color: #f9fafb;
+}
+/* Pay textbox: xám khi bị disable (Reactive Forms sẽ set attribute disabled) */
+.table input[formControlName="pay"][disabled] {
+  background-color: #f3f4f6;
+  border-color: #d1d5db;
+  color: #6b7280;
+  -webkit-text-fill-color: #6b7280;
+  opacity: 1;
+  cursor: not-allowed;
+}
+.totals-grid {
+  margin: 10px 0 16px;
+  display: grid;
+  grid-template-columns: 1fr auto; /* label | number */
+  row-gap: 6px;
+  align-items: baseline;
+
+  .label {
+    text-align: right;
+    padding-right: 12px;
+    color: #475569;
+  }
+  .value {
+    min-width: 140px;
+    text-align: right;
+    font-weight: 600;
+    color: #0f172a;
+  }
+  .value.warn {
+    color: #b91c1c;
+  }
+  .knock-table .num,
+  .knock-table td.r input,
+  .pm-table td.r input {
+    text-align: right;
+  }
+}
+.blue { color: #2563eb; }          /* blue-600 */
+.table tfoot tr.sum { background:#f9fafb; font-weight:600; }
+.table tfoot tr.sum td { padding: 8px 10px }
+.table td.r .blue {
+  color: #2563eb !important;         /* xanh dương */
+}
+
+/* nếu ô Outstanding của bạn thực sự là <input disabled>, dùng thêm: */
+.table td.r input.blue[disabled] {
+  color: #2563eb !important;
+  -webkit-text-fill-color: #2563eb !important; /* Chrome/Safari */
+}
+/* Tô nhẹ cả hàng khi quá hạn */
+.overdue-row td {
+  background: #fff1f2;     /* hồng nhạt */
+}
+
+/* viền nhấn nhẹ bên trái (tùy chọn) */
+
+
+/* giữ màu xanh dương của Outstanding nếu bạn đã set .blue */
+.overdue-row .blue {
+  color: #2563eb !important;
+}
+:host-context(.view-mode) .table input,
+:host-context(.view-mode) .table select,
+:host-context(.view-mode) .table textarea {
+  cursor: default;
+}
+
+.badge-view {
+  background: #eff6ff;
+  color: #2563eb;
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 12px;
+}
+.table th.sortable { cursor: pointer; user-select: none; }
+.table th .sort { opacity: .45; margin-left: 6px; font-size: 11px; }
+.table th .sort.on { opacity: .9; }

@@ -1,0 +1,374 @@
+/* ====== Page Title ====== */
+.page-title {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 12px;
+  align-items: center;
+  margin: 8px 0 16px;
+
+  h1 {
+    margin: 0;
+    font-size: 20px;
+    font-weight: 700;
+    color: #1f2937;
+  }
+
+  .actions {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+
+    .search {
+      width: 280px;
+      padding: 8px 10px;
+      border: 1px solid #d1d5db;
+      border-radius: 8px;
+      outline: none;
+      transition: box-shadow 0.15s ease;
+    }
+    .search:focus {
+      box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.2);
+      border-color: #10b981;
+    }
+  }
+}
+
+/* ====== Panel / Card ====== */
+.panel {
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+  overflow: hidden;
+
+  .panel-head {
+    background: linear-gradient(180deg, #b7e1b3, #8fd38e);
+    color: #1b4332;
+    font-weight: 700;
+    padding: 12px 16px;
+    border-bottom: 1px solid #e5e7eb;
+  }
+
+  .panel-body {
+    padding: 12px 16px;
+  }
+}
+/* ====== Links in row ====== */
+.link {
+  border: none;
+  background: transparent;
+  padding: 0;
+  margin-left: 10px;
+  cursor: pointer;
+  color: #2563eb;
+}
+.link:hover {
+  text-decoration: underline;
+}
+.link.danger {
+  color: #ef4444;
+}
+
+/* ====== Grid / Table ====== */
+.grid {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  overflow: hidden;
+
+  th,
+  td {
+    padding: 10px 12px;
+    border-bottom: 1px solid #f1f5f9;
+    vertical-align: middle;
+    background: #fff;
+  }
+
+  thead th {
+    font-weight: 700;
+    color: #334155;
+    background: #f8fafc;
+  }
+
+  tbody tr {
+    transition: background 0.1s ease;
+    cursor: pointer;
+  }
+  tbody tr:hover {
+    background: #fafafa;
+  }
+  tbody tr.selected {
+    background: #eefdf5;
+  }
+
+  .num {
+    text-align: right;
+  }
+  .w-140 {
+    width: 140px;
+  }
+  .w-160 {
+    width: 160px;
+  }
+}
+
+.records {
+  padding: 10px 0 2px;
+  color: #6b7280;
+  font-size: 13px;
+}
+
+/* ====== Pills ====== */
+.pill {
+  display: inline-block;
+  min-width: 36px;
+  text-align: center;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 700;
+  border: 1px solid #e5e7eb;
+  background: #f3f4f6;
+  color: #374151;
+}
+.pill.ok {
+  background: #ecfdf5;
+  color: #047857;
+  border-color: #a7f3d0;
+}
+.pill.no {
+  background: #fef2f2;
+  color: #b91c1c;
+  border-color: #fecaca;
+}
+
+.row-actions {
+  float: right;
+}
+
+/* ====== Modal (app-modal) ====== */
+.app-modal {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 10000; /* cao để luôn nổi trên mọi thứ */
+}
+.app-modal.show {
+  display: block;
+}
+
+.app-modal .backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(17, 24, 39, 0.35);
+  backdrop-filter: blur(1px);
+}
+
+.app-modal .dialog {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: min(760px, calc(100vw - 32px));
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.25);
+  overflow: hidden;
+}
+
+.dialog-head {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  gap: 8px;
+  background: linear-gradient(180deg, #b7e1b3, #8fd38e);
+  color: #1b4332;
+  padding: 10px 16px;
+  border-bottom: 1px solid #e5e7eb;
+
+  .title {
+    font-weight: 700;
+  }
+
+  .icon.close {
+    background: transparent;
+    border: none;
+    font-size: 22px;
+    line-height: 1;
+    cursor: pointer;
+    color: #1b4332;
+  }
+}
+
+.dialog-body {
+  padding: 14px 16px;
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: 180px 1fr;
+  gap: 12px;
+  align-items: center;
+  margin-bottom: 10px;
+
+  label {
+    color: #374151;
+    font-weight: 600;
+  }
+
+  .inp {
+    width: 100%;
+    padding: 8px 10px;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    outline: none;
+    transition: box-shadow 0.15s ease, border-color 0.15s ease;
+  }
+  .inp:focus {
+    box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.2);
+    border-color: #10b981;
+  }
+}
+
+.dialog-foot {
+  padding: 12px 16px;
+  border-top: 1px solid #f3f4f6;
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+/* Khóa scroll nền khi modal mở */
+:host ::ng-deep body.modal-open {
+  overflow: hidden !important;
+}
+.page-title {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 12px;
+  align-items: center;
+  margin: 8px 0 14px;
+
+  h1 {
+    margin: 0;
+    font-size: 20px;
+    font-weight: 700;
+    color: #1f2937;
+  }
+
+  .actions {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+
+    .search {
+      width: 320px;
+      padding: 8px 10px;
+      border: 1px solid #d1d5db;
+      border-radius: 8px;
+      outline: none;
+      transition: box-shadow 0.15s ease, border-color 0.15s ease;
+    }
+    .search:focus {
+      box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.2);
+      border-color: #10b981;
+    }
+  }
+}
+
+/* Green bar + bo góc + shadow giống page trước */
+.page-title-green {
+  background: linear-gradient(180deg, #b7e1b3, #8fd38e);
+  border-radius: 12px;
+  padding: 12px 16px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+}
+
+  .panel-body{ padding:12px; }
+  .table{ width:100%; border-collapse:separate; border-spacing:0; }
+  .table th{ background:#f7fafc; border-bottom:1px solid #e8eef5; color:#0f172a; font-weight:700; text-align:left; padding:10px 12px; }
+  .table td{ border-bottom:1px solid #f0f4f9; padding:10px 12px; vertical-align:middle; color:#111827; }
+  /* con trỏ + hover */
+.gridwrap tbody tr { cursor: pointer; }
+.gridwrap tbody tr:hover { background: #f7fbf7; }
+
+/* dòng đang chọn */
+.gridwrap tbody tr.is-selected {
+  background: #eaf7e3;               /* xanh nhạt */
+  box-shadow: inset 0 0 0 2px #8fd06b;
+}
+.gridwrap tbody tr.is-selected td {
+  border-color: #d9ecd1;
+}
+/* trỏ chuột & hover */
+.table tbody tr { cursor: pointer; }
+.table tbody tr:hover { background: #f7fbf7; }
+
+/* dòng được chọn */
+.table tbody tr.selected {
+  background: #eaf7e3;                 /* xanh nhạt */
+  box-shadow: inset 0 0 0 2px #8fd06b;  /* viền nổi rõ */
+}
+.table tbody tr.selected td {
+  border-color: #d9ecd1;
+}
+.inp.readonly{
+  background: #f3f4f6;     /* xám nhạt */
+  color: #6b7280;          /* xám chữ */
+  border-color: #e5e7eb;   /* xám viền */
+  cursor: not-allowed;
+}
+.inp.readonly:focus{
+  outline: none;
+  box-shadow: none;
+  border-color: #e5e7eb;
+}
+.inp.readonly::placeholder{
+  color: #9ca3af;
+}
+.inp.invalid {
+  border-color: #ef4444 !important;
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, .15);
+}
+.error {
+  color: #ef4444;
+  font-size: 12px;
+  margin-top: 4px;
+}
+/* Lưới 3 cột giống hàng input trên */
+.cc-grid{
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  column-gap: 16px;
+  row-gap: 10px;
+  align-items: start;
+}
+
+.cc-grid .cell{
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.col-1{ grid-column: 1; }
+.col-2{ grid-column: 2; }
+.col-3{ grid-column: 3; }
+
+/* Radio + text cùng một hàng */
+.radio-inline{
+  display: inline-flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Khoảng cách nhỏ phía trên các khối con */
+.mt6{ margin-top: 6px; }
+
+/* Trạng thái disabled của control – nền xám, text nhạt */
+.cc-grid input:disabled,
+.cc-grid select:disabled{
+  background: #f3f4f6;
+  color: #6b7280;
+  cursor: not-allowed;
+}
+

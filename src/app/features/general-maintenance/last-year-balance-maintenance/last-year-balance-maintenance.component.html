@@ -1,0 +1,147 @@
+<div class="page">
+  <!-- Title + Save / Cancel -->
+  <div class="titlebar">
+    <h1>Last Year Balance Maintenance</h1>
+
+    <div class="toolbar">
+      <button class="btn" (click)="onCancel()">Cancel</button>
+      <button class="btn primary" (click)="onSave()">Save</button>
+    </div>
+  </div>
+
+  <div class="panel">
+    <!-- Tool line đặt TRONG panel, ngay trên grid -->
+    <!-- Ngay trên table -->
+    <div class="panel-tools">
+      <span class="fy-label">Fiscal Year:</span>
+      <select
+        class="inp fy"
+        [(ngModel)]="selectedYear"
+        (ngModelChange)="onYearChange($event)"
+      >
+        <option *ngFor="let y of years" [ngValue]="y">{{ y }}</option>
+      </select>
+      <button class="btn primary" (click)="inquiry()">Inquiry</button>
+    </div>
+
+    <table class="grid" *ngIf="showGrid">
+      <thead>
+        <tr>
+          <th class="w-320">Description</th>
+          <th class="w-110">Acc. No.</th>
+          <th class="w-70">Curr. Code</th>
+          <th class="w-110">Special Acc.</th>
+          <th
+            *ngFor="let m of [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]"
+            class="w-110 text-end"
+          >
+            {{
+              [
+                "Jan",
+                "Feb",
+                "Mar",
+                "Apr",
+                "May",
+                "Jun",
+                "Jul",
+                "Aug",
+                "Sep",
+                "Oct",
+                "Nov",
+                "Dec"
+              ][m]
+            }}
+            Amount
+          </th>
+        </tr>
+      </thead>
+      <tbody>
+        <ng-container *ngFor="let r of rows">
+          <!-- NHÓM -->
+          <tr *ngIf="r.isGroup" class="group-row">
+            <td class="desc">
+              <span class="indent" [style.width.px]="r.level * 18"></span>
+              <button class="tw" (click)="toggle(r)">
+                {{ r.expanded ? "▾" : "▸" }}
+              </button>
+              {{ r.description }}
+            </td>
+            <td class="mono">{{ r.accNo }}</td>
+            <td>{{ r.curr }}</td>
+            <td>{{ r.special }}</td>
+
+            <!-- Tổng cấp con trực tiếp hiển thị ngay trên hàng nhóm -->
+            <td
+              *ngFor="let m of [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]"
+              class="text-end mono"
+            >
+              <span
+                class="agg"
+                [ngClass]="{ neg: groupSum(r, m) < 0, pos: groupSum(r, m) > 0 }"
+              >
+                {{ format(groupSum(r, m)) }}
+              </span>
+            </td>
+          </tr>
+
+          <!-- LÁ -->
+          <tr *ngIf="!r.isGroup" class="leaf-row">
+            <td class="desc">
+              <span class="indent" [style.width.px]="r.level * 18"></span>
+              <span class="dot">•</span>
+              {{ r.description }}
+            </td>
+            <td class="mono">{{ r.accNo }}</td>
+            <td>{{ r.curr }}</td>
+            <td>{{ r.special }}</td>
+
+            <td
+              *ngFor="let m of [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]"
+              class="text-end"
+            >
+              <input
+                class="amt"
+                type="text"
+                appAmount
+                [decimals]="2"
+                [allowNegative]="true"
+                [(ngModel)]="r.amounts[m]"
+              />
+            </td>
+          </tr>
+        </ng-container>
+      </tbody>
+
+      <tfoot>
+        <tr class="total">
+          <td colspan="4" class="text-right">Total</td>
+          <td
+            *ngFor="let m of [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]"
+            class="text-end mono"
+          >
+            <span [ngClass]="{ neg: colTotal(m) < 0, pos: colTotal(m) > 0 }">
+              {{ format(colTotal(m)) }}
+            </span>
+          </td>
+        </tr>
+      </tfoot>
+    </table>
+
+    <div class="panel-foot">
+      <label class="chk inline">
+        <input
+          type="checkbox"
+          [(ngModel)]="includeZero"
+          class="chkbox"
+          style="
+            display: inline-block;
+            width: auto;
+            margin: 0;
+            vertical-align: middle;
+          "
+        />
+        <span>Report Include Zero Balance</span>
+      </label>
+    </div>
+  </div>
+</div>

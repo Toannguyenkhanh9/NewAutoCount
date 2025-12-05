@@ -1,0 +1,330 @@
+.page { --ink:#0f172a; --muted:#64748b; }
+.titlebar{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.toolbar{display:flex;gap:8px;align-items:center}
+.search{height:34px;padding:0 10px;border:1px solid #e5e7eb;border-radius:8px}
+.layout{display:grid;grid-template-columns:320px 1fr;gap:12px}
+.left{border:1px solid #eef2f6;border-radius:12px;padding:10px}
+.right{border:1px solid #eef2f6;border-radius:12px;padding:10px}
+.hint{color:#64748b;margin-bottom:8px}
+.tree .cat{margin-bottom:8px}
+.cat-row{cursor:pointer;padding:6px 8px;border-radius:8px;background:#f7fafc;border:1px solid #eef2f6}
+.types{padding-left:12px;margin-top:6px}
+.type-row{padding:6px 8px;border-radius:8px;cursor:pointer}
+.type-row.active{background:#e8f7ee;border:1px solid #cfeede}
+.tw{display:inline-block;width:18px;text-align:center}
+.mono{font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace}
+.grid{width:100%;border-collapse:collapse}
+.grid th, .grid td{border-bottom:1px solid #eef2f6;padding:8px}
+.grid .empty{color:#64748b;text-align:center}
+.text-end{text-align:right}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px}
+label{display:flex;flex-direction:column;gap:6px}
+.inp{height:34px;border:1px solid #e5e7eb;border-radius:8px;padding:0 10px}
+.inp.mono{font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace}
+.row{display:flex;align-items:center;gap:12px}
+.chk{display:flex;align-items:center;gap:8px}
+.sample{margin-left:auto;color:#0f172a}
+.month-panel{margin-top:6px;border:1px solid #eef2f6;border-radius:10px;padding:10px;background:#f8fbf7}
+.year-ctrl{display:flex;gap:8px;align-items:center;margin-bottom:8px}
+.year-ctrl .yr{font-weight:700}
+.months{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.mrow{display:grid;grid-template-columns:1fr 120px;gap:8px;align-items:center}
+.inp.small{height:30px}
+.muted{color:#64748b}
+.mb8{margin-bottom:8px}
+.mt8{margin-top:8px}
+.btn.xsmall.link { padding: 2px 6px; border: 0; background: transparent; color: var(--brand-600); cursor: pointer; }
+.btn.xsmall.link:hover { text-decoration: underline; }
+.month-panel{
+  display:flex; gap:12px; align-items:flex-start;
+  padding:12px; border:1px solid #e6efe1; border-radius:10px; background:#f7fbf5;
+}
+.year-box{
+  width:75px; border:1px solid #e0eadb; border-radius:8px; background:#fff; overflow:hidden;
+}
+.ytools{ display:flex; gap:6px; padding:6px; border-bottom:1px solid #e0eadb; }
+.icon{ width:28px; height:28px; border:1px solid #d9e6d1; background:#fff; border-radius:6px; cursor:pointer; }
+.ylist{ max-height:260px; overflow:auto; }
+.yrow{ padding:6px 10px; cursor:pointer;  text-align:center;   }
+.yrow.sel{ background:#e9f6e6; font-weight:700; }
+
+.months{ flex:1; display:grid; grid-template-columns: 1fr 1fr; gap:10px 18px; }
+.mrow{ display:flex; align-items:center; gap:10px; }
+.mlbl{ min-width:220px; }
+.inp.small{ height:32px; padding:0 8px; }
+.empty-panel{
+  border:1px dashed #e5e7eb; border-radius:10px;
+  padding:28px; color:#6b7280; background:#fafafa;
+  text-align:center;
+}
+.grid .actions .link{
+  background: none;
+  border: 0;
+  padding: 0;
+  margin: 0 6px;
+  color: #2563eb;              /* xanh “link” */
+  text-decoration: underline;
+  cursor: pointer;
+  font: inherit;
+}
+.grid .actions .link:hover{ text-decoration: none; }
+
+.grid .actions .link.danger{ color: #dc2626; }  /* Delete đỏ */
+.grid .actions .sep{ color:#9ca3af; margin: 0 2px; }  /* dấu · ngăn cách */
+.w-140{ width:140px; }
+.month-panel.disabled{
+  opacity: .55;               /* bôi mờ */
+  user-select: none;
+}
+
+.month-panel.disabled .yrow{  /* trỏ chuột không còn dạng clickable */
+  cursor: default;
+}
+
+.month-panel .yrow{ cursor: pointer; }
+
+.form-rows .row-inline {
+  display: flex; gap: 16px;  align-items: flex-end; margin-bottom: 10px;
+}
+.form-rows .row-inline .lbl { font-weight: 600; margin-bottom: 4px; }
+.form-rows .grow   { flex: 1 1 auto; min-width: 0; }
+.form-rows .shrink { flex: 0 0 260px; }
+.form-rows .right  { margin-left: auto; }
+.sample-wrap .inp  { min-width: 240px; }
+
+.month-panel.disabled {
+  opacity: .55; pointer-events: none; user-select: none;
+}
+/* Hàng theo chiều ngang */
+.row-inline { display:flex; gap:16px; }
+.row-inline.align-center { align-items:center; }
+
+/* Cột field chuẩn hóa label + input */
+.field .lbl { font-weight:600; margin-bottom:4px; line-height:1; }
+.field.grow   { flex:1 1 auto; min-width:0; }
+.field.shrink { flex:0 0 260px; }
+
+/* Checkbox / switch inline với chữ, canh giữa theo chiều dọc */
+.chk-inline {
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  height:50px;            /* bằng chiều cao .inp để thẳng hàng */
+  padding:0 4px;
+}
+
+/* Input height đồng đều (nếu cần) */
+.inp { height:38px; }
+
+/* đẩy Sample sang phải */
+.ml-auto { margin-left:auto; }
+
+/* Panel tháng mờ khi tắt monthly (giữ như trước) */
+.month-panel.disabled { opacity:.55; pointer-events:none; user-select:none; }
+/* layout hàng ngang */
+.row-inline { display: flex; gap: 16px; }
+.row-inline.align-center { align-items: center; }
+
+/* field + label chuẩn */
+.field .lbl { font-weight: 600; margin-bottom: 6px; }
+.grow { flex: 1 1 auto; min-width: 0; }
+.w-100 { width: 100%; }
+
+/* checkbox + text inline */
+.chk-inline {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 38px; /* bằng chiều cao .inp để thẳng hàng */
+  white-space: nowrap;
+}
+.ml16 { margin-left: 16px; }
+
+/* input đồng đều */
+.inp { height: 38px; }
+
+/* sample box cố định bề rộng, để Format full width còn Sample gọn bên phải */
+.sample-box { flex: 0 0 260px; }
+
+/* (nếu có) panel tháng mờ khi tắt */
+.month-panel.disabled { opacity: .55; pointer-events: none; user-select: none; }
+/* Hàng inline nói chung */
+.row-inline {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap; /* tránh tràn khi màn hình hẹp */
+}
+
+/* Checkbox + text cùng một dòng, căn giữa */
+.chk-inline{
+  display: inline-flex;        /* QUAN TRỌNG: không để block */
+  align-items: center;         /* checkbox & chữ thẳng hàng dọc */
+  gap: 8px;                    /* khoảng cách giữa checkbox và chữ */
+  line-height: 1.2;
+  white-space: nowrap;         /* tránh xuống dòng giữa checkbox & nhãn */
+}
+
+/* Tránh margin mặc định làm lệch hàng */
+.chk-inline input[type="checkbox"]{
+  display: inline-block;
+  margin: 0;
+  vertical-align: middle;      /* fallback cho 1 số trình duyệt */
+}
+
+/* Hàng có checkbox (thêm bảo hiểm) */
+.row-inline.align-center{
+  display:flex;
+  align-items:center;
+  gap:12px;
+}
+
+/* Ô “Sample” vẫn canh đẹp khi nằm cạnh Format */
+.sample-box{ min-width: 220px; }
+
+/* ===== Hard override cho checkbox + text cùng hàng ===== */
+:host ::ng-deep label.chk-inline {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  margin: 0 !important;
+  vertical-align: middle !important;
+}
+
+:host ::ng-deep label.chk-inline > input[type='checkbox'] {
+  display: inline-block !important;
+  width: 16px;
+  height: 16px;
+  margin: 0 6px 0 0 !important;
+  vertical-align: middle !important;
+}
+
+:host ::ng-deep label.chk-inline > span {
+  line-height: 1.1;
+}
+
+/* đảm bảo hàng chứa checkbox căn giữa theo trục dọc */
+.row-inline.align-center {
+  display: flex;
+  align-items: center;
+}
+
+/* Ép checkbox + text nằm cùng 1 dòng, giữa hàng, có khoảng cách đẹp */
+.inline-check {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  white-space: nowrap !important;
+  line-height: 1.25 !important;
+  margin: 8px 0 !important;
+
+  input[type='checkbox'] {
+    display: inline-block !important;
+    margin: 0 !important;
+    vertical-align: middle !important;
+    inline-size: auto !important;
+    block-size: auto !important;
+  }
+
+  label {
+    margin: 0 !important;
+    padding: 0 !important;
+    cursor: pointer;
+  }
+
+  &.right {
+    display: flex !important;
+    justify-content: flex-end !important;
+  }
+}
+
+/* Nếu project có rule “label, input { display:block }” — vô hiệu hóa
+   cho checkbox trong dialog để tránh xuống dòng */
+.dialog input[type='checkbox'] {
+  display: inline-block !important;
+}
+.name-row{
+  display: grid;
+  grid-template-columns: 1fr auto;
+  column-gap: 12px;
+  /* không canh giữa toàn bộ cột nữa */
+  align-items: stretch;
+}
+
+/* Bên trái (label + input) thành 2 hàng */
+.name-row .field{
+  display: grid;
+  grid-template-rows: auto auto; /* 1: label, 2: input */
+}
+
+/* Checkbox nằm ở dòng thứ 2 -> ngang hàng với input */
+.name-row .inline-check{
+  align-self: end;                 /* bám đáy (ngang với input) */
+  display: inline-flex;
+  align-items: center;             /* checkbox + text chung 1 dòng */
+  gap: 8px;
+  margin: 0;                       /* tránh bị đội lên/ xuống */
+}
+
+/* Tùy chọn: đồng bộ khoảng cách label */
+.name-row .field .lbl{
+  margin-bottom: 6px;
+}
+/* HÀNG NAME: ép layout riêng, bỏ ảnh hưởng của .row-inline/.align-center cũ */
+.row-inline.name-row{
+  /* reset những thuộc tính dễ gây lệch của grid/flex trước đó */
+  display: grid !important;
+  grid-template-columns: 1fr max-content;
+  column-gap: 12px;
+  align-items: end !important;  /* canh cạnh dưới 2 cột */
+}
+
+/* Cột trái (label + input) = 2 hàng: label (auto) + input (cao = input thực) */
+.row-inline.name-row .field{
+  display: grid;
+  grid-template-rows: auto var(--inp-h, 36px);
+}
+.row-inline.name-row .field .lbl{ margin-bottom: 6px; }
+
+/* Cột phải: checkbox + text nằm ngang, bám cạnh dưới (ngang hàng input) */
+.row-inline.name-row .inline-check{
+  align-self: end !important;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: var(--inp-h, 36px);    /* bằng chiều cao input */
+  line-height: var(--inp-h, 36px);
+  margin: 0 !important;          /* chặn margin cũ từng thêm để “nắn” vị trí */
+  padding: 0;                    /* tùy thích: bỏ khung nếu có */
+}
+
+/* Checkbox không bị đẩy xuống bởi line-height */
+.row-inline.name-row .inline-check input{
+  margin: 0 6px 0 0;
+  transform: translateY(-1px);   /* nhỏ để khớp hoàn hảo (tùy font, có thể bỏ) */
+}
+
+/* Nếu trước đó có rule nâng checkbox: hạ xuống */
+.inline-check.right{ margin-top: 0 !important; }
+/* Mặc định (áp cho mọi chỗ dùng .inline-check) */
+.inline-check{
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 14px;            /* <<< nới khung */            /* <<< rộng tối thiểu */
+  height: var(--inp-h, 36px);   /* cùng cao với input */
+  line-height: var(--inp-h, 36px);
+  border: 1px solid var(--line, #e5e7eb);
+  border-radius: 12px;
+  background: #fff;
+}
+
+/* Nếu rule của hàng Name dùng selector riêng, giữ độ ưu tiên cao */
+.row-inline.name-row .inline-check{
+  padding: 6px 16px;            /* có thể nới thêm tuỳ thích */           /* muốn rộng hơn nữa thì tăng số ở đây */
+}
+/* checkbox & label */
+.inline-check input{ margin: 0 8px 0 0; }
+.inline-check label{ cursor: pointer; white-space: nowrap; }
+
+

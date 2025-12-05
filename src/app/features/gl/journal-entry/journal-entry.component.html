@@ -1,0 +1,264 @@
+<div class="page-wrap">
+  <ng-container *ngIf="!voucherOpen">
+    <!-- PAGE HEADER : modern / compact like Contacts -->
+    <div class="je-header">
+      <div class="left">
+        <h1>General Ledger/Journal Entry</h1>
+      </div>
+
+      <div class="right">
+        <button class="btn primary" (click)="openNew()">+ New</button>
+      </div>
+    </div>
+    <!-- LIST PANEL -->
+    <div class="panel">
+      <button class="cols-fab" (click)="openCols()" aria-label="Select columns">
+        <!-- icon “bảng” (SVG) -->
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none">
+          <rect x="3" y="3" width="18" height="18" rx="2" stroke="currentColor" stroke-width="2" />
+          <path d="M3 9h18M3 15h18M9 3v18M15 3v18" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+        </svg>
+      </button>
+      <div class="gridwrap">
+        <table>
+          <thead>
+            <tr>
+              <ng-container *ngIf="col.type">
+                <th style="width: 80px">Type</th>
+              </ng-container>
+              <ng-container *ngIf="col.docNo">
+                <th style="width: 180px">No.</th>
+              </ng-container>
+              <ng-container *ngIf="col.docDate">
+                <th style="width: 140px">Date</th>
+              </ng-container>
+              <ng-container *ngIf="col.description">
+                <th>Description</th>
+              </ng-container>
+              <ng-container *ngIf="col.netTotal">
+                <th style="width: 140px" class="text-end">
+                  Net Total
+                </th>
+              </ng-container>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let r of filtered(); trackBy: trackById" (click)="pick(r)" [class.selected]="isPicked(r)">
+              <ng-container *ngIf="col.type">
+                <td>JV</td>
+              </ng-container>
+              <ng-container *ngIf="col.docNo">
+                <td>{{ r.docNo }}</td>
+              </ng-container>
+              <ng-container *ngIf="col.docDate">
+                <td>{{ r.docDate }}</td>
+              </ng-container>
+              <ng-container *ngIf="col.description">
+                <td>{{ r.description }}</td>
+              </ng-container>
+              <ng-container *ngIf="col.netTotal">
+                <td class="text-end">
+                  <b>{{ r.netTotal | number : "1.2-2" }}</b>
+                </td>
+              </ng-container>
+            </tr>
+            <tr *ngIf="filtered().length === 0">
+              <td [attr.colspan]="visibleColsCount()" class="empty">No data</td>
+            </tr>
+          </tbody>
+          <tfoot *ngIf="col.netTotal">
+            <tr>
+              <td [attr.colspan]="visibleColsCount() - 1" class="text-end">
+                <b>Total</b>
+              </td>
+              <td class="text-end">
+                <b>{{ totalNet() | number : "1.2-2" }}</b>
+              </td>
+            </tr>
+          </tfoot>
+        </table>
+      </div>
+    </div>
+  </ng-container>
+  <!-- ===== EDITOR FULL PAGE (thay cho modal) ===== -->
+  <ng-container *ngIf="voucherOpen">
+    <div class="page-header">
+      <button type="button" class="back-btn" (click)="backToList()">
+        <svg class="icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <path d="M15 19l-7-7 7-7" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+            stroke-linejoin="round" />
+        </svg>
+      </button>
+      <h1 class="title">
+        {{ editingId ? "Edit Journal Entry" : "New Journal Entry" }}
+      </h1>
+      <div class="grow"></div>
+      <button class="btn cancel" (click)="cancelEdit()">Cancel</button>
+      <button class="btn primary" [disabled]="!canSave()" (click)="saveVoucher()">
+        Save
+      </button>
+    </div>
+
+    <div class="panel">
+      <!-- Top form -->
+      <div class="grid6">
+        <label>Description
+          <input class="inp" [(ngModel)]="v.description" placeholder="e.g. DEPRECIATION 09/2025" />
+        </label>
+
+        <label>Journal Voucher No
+          <input class="inp monospace" [(ngModel)]="v.docNo" placeholder="&lt;&lt;New&gt;&gt;" />
+        </label>
+
+        <label>Date
+          <input class="inp" type="date" [(ngModel)]="v.docDate" />
+        </label>
+
+        <label>2nd Voucher No.
+          <input class="inp" [(ngModel)]="v.secondNo" />
+        </label>
+
+        <label>Journal Type
+          <select class="inp" [(ngModel)]="v.journalType">
+            <option *ngFor="let t of journalTypes" [value]="t.code">
+              {{ t.code }} — {{ t.name }}
+            </option>
+          </select>
+        </label>
+
+        <label class="chk" style="margin-top: 26px">
+          <input type="checkbox" [(ngModel)]="v.postDetailToGL" />
+          Post Detail Description to G/L
+        </label>
+      </div>
+      <br />
+      <!-- Lines table -->
+
+      <table class="table bordered">
+        <thead>
+          <tr>
+            <th style="width: 200px;">Acc. No.</th>
+            <th>Account Desc.</th>
+            <th>Description</th>
+            <th>Ref. 2</th>
+            <th class="text-end">DR</th>
+            <th class="text-end">CR</th>
+            <th class="text-center"></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let d of v.lines; let i = index">
+            <td>
+              <select class="inp" [(ngModel)]="d.accNo" (ngModelChange)="fillAccName(d)">
+                <option value="">-- Select --</option>
+                <option *ngFor="let a of accounts" [value]="a.code">
+                  {{ a.code }} — {{ a.name }}
+                </option>
+              </select>
+            </td>
+            <td>
+              <input class="inp" [(ngModel)]="d.accName" placeholder="Auto when Acc. No selected" />
+            </td>
+            <td>
+              <input class="inp" [(ngModel)]="d.desc" placeholder="Detail description (auto from Document Desc)" />
+            </td>
+            <td>
+              <input class="inp" [(ngModel)]="d.ref2" placeholder="Optional" />
+            </td>
+            <td class="text-end">
+              <input class="inp text-end monospace" type="number" step="0.01" [(ngModel)]="d.dr"
+                (input)="onAmountEdit(d, 'dr')" />
+            </td>
+            <td class="text-end">
+              <input class="inp text-end monospace" type="number" step="0.01" [(ngModel)]="d.cr"
+                (input)="onAmountEdit(d, 'cr')" />
+            </td>
+            <td class="text-center">
+              <button class="btn btn-danger" title="Delete" (click)="askRemoveLine(i)">
+                <span class="ico trash"></span>
+              </button>
+            </td>
+          </tr>
+          <tr *ngIf="v.lines.length === 0">
+            <td colspan="7" class="text-center text-muted">
+              No lines. Add at least one.
+            </td>
+          </tr>
+        </tbody>
+        <tfoot>
+          <tr>
+            <td colspan="4" class="text-end"><b>Total DR</b></td>
+            <td class="text-end">
+              <b>{{ totalDR() | number : "1.2-2" }}</b>
+            </td>
+            <td class="text-end">
+              <b>{{ totalCR() | number : "1.2-2" }}</b>
+            </td>
+            <td></td>
+          </tr>
+          <tr>
+            <td colspan="4" class="text-end"><b>Difference (Dr - Cr)</b></td>
+            <td class="text-end" colspan="2">
+              <b>{{ diff() | number : "1.2-2" }}</b>
+              <span class="pill" [class.ok]="balanced()" [class.bad]="!balanced()">
+                {{ balanced() ? "Balanced" : "Not Balanced" }}
+              </span>
+            </td>
+            <td></td>
+          </tr>
+        </tfoot>
+      </table>
+
+      <div class="panel-actions">
+        <button class="btn primary" (click)="addLine()">+ Add Line</button>
+        <div class="grow"></div>
+        <div class="err" *ngIf="errors.mismatch">{{ errors.mismatch }}</div>
+        <div class="err" *ngIf="errors.anyBothSides">
+          {{ errors.anyBothSides }}
+        </div>
+        <div class="err" *ngIf="errors.noAmount">{{ errors.noAmount }}</div>
+      </div>
+    </div>
+  </ng-container>
+  <div class="drawer-backdrop" *ngIf="columnsDrawerOpen" (click)="closeCols()"></div>
+  <div class="drawer" *ngIf="columnsDrawerOpen">
+    <div class="drawer-head">
+      <div class="title">Select Columns</div>
+      <button class="btn small" (click)="closeCols()">Close</button>
+    </div>
+
+    <div class="drawer-body">
+      <label class="chk-row">
+        <input type="checkbox" [(ngModel)]="viewAll" />
+        <span>View All Columns</span>
+      </label>
+
+      <div class="sep"></div>
+
+      <label class="chk-row" *ngFor="let c of columns">
+        <input type="checkbox" [(ngModel)]="c.checked" />
+        <span>{{ c.name }}</span>
+      </label>
+    </div>
+  </div>
+  <!-- Confirm delete line -->
+  <div class="dialog" *ngIf="confirmLineOpen" style="z-index: 2100">
+    <div class="dialog-panel-small">
+      <div class="dialog-title">
+        Confirm delete
+        <button class="x" (click)="confirmLineOpen = false" aria-label="Close">
+          ✕
+        </button>
+      </div>
+    <div class="dialog-body">
+      <p>
+      Remove this journal line ?
+      </p>
+    </div>
+      <div class="dialog-actions">
+        <button class="btn" (click)="confirmLineOpen = false">Cancel</button>
+        <button class="btn danger" (click)="doRemoveLine()">Delete</button>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,736 @@
+<div class="page">
+  <!-- Title + Toolbar -->
+  <div class="titlebar">
+    <h1>Debtor Maintenance</h1>
+    <div class="toolbar" role="toolbar" aria-label="Debtor actions">
+      <input
+        class="search1"
+        type="text"
+        placeholder="Search code / company Name ..."
+        [(ngModel)]="q"
+      />
+      <button class="btn primary" (click)="newDebtor()">
+        <span class="ico plus"></span> New
+      </button>
+      <button class="btn" [disabled]="!selected" (click)="editDebtor()">
+        <span class="ico edit"></span> Edit
+      </button>
+      <button
+        class="btn danger"
+        [disabled]="!selected"
+        (click)="onDeleteDebtor()"
+      >
+        <span class="ico trash"></span> Delete
+      </button>
+    </div>
+  </div>
+
+  <!-- Grid -->
+  <div class="gridwrap">
+    <table>
+      <thead>
+        <tr>
+          <th (click)="setSort('debtorAccount')">Code</th>
+          <th>Customer Name</th>
+          <th>Company/SSM ID</th>
+          <th>Phone</th>
+          <th>Customer's TIN</th>
+          <th>Active</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr
+          *ngFor="let r of filteredRows(); let i = index"
+          (click)="select(r)"
+          [class.selected]="selected === r"
+        >
+          <td>{{ r.debtorAccount }}</td>
+          <td>{{ r.companyName }}</td>
+          <td>{{ r.type }}</td>
+          <td>
+            {{ r.phone }}
+          </td>
+          <td>
+            {{ r.customerTin }}
+          </td>
+          <td>
+            <input type="checkbox" [checked]="r.active" disabled />
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Pager -->
+  <div class="pager">
+    <div class="nav">
+      <button class="pg" (click)="first()">&laquo;</button>
+      <button class="pg" (click)="prev()">&lsaquo;</button>
+      <span class="pginfo">Page {{ page }} / {{ totalPages }}</span>
+      <button class="pg" (click)="next()">&rsaquo;</button>
+      <button class="pg" (click)="last()">&raquo;</button>
+    </div>
+  </div>
+
+  <!-- PRINT LISTING -->
+  <div class="dialog" *ngIf="showPrint">
+    <div class="dialog-panel">
+      <div class="dialog-title">
+        Debtor Listing
+        <button class="x" (click)="showPrint = false">✕</button>
+      </div>
+      <div class="dialog-body">
+        <form [formGroup]="printForm" class="grid4">
+          <label
+            >Status
+            <select formControlName="active">
+              <option value="all">All</option>
+              <option value="active">Active</option>
+              <option value="inactive">Inactive</option>
+            </select>
+          </label>
+          <label
+            >Area
+            <select formControlName="area">
+              <option value="">Any</option>
+              <option>CENTRAL</option>
+              <option>SOUTH</option>
+              <option>NORTH</option>
+              <option>EAST</option>
+              <option>WEST</option>
+            </select>
+          </label>
+          <label>Agent<input formControlName="agent" /></label>
+          <label
+            >Currency
+            <select formControlName="currency">
+              <option value="">Any</option>
+              <option>MYR</option>
+              <option>USD</option>
+              <option>SGD</option>
+            </select>
+          </label>
+          <label
+            >Sort by
+            <select formControlName="sort">
+              <option value="code">Code</option>
+              <option value="name">Name</option>
+              <option value="area">Area</option>
+              <option value="agent">Agent</option>
+            </select>
+          </label>
+        </form>
+
+        <div class="dialog-actions">
+          <button class="btn primary" (click)="showPrintPreview = true">
+            Preview
+          </button>
+          <button
+            class="btn ghost"
+            (click)="printNow()"
+            *ngIf="showPrintPreview"
+          >
+            Print
+          </button>
+        </div>
+
+        <div class="preview" *ngIf="showPrintPreview">
+          <h3>Debtor Listing (Preview)</h3>
+          <table>
+            <thead>
+              <tr>
+                <th>Code</th>
+                <th>Name</th>
+                <th>Agent</th>
+                <th>Currency</th>
+                <th>Active</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let d of buildListing()">
+                <td>{{ d.debtorAccount }}</td>
+                <td>{{ d.companyName }}</td>
+                <td>{{ d.currency }}</td>
+                <td>{{ d.active ? "Y" : "N" }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- DETAIL REPORT -->
+  <div class="dialog" *ngIf="showDetail">
+    <div class="dialog-panel">
+      <div class="dialog-title">
+        Debtor Detail Report — {{ selected?.debtorAccount }}
+        <button class="x" (click)="showDetail = false">✕</button>
+      </div>
+      <div class="dialog-body report">
+        <h2>{{ selected?.companyName }}</h2>
+        <div class="kv">
+          <div><b>Type:</b> {{ selected?.type }}</div>
+          <div><b>Phone:</b> {{ selected?.phone }}</div>
+          <div><b>Currency:</b> {{ selected?.currency }}</div>
+          <div><b>Credit Term:</b> {{ selected?.creditTerm }}</div>
+          <div>
+            <b>Credit Limit:</b> {{ selected?.creditLimit | number : "1.0-0" }}
+          </div>
+          <div><b>Active:</b> {{ selected?.active ? "Yes" : "No" }}</div>
+        </div>
+      </div>
+      <div class="dialog-actions">
+        <button class="btn ghost" (click)="printNow()">Print</button>
+        <button class="btn primary" (click)="showDetail = false">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- =============== CREATE / EDIT / VIEW DEBTOR ============== -->
+  <div class="dialog" *ngIf="showForm">
+    <div class="dialog-panel" style="width: min(1100px, 96vw)">
+      <div class="dialog-title">
+        {{
+          formMode === "new"
+            ? "Create Debtor"
+            : formMode === "edit"
+            ? "Edit Debtor"
+            : "View Debtor"
+        }}
+        <button class="x" (click)="showForm = false">✕</button>
+      </div>
+
+      <form [formGroup]="debtorForm" class="dialog-body">
+        <div class="gbox">
+          <div class="gbox-title">Profile</div>
+
+          <!-- Các mục Control Account / Debtor Type / Debtor Account / Group Company / Active đã ẩn khỏi UI -->
+
+          <div class="gbox-body grid3">
+            <!-- Customer Name (required) -->
+            <label>
+              <span class="lbl">Debtor Code <span class="req">*</span></span>
+              <input
+                formControlName="code"
+                required
+                placeholder="300-xxx"
+                list="debtorCodeOptions"
+                (focus)="onCodeFocus()"
+                [readonly]="formMode === 'view'"
+              />
+              <datalist id="debtorCodeOptions">
+                <option *ngFor="let c of debtorCodeList" [value]="c"></option>
+              </datalist>
+            </label>
+            <label>
+              <span class="lbl">Customer Name <span class="req">*</span></span>
+              <input
+                formControlName="name"
+                required
+                [readonly]="formMode === 'view'"
+              />
+            </label>
+
+            <!-- Company / SSM ID (required) -->
+            <label>
+              <span class="lbl">Company/SSM ID</span>
+              <input
+                formControlName="registrationNo"
+                [readonly]="formMode === 'view'"
+              />
+            </label>
+
+            <!-- Individual ID / Passport No (required) -->
+            <label>
+              <span class="lbl"
+                >Individual ID / Passport No <span class="req">*</span></span
+              >
+              <input
+                formControlName="individualId"
+                required
+                [readonly]="formMode === 'view'"
+              />
+            </label>
+
+            <!-- Customer's TIN (required) + search -->
+            <label>
+              <span class="lbl">
+                Customer's TIN <span class="req">*</span>
+                <button
+                  type="button"
+                  class="chip chip-link"
+                  (click)="openTinLookup()"
+                  title="Search TIN"
+                >
+                  Search TIN
+                </button>
+              </span>
+              <input
+                formControlName="tinNo"
+                required
+                [readonly]="formMode === 'view'"
+              />
+            </label>
+
+            <!-- Customer's SST Registration No. -->
+            <label>
+              <span class="lbl">Customer's SST Registration No.</span>
+              <input
+                formControlName="sstRegNo"
+                [readonly]="formMode === 'view'"
+              />
+            </label>
+
+            <!-- Currency giữ nguyên -->
+            <label>
+              <span class="lbl">Currency</span>
+              <select
+                formControlName="currency"
+                [disabled]="formMode === 'view'"
+              >
+                <option *ngFor="let c of currencies" [ngValue]="c.code">
+                  {{ c.code }}
+                </option>
+              </select>
+            </label>
+          </div>
+        </div>
+
+        <!-- GENERAL + OTHERS (merged; no tabs) -->
+        <div class="gbox">
+          <div class="gbox-title">Address & Contact</div>
+          <div class="gbox-body grid3">
+            <label class="wide">
+              <span class="lbl"
+                >Billing Address <span class="req">*</span></span
+              >
+              <textarea
+                rows="1"
+                formControlName="billAddress"
+                required
+                [readonly]="formMode === 'view'"
+              ></textarea>
+            </label>
+
+            <label>
+              <span class="lbl">Phone <span class="req">*</span></span>
+              <input
+                formControlName="phone"
+                required
+                [readonly]="formMode === 'view'"
+              />
+            </label>
+
+            <label>
+              <span class="lbl">Fax <span class="req">*</span></span>
+              <input
+                formControlName="fax"
+                required
+                [readonly]="formMode === 'view'"
+              />
+            </label>
+
+            <label>
+              <span class="lbl">Post Code <span class="req">*</span></span>
+              <input
+                formControlName="postCode"
+                required
+                [readonly]="formMode === 'view'"
+              />
+            </label>
+
+            <div class="addr-sep" aria-hidden="true"></div>
+
+            <label class="wide">
+              <span class="lbl">
+                Delivery Address
+                <button
+                  type="button"
+                  class="chip"
+                  (click)="copyBillingToDelivery()"
+                  title="Copy from Billing Address"
+                >
+                  Copy
+                </button>
+              </span>
+              <textarea
+                rows="1"
+                formControlName="deliveryAddress"
+                [readonly]="formMode === 'view'"
+              ></textarea>
+            </label>
+
+            <label>
+              <span class="lbl">Post Code</span>
+              <input
+                formControlName="deliveryPostCode"
+                [readonly]="formMode === 'view'"
+              />
+            </label>
+
+            <label>
+              <span class="lbl">Email Address</span>
+              <input formControlName="email" [readonly]="formMode === 'view'" />
+            </label>
+
+            <label>
+              <span class="lbl">Website</span>
+              <input
+                formControlName="website"
+                [readonly]="formMode === 'view'"
+              />
+            </label>
+          </div>
+        </div>
+        <!-- Credit & Others (merged) -->
+        <!-- Credit & Others -->
+        <div class="gbox">
+          <div class="gbox-title">Credit & Others</div>
+
+          <div class="gbox-body grid3 three-cols">
+            <!-- Hàng Credit Term + nút Credit Control -->
+            <div class="col">
+              <label>Credit Term</label>
+              <div class="input-with-btn">
+                <select formControlName="creditTerm">
+                  <option *ngFor="let ct of creditTerms" [ngValue]="ct.code">
+                    {{ ct.name }}
+                  </option>
+                </select>
+
+                <!-- nút gọn ngay cạnh select -->
+                <button
+                  type="button"
+                  class="btn primary"
+                  (click)="openCreditControl()"
+                  title="Open Credit Control"
+                >
+                  Credit Control
+                </button>
+              </div>
+            </div>
+
+            <!-- Actual Term: chỉ khi Edit -->
+            <label *ngIf="formMode === 'edit'">
+              Actual Term
+              <input
+                type="number"
+                min="0"
+                step="1"
+                formControlName="actualTerm"
+              />
+            </label>
+
+            <!-- Sales Tax Exemption No. -->
+            <label>
+              Sales Tax Exemption No.
+              <input
+                formControlName="taxExemptionNo"
+                [readonly]="formMode === 'view'"
+              />
+            </label>
+
+            <!-- Expired Date -->
+            <label>
+              Expired Date
+              <input
+                type="date"
+                formControlName="taxExemptionExpiry"
+                [disabled]="formMode === 'view'"
+              />
+            </label>
+          </div>
+        </div>
+
+        <div class="dialog-actions">
+          <button type="button" class="btn cancel" (click)="showForm = false">
+            Cancel
+          </button>
+          <button
+            *ngIf="formMode !== 'view'"
+            type="button"
+            class="btn primary"
+            (click)="saveDebtor()"
+          >
+            Save
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- =================== CREDIT CONTROL POPUP =================== -->
+  <div class="dialog" *ngIf="showCredit">
+    <div
+      class="dialog-panel-small"
+      role="dialog"
+      aria-modal="true"
+      style="width: min(720px, 96vw)"
+    >
+      <div class="dialog-title">
+        Debtor Credit Control
+        <button class="x" (click)="showCredit = false" aria-label="Close">
+          ×
+        </button>
+      </div>
+
+      <div class="dialog-body">
+        <form [formGroup]="creditForm" class="cc-grid">
+          <label class="cell">
+            Credit Limit
+            <input
+              type="text"
+              appAmount
+              [decimals]="2"
+              formControlName="creditLimit"
+            />
+          </label>
+
+          <label class="cell">
+            Credit Term's Overdue Limit
+            <input
+              type="text"
+              appAmount
+              [decimals]="2"
+              formControlName="overdueLimit"
+            />
+          </label>
+
+          <label class="cell">
+            Credit Control
+            <select formControlName="scope">
+              <option value="ALL">All Documents</option>
+              <option value="BYDOC">By Document</option>
+            </select>
+          </label>
+        </form>
+
+        <div class="cc-modes" [formGroup]="creditForm">
+          <label class="radio-inline">
+            <input type="radio" formControlName="mode" value="DISABLED" />
+            <span>All Disabled</span>
+          </label>
+
+          <div
+            class="mode-row"
+            [class.dimmed]="creditForm.value.mode !== 'BY_TERM'"
+          >
+            <label class="radio-inline">
+              <input type="radio" formControlName="mode" value="BY_TERM" />
+              <span>Controlled by credit term</span>
+            </label>
+
+            <div class="mode-body grid2">
+              <label>
+                If exceed credit limit
+                <select formControlName="exceedCreditAction">
+                  <option value="ALLOW">No Block</option>
+                  <option value="BLOCK">Block</option>
+                  <option value="NEEDPWD">Need Password</option>
+                </select>
+              </label>
+              <label>
+                If exceed overdue limit
+                <select formControlName="exceedOverdueAction">
+                  <option value="ALLOW">No Block</option>
+                  <option value="BLOCK">Block</option>
+                  <option value="NEEDPWD">Need Password</option>
+                </select>
+              </label>
+            </div>
+          </div>
+
+          <div
+            class="mode-row"
+            [class.dimmed]="creditForm.value.mode !== 'SUSPEND'"
+          >
+            <label class="radio-inline">
+              <input type="radio" formControlName="mode" value="SUSPEND" />
+              <span>Suspend</span>
+            </label>
+
+            <div class="mode-body">
+              <label
+                >Suspend Reason
+                <input formControlName="suspendReason" />
+              </label>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="dialog-actions">
+        <button class="btn cancel" (click)="showCredit = false">Cancel</button>
+        <button class="btn primary" (click)="saveCreditControl()">OK</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Confirm delete contact -->
+<div class="dialog" *ngIf="showContactDeleteConfirm">
+  <div class="dialog-panel-small" role="dialog" aria-modal="true">
+    <div class="dialog-title">
+      Delete Contact
+      <button
+        class="x"
+        (click)="closeContactDeleteConfirm()"
+        aria-label="Close"
+      >
+        ×
+      </button>
+    </div>
+
+    <div class="dialog-body">
+      <p>
+        Are you sure you want to delete
+        <b>{{ selectedContact?.name || "this contact" }}</b
+        >?
+      </p>
+    </div>
+
+    <div class="dialog-actions">
+      <button class="btn cancel" (click)="closeContactDeleteConfirm()">
+        Cancel
+      </button>
+      <button class="btn danger" (click)="confirmDeleteContact()">
+        Delete
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Success popup -->
+<div class="dialog" *ngIf="showSuccess">
+  <div
+    class="dialog-panel-small"
+    role="dialog"
+    aria-modal="true"
+    style="min-width: 360px"
+  >
+    <div
+      class="dialog-title"
+      style="background: linear-gradient(180deg, #9be28a 0%, #62c84f 100%)"
+    >
+      Success
+      <button class="x" (click)="closeSuccess()" aria-label="Close">×</button>
+    </div>
+    <div class="dialog-body">
+      <p style="margin: 8px 0; font-weight: 600; color: #14532d">
+        {{ successMsg }}
+      </p>
+    </div>
+    <div class="dialog-actions">
+      <button class="btn primary" (click)="closeSuccess()">OK</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== BRANCH EDITOR POPUP ===================== -->
+<div class="dialog" *ngIf="showBranchEditor">
+  <div class="dialog-panel-small" style="width: min(720px, 96vw)">
+    <div class="dialog-title">
+      {{ branchEditIndex === -1 ? "Add Branch" : "Edit Branch" }}
+      <button class="x" (click)="closeBranchEditor()">×</button>
+    </div>
+
+    <form class="dialog-body" [formGroup]="branchForm">
+      <div class="grid2">
+        <label>Branch Code<input formControlName="code" /></label>
+        <label>Branch Name<input formControlName="name" /></label>
+      </div>
+
+      <label class="wide"
+        >Address
+        <textarea rows="3" formControlName="address"></textarea>
+      </label>
+
+      <div class="grid3">
+        <label>Post Code<input formControlName="postCode" /></label>
+        <label>Attention<input formControlName="attention" /></label>
+        <label>Email Address<input formControlName="email" /></label>
+
+        <label>Phone 1<input formControlName="phone1" /></label>
+        <label>Phone 2<input formControlName="phone2" /></label>
+        <label>Fax 1<input formControlName="fax1" /></label>
+        <label>Fax 2<input formControlName="fax2" /></label>
+        <label
+          >Area
+          <select formControlName="area">
+            <option *ngFor="let a of areas" [ngValue]="a.code">
+              {{ a.name }}
+            </option>
+          </select>
+        </label>
+      </div>
+    </form>
+
+    <div class="dialog-actions">
+      <button class="btn cancel" (click)="closeBranchEditor()">Cancel</button>
+      <button
+        class="btn primary"
+        (click)="saveBranchEditor()"
+        [disabled]="!branchForm.valid"
+      >
+        OK
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== CONFIRM DELETE BRANCH ===================== -->
+<div class="dialog" *ngIf="showBranchDeleteConfirm">
+  <div class="dialog-panel-small" role="dialog" aria-modal="true">
+    <div class="dialog-title">
+      Delete Branch
+      <button class="x" (click)="closeBranchDeleteConfirm()" aria-label="Close">
+        ×
+      </button>
+    </div>
+
+    <div class="dialog-body">
+      <p>
+        Are you sure you want to delete
+        <b>{{ selectedBranch?.code || "this branch" }}</b
+        >?
+      </p>
+    </div>
+
+    <div class="dialog-actions">
+      <button class="btn cancel" (click)="closeBranchDeleteConfirm()">
+        Cancel
+      </button>
+      <button class="btn danger" (click)="confirmDeleteBranch()">Delete</button>
+    </div>
+  </div>
+</div>
+
+<div class="dialog" *ngIf="showDeleteDebtorConfirm">
+  <div class="dialog-panel-small" role="dialog" aria-modal="true">
+    <div class="dialog-title">
+      Delete Debtor &nbsp;<button
+        class="x"
+        (click)="closeDeleteDebtorConfirm()"
+        aria-label="Close"
+      >
+        ×
+      </button>
+    </div>
+
+    <div class="dialog-body">
+      <p>
+        Are you sure you want to delete
+        <b>{{ selected?.debtorAccount }}</b>
+        ?
+      </p>
+    </div>
+
+    <div class="dialog-actions">
+      <button class="btn cancel" (click)="closeDeleteDebtorConfirm()">
+        Cancel
+      </button>
+      <button class="btn danger" (click)="deleteDebtor()">Delete</button>
+    </div>
+  </div>
+</div>

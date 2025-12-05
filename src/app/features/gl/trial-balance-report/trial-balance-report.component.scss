@@ -1,0 +1,68 @@
+/* ===== Page base ===== */
+.page { padding: 16px; }
+
+/* Header */
+.header {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 12px;
+  align-items: center;
+  margin-bottom: 12px;
+  background: linear-gradient(180deg, #d8efcf, #cdeac4);
+  border: 1px solid #c8e2b9;
+  border-radius: 8px;
+  padding: 10px 12px;
+
+  .title { font-weight: 700; font-size: 18px; color: #183d25; }
+  .tools { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+}
+
+.cap { font-weight: 600; color:#1d3b29; }
+.search, .inp {
+  padding: 8px 10px; border: 1px solid #d9e4d6; border-radius: 8px; outline: none; background: #fff;
+}
+.search { min-width: 280px; }
+.chk { display:flex; align-items:center; gap:6px; }
+.sp { width:8px; }
+
+/* Buttons */
+.btn {
+  border: 1px solid #cfd9cc; background: #f7faf6; padding: 6px 12px; border-radius: 10px; cursor: pointer; transition: .15s ease; font-weight: 600;
+  &:hover { background: #eef6ea; }
+  &:disabled { opacity:.5; cursor:not-allowed; }
+  &.primary { background:#2bb24a; border-color:#2bb24a; color:#fff; }
+  &.ghost { background:transparent; }
+}
+
+/* Card */
+.card {
+  background:#fff; border:1px solid #e8eee6; border-radius:10px; overflow:hidden; box-shadow:0 1px 4px rgba(0,0,0,.04);
+}
+
+/* Grid/table */
+.grid {
+  width:100%; border-collapse: collapse;
+
+  thead th {
+    text-align:left; font-weight:700; font-size:13px; color:#1d3b28;
+    background:#f5faf3; border-bottom:1px solid #e6efe1; padding:10px 12px;
+  }
+  thead th.text-center { text-align: center; }
+
+  tbody td, tfoot td {
+    padding:10px 12px; border-bottom:1px solid #f1f4f0; vertical-align:middle;
+  }
+
+  tfoot tr td {
+    background:#fbfefb; border-top:1px solid #e6efe1; font-weight:600;
+  }
+}
+
+.text-end { text-align: end; }
+.text-center { text-align: center; }
+.monospace { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace; }
+.cut { max-width: 420px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+
+/* Footer */
+.footer { padding:10px 12px; font-size:12px; color:#49614f; background:#f9fcf8; display:flex; gap:8px; align-items:center; }
+.sep { opacity:.5; }

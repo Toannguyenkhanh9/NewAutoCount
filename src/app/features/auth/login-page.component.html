@@ -4,7 +4,7 @@
       <div class="login-logo">AC</div>
       <div class="login-title-group">
         <h1>Sign in</h1>
-        <p>AutoCount Accounting Web</p>
+        <p>AutoCount Accounting</p>
       </div>
     </div>
 
@@ -12,78 +12,69 @@
       <mat-form-field appearance="outline">
         <mat-label>Username</mat-label>
         <input matInput formControlName="username" autocomplete="username" />
-        <mat-error
-          *ngIf="
+        <mat-error *ngIf="
             form.controls['username'].hasError('required') &&
             form.controls['username'].touched
-          "
-        >
+          ">
           Username is required
+        </mat-error>
+        <mat-error *ngIf="
+      form.controls['username'].hasError('invalid') &&
+      !form.controls['username'].hasError('required')
+    ">
+          Invalid username or password
         </mat-error>
       </mat-form-field>
 
       <mat-form-field appearance="outline">
         <mat-label>Password</mat-label>
-        <input
-          matInput
-          [type]="hidePassword ? 'password' : 'text'"
-          formControlName="password"
-          autocomplete="current-password"
-        />
-        <button
-          mat-icon-button
-          matSuffix
-          type="button"
-          (click)="hidePassword = !hidePassword"
-        >
+        <input matInput [type]="hidePassword ? 'password' : 'text'" formControlName="password"
+          autocomplete="current-password" />
+        <button mat-icon-button matSuffix type="button" (click)="hidePassword = !hidePassword">
           <mat-icon>{{
             hidePassword ? 'visibility_off' : 'visibility'
-          }}</mat-icon>
+            }}</mat-icon>
         </button>
-        <mat-error
-          *ngIf="
+        <mat-error *ngIf="
             form.controls['password'].hasError('required') &&
             form.controls['password'].touched
-          "
-        >
+          ">
           Password is required
+        </mat-error>
+        <mat-error *ngIf="
+      form.controls['password'].hasError('invalid') &&
+      !form.controls['password'].hasError('required')
+    ">
+          Invalid username or password
         </mat-error>
       </mat-form-field>
 
-<mat-form-field appearance="outline">
-  <mat-label>Company</mat-label>
-  <mat-select formControlName="company">
-    <mat-option *ngIf="companiesLoading" disabled>Loading...</mat-option>
+      <mat-form-field appearance="outline">
+        <mat-label>Company</mat-label>
+        <mat-select formControlName="company">
+          <mat-option *ngIf="companiesLoading" disabled>Loading...</mat-option>
 
-    <mat-option
-      *ngFor="let c of companies"
-      [value]="c.Id"
-    >
-      {{ c.Company }}
-    </mat-option>
-  </mat-select>
+          <mat-option *ngFor="let c of companies" [value]="c.Id">
+            {{ c.Company }}
+          </mat-option>
+        </mat-select>
 
-  <mat-error
-    *ngIf="
+        <mat-error *ngIf="
       form.controls['company'].hasError('required') &&
       form.controls['company'].touched
-    "
-  >
-    Company is required
-  </mat-error>
-</mat-form-field>
+    ">
+          Company is required
+        </mat-error>
+      </mat-form-field>
 
-<div class="error-message" *ngIf="companiesError">
-  {{ companiesError }}
-</div>
+      <div class="error-message" *ngIf="companiesError">
+        {{ companiesError }}
+      </div>
+      <div class="error-message" *ngIf="errorMessage">
+        {{ errorMessage }}
+      </div>
 
-
-      <button
-        mat-raised-button
-        color="primary"
-        class="login-button"
-        type="submit"
-      >
+      <button mat-raised-button color="primary" class="login-button" type="submit">
         Login
       </button>
 

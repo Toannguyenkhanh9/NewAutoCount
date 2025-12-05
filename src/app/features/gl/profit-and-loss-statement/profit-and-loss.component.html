@@ -1,0 +1,115 @@
+<div class="page">
+  <!-- Header / Toolbar -->
+  <div class="titlebar">
+    <h1>Profit and Loss Statement</h1>
+
+    <div class="toolbar">
+      <label class="cap">From</label>
+      <input class="inp" type="date" [(ngModel)]="dateFrom" />
+
+      <label class="cap">To</label>
+      <input class="inp" type="date" [(ngModel)]="dateTo" />
+
+      <!-- <input class="search" [(ngModel)]="q" placeholder="Search account code / name..." /> -->
+
+      <label class="chk">
+        <input type="checkbox" [(ngModel)]="includeZero" />
+        <span>Show zero-balance lines</span>
+      </label>
+
+      <button class="btn ghost" (click)="setThisMonth()">This Month</button>
+      <button class="btn ghost" (click)="setThisYear()">This Year</button>
+
+      <span class="sp"></span>
+      <button class="btn" (click)="onExport()">Export</button>
+      <button class="btn" (click)="onRefresh()">Refresh</button>
+      <button class="btn" (click)="onPrint()">Print</button>
+    </div>
+  </div>
+
+  <!-- KPI Strip -->
+  <div class="kpi-strip">
+    <div class="kpi">
+      <div class="cap">Gross Profit (Period)</div>
+      <div class="val" [class.neg]="grossPeriod()<0">{{ grossPeriod() | number:'1.2-2' }}</div>
+    </div>
+    <div class="kpi">
+      <div class="cap">Gross Profit (YTD)</div>
+      <div class="val" [class.neg]="grossYtd()<0">{{ grossYtd() | number:'1.2-2' }}</div>
+    </div>
+    <div class="kpi">
+      <div class="cap">Net Profit (Period)</div>
+      <div class="val" [class.neg]="netPeriod()<0">{{ netPeriod() | number:'1.2-2' }}</div>
+    </div>
+    <div class="kpi">
+      <div class="cap">Net Profit (YTD)</div>
+      <div class="val" [class.neg]="netYtd()<0">{{ netYtd() | number:'1.2-2' }}</div>
+    </div>
+  </div>
+
+  <!-- Content -->
+  <div class="card">
+    <div class="section" *ngFor="let cat of categories">
+      <!-- Section header -->
+      <div class="section-header">
+        <button class="toggle" (click)="toggle(cat)">{{ isCollapsed(cat) ? '+' : '−' }}</button>
+        <div class="name">{{ labels[cat] }}</div>
+        <div class="totals">
+          <div class="cap">Period</div>
+          <div class="val">{{ group(cat).totalPeriod | number:'1.2-2' }}</div>
+          <div class="cap">YTD</div>
+          <div class="val">{{ group(cat).totalYtd    | number:'1.2-2' }}</div>
+        </div>
+      </div>
+
+      <!-- Lines -->
+      <div class="lines" *ngIf="!isCollapsed(cat)">
+        <table class="grid">
+          <thead>
+            <tr>
+              <th style="width:160px">Account</th>
+              <th>Name</th>
+              <th class="text-end" style="width:160px">Period</th>
+              <th class="text-end" style="width:160px">YTD</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let l of group(cat).lines; trackBy: trackLine">
+              <td class="monospace">{{ l.acc }}</td>
+              <td class="cut">{{ l.name }}</td>
+              <td class="text-end">{{ l.period | number:'1.2-2' }}</td>
+              <td class="text-end">{{ l.ytd    | number:'1.2-2' }}</td>
+            </tr>
+          </tbody>
+          <tfoot>
+            <tr>
+              <td colspan="2" class="text-end"><b>Subtotal</b></td>
+              <td class="text-end"><b>{{ group(cat).totalPeriod | number:'1.2-2' }}</b></td>
+              <td class="text-end"><b>{{ group(cat).totalYtd    | number:'1.2-2' }}</b></td>
+            </tr>
+          </tfoot>
+        </table>
+      </div>
+    </div>
+
+    <!-- Gross Profit -->
+    <div class="summary">
+      <div class="label">Gross Profit</div>
+      <div class="val" [class.neg]="grossPeriod()<0">{{ grossPeriod() | number:'1.2-2' }}</div>
+      <div class="val" [class.neg]="grossYtd()<0">{{ grossYtd() | number:'1.2-2' }}</div>
+    </div>
+
+    <!-- Net Profit -->
+    <div class="summary strong">
+      <div class="label">Net Profit</div>
+      <div class="val" [class.neg]="netPeriod()<0">{{ netPeriod() | number:'1.2-2' }}</div>
+      <div class="val" [class.neg]="netYtd()<0">{{ netYtd() | number:'1.2-2' }}</div>
+    </div>
+
+    <div class="footer">
+      Period: {{ dateFrom }} → {{ dateTo }}
+      <span class="sep">•</span>
+      YTD from: {{ (dateTo ? (dateTo.slice(0,4) + '-01-01') : '') }}
+    </div>
+  </div>
+</div>

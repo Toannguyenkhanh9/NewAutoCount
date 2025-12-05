@@ -1,0 +1,102 @@
+<div class="page">
+  <!-- Header / Toolbar -->
+  <div class="titlebar">
+    <h1>Trial Balance Report</h1>
+
+    <div class="toolbar">
+      <label class="cap">From</label>
+      <input class="inp" type="date" [(ngModel)]="dateFrom" />
+
+      <label class="cap">To</label>
+      <input class="inp" type="date" [(ngModel)]="dateTo" />
+
+      <label class="cap">Account From</label>
+      <select class="inp" [(ngModel)]="accFrom">
+        <option *ngFor="let a of accounts" [value]="a.code">{{ a.code }} — {{ a.name }}</option>
+      </select>
+
+      <label class="cap">To</label>
+      <select class="inp" [(ngModel)]="accTo">
+        <option value="9999-999">9999-999 — (Max)</option>
+        <option *ngFor="let a of accounts" [value]="a.code">{{ a.code }} — {{ a.name }}</option>
+      </select>
+
+      <!-- <input class="search" [(ngModel)]="q" placeholder="Search account code / name..." /> -->
+
+      <label class="chk">
+        <input type="checkbox" [(ngModel)]="includeZero" />
+        <span>Show zero-balance accounts</span>
+      </label>
+
+      <button class="btn ghost" (click)="setThisMonth()">This Month</button>
+      <span class="sp"></span>
+      <button class="btn" (click)="onExport()">Export</button>
+      <button class="btn" (click)="onRefresh()">Refresh</button>
+      <button class="btn" (click)="onPrint()">Print</button>
+    </div>
+  </div>
+
+  <!-- Content -->
+  <div class="gridwrap">
+    <table>
+      <thead>
+        <tr>
+          <th rowspan="2" style="width:160px">Account Code</th>
+          <th rowspan="2">Account Name</th>
+          <th colspan="2" class="text-center">Opening</th>
+          <th colspan="2" class="text-center">Period</th>
+          <th colspan="2" class="text-center">Closing</th>
+        </tr>
+        <tr>
+          <th class="text-end" style="width:140px">Dr</th>
+          <th class="text-end" style="width:140px">Cr</th>
+          <th class="text-end" style="width:140px">Dr</th>
+          <th class="text-end" style="width:140px">Cr</th>
+          <th class="text-end" style="width:140px">Dr</th>
+          <th class="text-end" style="width:140px">Cr</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        <tr *ngFor="let r of trial(); trackBy: trackAcc">
+          <td class="monospace">{{ r.acc.code }}</td>
+          <td class="cut">{{ r.acc.name }}</td>
+
+          <td class="text-end">{{ r.openingDr | number:'1.2-2' }}</td>
+          <td class="text-end">{{ r.openingCr | number:'1.2-2' }}</td>
+
+          <td class="text-end">{{ r.periodDr  | number:'1.2-2' }}</td>
+          <td class="text-end">{{ r.periodCr  | number:'1.2-2' }}</td>
+
+          <td class="text-end">{{ r.closingDr | number:'1.2-2' }}</td>
+          <td class="text-end">{{ r.closingCr | number:'1.2-2' }}</td>
+        </tr>
+      </tbody>
+
+      <tfoot>
+        <tr>
+          <td colspan="2" class="text-end"><b>Totals</b></td>
+
+          <td class="text-end"><b>{{ total('openingDr') | number:'1.2-2' }}</b></td>
+          <td class="text-end"><b>{{ total('openingCr') | number:'1.2-2' }}</b></td>
+
+          <td class="text-end"><b>{{ total('periodDr')  | number:'1.2-2' }}</b></td>
+          <td class="text-end"><b>{{ total('periodCr')  | number:'1.2-2' }}</b></td>
+
+          <td class="text-end"><b>{{ total('closingDr') | number:'1.2-2' }}</b></td>
+          <td class="text-end"><b>{{ total('closingCr') | number:'1.2-2' }}</b></td>
+        </tr>
+      </tfoot>
+    </table>
+
+    <div class="footer">
+      Accounts: {{ trial().length }}
+      <span class="sep">•</span>
+      Opening Dr = Cr? <b>{{ (total('openingDr') - total('openingCr')) | number:'1.2-2' }}</b>
+      <span class="sep">•</span>
+      Period Dr = Cr? <b>{{ (total('periodDr') - total('periodCr')) | number:'1.2-2' }}</b>
+      <span class="sep">•</span>
+      Closing Dr = Cr? <b>{{ (total('closingDr') - total('closingCr')) | number:'1.2-2' }}</b>
+    </div>
+  </div>
+</div>

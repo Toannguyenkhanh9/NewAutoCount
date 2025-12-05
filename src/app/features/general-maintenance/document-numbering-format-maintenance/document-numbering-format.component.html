@@ -1,0 +1,342 @@
+<div class="page">
+  <!-- Header -->
+  <div class="titlebar">
+    <h1>Document Numbering Format Maintenance</h1>
+
+    <div class="toolbar">
+      <input
+        class="search1"
+        [(ngModel)]="q"
+        placeholder="Search format / pattern..."
+      />
+      <button class="btn primary" (click)="openNew()" [disabled]="!selectedDoc">
+        New
+      </button>
+    </div>
+  </div>
+
+  <div class="layout">
+    <!-- LEFT: tree -->
+    <div class="left">
+      <div class="hint">
+        1. Expand and click to select <b>DocType</b> (e.g. Invoice)
+      </div>
+
+      <div class="tree">
+        <div class="cat" *ngFor="let c of cats">
+          <div class="cat-row" (click)="c.expanded = !c.expanded">
+            <span class="tw">{{ c.expanded ? "▾" : "▸" }}</span>
+            {{ c.name }}
+          </div>
+
+          <div class="types" *ngIf="c.expanded">
+            <div
+              class="type-row"
+              *ngFor="let t of c.types"
+              [class.active]="selectedDoc?.id === t.id"
+              (click)="pickDoc(t, $event)"
+            >
+              <span class="tw">•</span>
+              DocType: <b>{{ t.name }}</b>
+              <span class="mono">&nbsp;({{ t.id }})</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT: formats list -->
+    <div class="right" *ngIf="selectedDoc; else rightPlaceholder">
+      <div class="hint">
+        2. Click <b>New</b> to create a new format for the selected DocType
+      </div>
+
+      <table class="grid">
+        <thead>
+          <tr>
+            <th style="width: 160px">Name</th>
+            <th class="text-end" style="width: 140px">Next Number</th>
+            <th>Format</th>
+            <th class="text-center" style="width: 120px">Is Default</th>
+            <th class="text-center" style="width: 150px">Reset By Month</th>
+            <th class="text-end w-140">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let r of visibleFormats">
+            <td>{{ r.name }}</td>
+
+            <!-- Next number (nếu monthly -> lấy theo tháng hiện tại) -->
+            <td class="mono text-end">{{ nextNumPreview(r) }}</td>
+
+            <td class="mono">{{ r.format }}</td>
+
+            <!-- Is Default: Yes / No (+ tùy chọn Set) -->
+            <td class="text-center">
+              <ng-container *ngIf="r.isDefault; else notDef">Yes</ng-container>
+              <ng-template #notDef> No </ng-template>
+            </td>
+
+            <!-- Reset By Month = Each month with different running set number -->
+            <td class="text-center">{{ r.monthly ? "Yes" : "No" }}</td>
+
+            <td class="text-end actions">
+              <button
+                type="button"
+                class="link"
+                (click)="openEdit(r); $event.stopPropagation()"
+              >
+                Edit
+              </button>
+              <span class="sep">·</span>
+              <button
+                type="button"
+                class="link danger"
+                (click)="openDelete(r, true); $event.stopPropagation()"
+              >
+                Delete
+              </button>
+            </td>
+          </tr>
+
+          <tr *ngIf="visibleFormats.length === 0">
+            <td colspan="6" class="empty">
+              No format yet. Select a DocType and click New.
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <ng-template #rightPlaceholder>
+      <div class="right">
+        <div class="empty-panel">
+          Select <b>DocType</b> in the left panel to view/set the format.
+        </div>
+      </div>
+    </ng-template>
+  </div>
+</div>
+
+<!-- MODAL: Document Numbering Format -->
+<div class="dialog" *ngIf="showModal">
+  <div class="dialog-panel wide">
+    <div class="dialog-title">
+      {{isEdit ? 'Edit' : 'Create'}} DocType: {{ selectedDoc?.name }} ({{ selectedDoc?.id }})
+      <button class="x" (click)="showModal = false">✕</button>
+    </div>
+
+    <div class="dialog-body form-rows">
+      <!-- ROW: Name + Set as default (inline) -->
+      <div class="row-inline align-center name-row">
+        <div class="field grow">
+          <div class="lbl">Name</div>
+          <input
+            class="inp w-100"
+            [(ngModel)]="form.name"
+            placeholder="IV-1"
+            (input)="onNameInput()"
+          />
+        </div>
+
+        <div class="inline-check right">
+          <input id="isDefault" type="checkbox" [(ngModel)]="form.isDefault" />
+          <label for="isDefault">Is Default</label>
+        </div>
+      </div>
+
+      <!-- ROW: Next Number (full width) -->
+      <div class="row-inline">
+        <div class="field grow">
+          <div class="lbl">Next Number</div>
+          <input
+            class="inp w-100"
+            type="number"
+            [(ngModel)]="form.nextNo"
+            [disabled]="form.monthly"
+             (ngModelChange)="updateSample()"
+              (keydown)="blockNonInteger($event)"
+          />
+        </div>
+      </div>
+
+      <!-- ROW: Format (full width) + Sample ở bên phải -->
+      <div class="row-inline">
+        <div class="field grow">
+          <div class="lbl">Format</div>
+          <input
+            class="inp w-100 mono"
+            [(ngModel)]="form.format"
+            (input)="updateDigitsFromFormat(); updateSample()"
+            placeholder="INV-&#123;yy&#125;&#123;MM&#125;-&lt;00000&gt;"
+          />
+        </div>
+
+        <div class="field sample-box">
+          <div class="lbl">Sample</div>
+          <input class="inp w-100 mono" [value]="form.sample" readonly />
+        </div>
+      </div>
+
+      <div class="inline-check">
+        <input
+          id="monthly"
+          type="checkbox"
+          [(ngModel)]="form.monthly"
+          (ngModelChange)="onMonthlyChange($event)"
+        />
+        <label for="monthly"
+          >Each month with different running set number</label
+        >
+      </div>
+
+      <!-- Month panel: luôn render, mờ/khóa khi không monthly -->
+      <div class="month-panel" [class.disabled]="!form.monthly">
+        <!-- LEFT: years with + / - -->
+        <div class="year-box">
+          <div class="ytools">
+            <button
+              class="icon"
+              (click)="addYear()"
+              [disabled]="!form.monthly"
+              title="Add year"
+            >
+              ＋
+            </button>
+
+            <button
+              class="icon"
+              (click)="removeYear()"
+              [disabled]="
+                !form.monthly ||
+                years.length <= 1 ||
+                selectedYear === currentYear
+              "
+              title="Remove selected year"
+            >
+              －
+            </button>
+          </div>
+          <div class="ylist">
+            <div
+              class="yrow"
+              *ngFor="let y of years; let i = index"
+              (click)="form.monthly && selectYearIndex(i)"
+              [class.sel]="i === selectedYearIdx"
+              [attr.aria-disabled]="!form.monthly"
+            >
+             {{ y }}
+            </div>
+          </div>
+        </div>
+
+        <!-- RIGHT: months -->
+        <div class="months">
+          <div
+            class="mrow"
+            *ngFor="let m of [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]"
+          >
+            <div class="mlbl">
+              {{
+                [
+                  "January",
+                  "February",
+                  "March",
+                  "April",
+                  "May",
+                  "June",
+                  "July",
+                  "August",
+                  "September",
+                  "October",
+                  "November",
+                  "December"
+                ][m]
+              }}
+              Next Number
+            </div>
+            <input
+              class="inp mono small"
+              type="number"
+              [(ngModel)]="form.monthNext[m]"
+              (input)="syncAndUpdateSample()"
+              [disabled]="!form.monthly"
+              (keydown)="blockNonInteger($event)" />
+          </div>
+        </div>
+      </div>
+
+      <div class="muted mt8">
+        Hint: If you enable "Each month with different running set number", you
+        should embed month/year into your format.<br/> For example:
+        <code>PV-&#123;yyyyMM&#125;-&lt;0000&gt;</code>.
+      </div>
+    </div>
+
+    <div class="dialog-actions">
+      <button class="btn cancel" (click)="showModal = false">Cancel</button>
+      <button class="btn primary" (click)="save()">Save</button>
+    </div>
+  </div>
+</div>
+
+<div class="dialog" *ngIf="showDeleteConfirm">
+  <div class="dialog-panel-small" role="dialog" aria-modal="true">
+    <div class="dialog-title">
+      Delete {{ deleteTarget?.name || "Item" }}
+      <button class="x" (click)="closeDeleteConfirm()" aria-label="Close">
+        ×
+      </button>
+    </div>
+
+    <div class="dialog-body">
+      <p>
+        Are you sure you want to delete
+        <b>{{ deleteTarget?.name }}</b>
+        <ng-container *ngIf="deleteTarget?.docTypeId">
+          ({{ deleteTarget?.docTypeId }})</ng-container
+        >?
+      </p>
+    </div>
+
+    <div class="dialog-actions">
+      <button class="btn cancel" (click)="closeDeleteConfirm()">Cancel</button>
+      <button class="btn danger" (click)="confirmDelete()">Delete</button>
+    </div>
+  </div>
+</div>
+<div class="dialog" *ngIf="showSetDefaultConfirm">
+  <div class="dialog-panel-small" role="dialog" aria-modal="true">
+    <div class="dialog-title">
+      Set Default
+      <button class="x" (click)="closeSetDefaultConfirm()" aria-label="Close">
+        ×
+      </button>
+    </div>
+    <div class="dialog-body">
+      <p>
+        Make
+        <b>{{ setDefTarget?.row?.name || setDefTarget?.row?.format }}</b> the
+        default for <b>{{ setDefTarget?.row?.docTypeId }}</b
+        >?
+      </p>
+    </div>
+    <div class="dialog-actions">
+      <button class="btn cancel" (click)="closeSetDefaultConfirm()">Cancel</button>
+      <button class="btn primary" (click)="confirmSetDefault()">Save</button>
+    </div>
+  </div>
+</div>
+<div class="dialog" *ngIf="showSuccess">
+  <div class="dialog-panel-small" role="dialog" aria-modal="true" style="min-width: 360px">
+    <div class="dialog-title" style="background: linear-gradient(180deg,#9be28a 0%, #62c84f 100%);">
+       Success
+      <button class="x" (click)="closeSuccess()" aria-label="Close">×</button>
+    </div>
+    <div class="dialog-body">
+      <p style="margin: 8px 0; font-weight:600; color:#14532d">{{ successMsg }}</p>
+    </div>
+    <div class="dialog-actions">
+      <button class="btn primary" (click)="closeSuccess()">OK</button>
+    </div>
+  </div>
+</div>

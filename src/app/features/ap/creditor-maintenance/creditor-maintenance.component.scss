@@ -1,0 +1,913 @@
+.dm-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.dm-toolbar .group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding-left: 8px;
+  position: relative;
+}
+.dm-toolbar .group:not(:first-child)::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 6px;
+  bottom: 6px;
+  width: 1px;
+  background: rgba(0, 0, 0, 0.08);
+}
+/* CSS-mask icons (nhẹ, không cần lib) */
+.ico {
+  width: 16px;
+  height: 16px;
+  display: inline-block;
+  background: currentColor;
+  mask-size: 16px 16px;
+  mask-repeat: no-repeat;
+  mask-position: center;
+}
+.plus {
+  mask-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="black" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>');
+}
+.edit {
+  mask-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="black" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5 20.5 7.5 7 21H3v-4z"/></svg>');
+}
+.eye {
+  mask-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="black" stroke-width="2"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7S1 12 1 12Z"/><circle cx="12" cy="12" r="3"/></svg>');
+}
+.trash {
+  mask-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="black" stroke-width="2"><path d="M3 6h18"/><path d="M8 6V4h8v2"/><path d="M19 6l-1 14H6L5 6"/></svg>');
+}
+.refresh {
+  mask-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="black" stroke-width="2"><path d="M21 12a9 9 0 1 1-2.64-6.36"/><path d="M21 3v6h-6"/></svg>');
+}
+.search {
+  mask-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="black" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>');
+}
+.history {
+  mask-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="black" stroke-width="2"><path d="M3 12a9 9 0 1 0 3-6.7L3 6"/><path d="M3 3v6h6"/><path d="M12 7v5l3 3"/></svg>');
+}
+.print {
+  mask-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="black" stroke-width="2"><path d="M6 9V2h12v7"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a3 3 0 0 1 3-3h14a3 3 0 0 1 3 3v5a2 2 0 0 1-2 2h-2"/><path d="M6 14h12v8H6z"/></svg>');
+}
+.doc {
+  mask-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="black" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M9 15h6M9 11h6"/></svg>');
+}
+
+/* ===== Rest of page styles (grid, filter, modals) ===== */
+.filter {
+  padding: 10px 12px;
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  justify-content: space-between;
+}
+.filter input {
+  height: 34px;
+  width: 420px;
+  max-width: 100%;
+  border: 1px solid #d7deea;
+  border-radius: 8px;
+  padding: 0 10px;
+}
+.meta {
+  color: #6b7280;
+}
+.center {
+  text-align: center;
+}
+
+.pager {
+  padding: 8px 12px 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-top: 1px solid #eef2f7;
+}
+.pg {
+  width: 30px;
+  height: 28px;
+  border: 1px solid #d7deea;
+  background: #fff;
+  border-radius: 6px;
+  cursor: pointer;
+}
+.pginfo {
+  margin:  8px;
+}
+
+.grid2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+.grid4 {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+}
+label {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-weight: 600;
+  color: #334155;
+}
+input,
+select,
+textarea {
+  border: 1px solid #d7deea;
+  border-radius: 8px;
+  padding: 8px 10px;
+}
+label.chk {
+  flex-direction: row;
+  align-items: center;
+  gap: 8px;
+}
+label.wide {
+  grid-column: 1 / -1;
+}
+.r {
+  text-align: right;
+}
+
+.preview {
+  margin-top: 10px;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 10px;
+}
+.preview h3 {
+  margin: 0 0 8px;
+}
+
+.report h2 {
+  margin: 6px 0 10px;
+}
+.report .kv {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(200px, 1fr));
+  gap: 6px 16px;
+  margin-bottom: 10px;
+}
+
+/* Responsive */
+@media (max-width: 1200px) {
+  .dm-toolbar {
+    gap: 8px;
+  }
+  .dm-toolbar .group {
+    gap: 6px;
+  }
+}
+@media (max-width: 768px) {
+  .dm-toolbar {
+    justify-content: flex-start;
+  }
+}
+/* Bổ sung style riêng cho Debtor form (tôn trọng theme gốc của bạn) */
+
+/* Tabs */
+.tabs {
+  margin-top: 10px;
+}
+.tabbar {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 8px;
+  flex-wrap: wrap;
+}
+.tabbar .tab {
+  border: 1px solid #d9e4d6;
+  background: #fff;
+  color: #203428;
+  padding: 6px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+}
+.tabbar .tab.active {
+  background: #e6f6dd;
+  border-color: #b7e0a0;
+}
+
+/* Tab body */
+.tabpane {
+  background: #fff;
+  border: 1px solid #e6efe1;
+  border-radius: 10px;
+  padding: 10px;
+}
+
+/* Smaller toolbars inside tabs */
+.tabpane .toolbar {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+/* Tables in tab panes */
+.tabpane table {
+  width: 100%;
+  border-collapse: collapse;
+}
+.tabpane thead th {
+  text-align: left;
+  font-weight: 700;
+  font-size: 13px;
+  background: #f5faf3;
+  border-bottom: 1px solid #e6efe1;
+  padding: 8px 10px;
+}
+.tabpane tbody td {
+  padding: 8px 10px;
+  border-bottom: 1px solid #f1f4f0;
+}
+.tabpane tbody tr.selected {
+  background: #eef9e8;
+}
+
+/* Grid helpers (thêm 4 cột) */
+.grid3 {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 10px;
+}
+.grid4 {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr 1fr;
+  gap: 10px;
+}
+.wide {
+  grid-column: 1 / -1;
+}
+
+/* Đặt label theo hàng ngang cho checkbox / radio */
+label.row {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 600;
+  line-height: 1.1;
+}
+
+/* Align preview report table */
+.preview table {
+  width: 100%;
+  border-collapse: collapse;
+}
+.preview thead th,
+.preview tbody td {
+  padding: 8px 10px;
+  border-bottom: 1px solid #e6efe1;
+}
+.preview h3 {
+  margin: 8px 0;
+}
+
+/* Price history small helpers */
+.r {
+  text-align: right;
+}
+
+/* Cut long link text in “Others” tab */
+.cut {
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+:host {
+  --debtor-tab-min: 460px;
+} /* bạn có thể chỉnh 440–520 tùy layout hiện tại */
+
+/* các tab có class equal sẽ tối thiểu cao bằng General */
+.tabpane.equal {
+  min-height: var(--debtor-tab-min);
+  display: flex;
+  flex-direction: column;
+}
+
+/* vùng nội dung chính tự giãn chiếm chỗ còn lại, cho scroll nếu dài */
+.tabpane.equal .fill {
+  flex: 1 1 auto;
+  overflow: auto;
+  border-radius: 10px;
+}
+
+/* giữ khoảng cách nhỏ với toolbar */
+.tabpane.equal .toolbar {
+  margin-bottom: 8px;
+}
+/* đặt select + checkbox trên cùng một hàng, có khoảng cách đẹp */
+.inline-field {
+  display: flex;
+  align-items: center;
+  gap: 14px; /* khoảng cách giữa select và checkbox */
+}
+
+/* làm khung “Group Company” gọn gàng hơn */
+.chk.gc {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px;
+  border: 1px solid #e6efe1;
+  border-radius: 8px;
+  background: #fff;
+}
+/* 3 cột giống layout WinForm */
+.grid3.three-cols {
+  grid-template-columns: 1fr 1fr 1fr;
+  align-items: start;
+}
+
+.grid3.three-cols .col {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* Tiêu đề nhỏ cho mỗi box */
+.lbl {
+  font-weight: 600;
+  color: var(--ink-800, #2c4234);
+}
+
+/* Khung radio (như groupbox) */
+.radio-box {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 10px 12px;
+  border: 1px solid var(--ink-200, #dde4e0);
+  border-radius: 8px;
+  background: var(--ink-50, #fafcfc);
+}
+
+.radio-box .row {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Nút dưới Credit Term */
+.mt6 {
+  margin-top: 6px;
+}
+.radio-box label.row,
+.radio-box label.radio-inline {
+  display: inline-flex !important;
+  flex-direction: row !important;
+  align-items: center;
+  gap: 8px;
+  font-weight: 500; /* tùy chọn */
+  line-height: 1.2;
+}
+
+/* sát nhau hơn, mỗi lựa chọn cách nhau 6px */
+.radio-box label.row + label.row {
+  margin-top: 6px;
+}
+
+/* tránh radio bị đẩy lệch dọc */
+.radio-box input[type="radio"] {
+  margin: 0;
+  transform: translateY(0);
+}
+/* Radio: input + text phải nằm 1 hàng */
+.radio-grid label.row,
+.radio-box label.row {
+  display: inline-flex !important;
+  flex-direction: row !important;
+  align-items: center;
+  gap: 8px;
+  white-space: nowrap; /* tránh chữ xuống dòng tách khỏi chấm radio */
+  line-height: 1.2;
+}
+
+/* khoảng cách dọc giữa các lựa chọn */
+.radio-grid label.row + label.row {
+  margin-top: 6px;
+}
+
+/* reset mặc định gây lệch */
+.radio-grid input[type="radio"],
+.radio-box input[type="radio"] {
+  margin: 0;
+  transform: translateY(0);
+  flex: 0 0 auto;
+}
+.radio-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  row-gap: 8px;
+  justify-items: start;
+}
+
+/* Một lựa chọn radio: radio + text CÙNG 1 HÀNG */
+.radio-inline {
+  display: inline-flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  gap: 8px !important;
+  white-space: nowrap; /* tránh text rơi xuống dòng khác radio */
+  line-height: 1.2;
+}
+
+/* reset margin/offset để không bị lệch dọc */
+.radio-inline input[type="radio"] {
+  margin: 0 !important;
+  transform: translateY(0) !important;
+}
+/* Lưới 3 cột giống hàng input trên */
+.cc-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  column-gap: 16px;
+  row-gap: 10px;
+  align-items: start;
+}
+
+.cc-grid .cell {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.col-1 {
+  grid-column: 1;
+}
+.col-2 {
+  grid-column: 2;
+}
+.col-3 {
+  grid-column: 3;
+}
+
+/* Radio + text cùng một hàng */
+.radio-inline {
+  display: inline-flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Khoảng cách nhỏ phía trên các khối con */
+.mt6 {
+  margin-top: 6px;
+}
+
+/* Trạng thái disabled của control – nền xám, text nhạt */
+.cc-grid input:disabled,
+.cc-grid select:disabled {
+  background: #f3f4f6;
+  color: #6b7280;
+  cursor: not-allowed;
+}
+/* Hàng 1: 3 ô đầu */
+.cc-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  column-gap: 16px;
+  row-gap: 10px;
+}
+.cc-grid .cell {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+/* Hàng 2: 3 radio – mỗi cái 1 dòng */
+.cc-modes {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 8px;
+}
+
+/* Radio + text cùng hàng */
+.radio-inline {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Phần nội dung của từng mode nằm dưới và thụt vào */
+.mode-row .mode-body {
+  margin-left: 28px; /* thụt vào dưới radio */
+  margin-top: 6px;
+}
+
+/* Màu xám khi bị disable (TS đã disable formControl; đây là hiệu ứng thị giác) */
+.dimmed select:disabled,
+.dimmed input:disabled {
+  background: #f3f4f6;
+  color: #6b7280;
+  cursor: not-allowed;
+}
+
+/* thanh tab */
+.tabs .tabbar {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+.tabs .tab {
+  border: 1px solid #cfddc9;
+  background: #fff;
+  color: var(--ink-800);
+  padding: 6px 12px;
+  border-radius: 10px;
+  cursor: pointer;
+}
+.tabs .tab.active {
+  color: #0f4d1f;
+  border-color: var(--brand-500);
+  box-shadow: 0 0 0 3px rgba(102, 197, 74, 0.12);
+  font-weight: 700;
+}
+
+/* khung cho tabpane */
+.tabpane {
+  position: relative;
+  border: 1.5px solid #d9e4d6; /* khung */
+  border-radius: 12px;
+  background: #fbfefb;
+  padding: 14px;
+}
+
+/* nhãn nổi phía trên khung (lấy từ data-title) */
+.tabpane::before {
+  content: attr(data-title);
+  position: absolute;
+  top: -12px;
+  left: 12px;
+  background: #fff;
+  color: #3c8a2e;
+  font-weight: 700;
+  border: 1px solid #d9e4d6;
+  border-radius: 8px;
+  padding: 2px 8px;
+  line-height: 1;
+}
+/* Tắt nhãn nổi cũ nếu còn */
+.tabs .tabpane::before {
+  content: none !important;
+}
+
+/* =============== Style A: Underline (Material-ish) =============== */
+.tabs.style-a {
+  .tabbar {
+    display: flex;
+    gap: 8px;
+    border-bottom: 1px solid #e5eee0;
+    margin-bottom: 10px;
+  }
+  .tab {
+    background: transparent;
+    border: none;
+    padding: 10px 14px;
+    color: var(--ink-600);
+    border-radius: 8px;
+    cursor: pointer;
+  }
+  .tab.active {
+    color: #0f4d1f;
+    font-weight: 700;
+  }
+  .tab.active::after {
+    content: "";
+    display: block;
+    height: 3px;
+    border-radius: 2px;
+    background: var(--brand-500);
+    margin-top: 8px;
+  }
+  .tabpane {
+    background: #fff;
+    padding: 14px 0 0;
+    border: none;
+  }
+}
+
+/* =============== Style B: Connected Card =============== */
+.tabs.style-b {
+  .tabbar {
+    display: flex;
+    gap: 4px;
+    margin-bottom: 0;
+  }
+  .tab {
+    background: #f6faf5;
+    border: 1px solid #dbe7d6;
+    border-bottom: none;
+    border-radius: 10px 10px 0 0;
+    padding: 8px 12px;
+    color: var(--ink-700);
+    cursor: pointer;
+  }
+  .tab.active {
+    background: #fff;
+    color: #0f4d1f;
+    font-weight: 700;
+    box-shadow: 0 -1px 0 #fff inset; /* liền mạch với panel */
+  }
+  .tabpane {
+    border: 1px solid #dbe7d6;
+    border-radius: 0 12px 12px 12px;
+    background: #fff;
+    padding: 14px;
+    box-shadow: var(--shadow-sm);
+  }
+}
+
+/* =============== Style C: Pill + Left Accent on Content =============== */
+.tabs.style-c {
+  .tabbar {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 10px;
+  }
+  .tab {
+    background: #fff;
+    border: 1px solid #dbe7d6;
+    color: var(--ink-700);
+    border-radius: 999px;
+    padding: 6px 12px;
+    cursor: pointer;
+  }
+  .tab.active {
+    background: var(--brand-500);
+    color: #fff;
+    border-color: var(--brand-500);
+    box-shadow: 0 2px 6px rgba(102, 197, 74, 0.24);
+  }
+  .tabpane {
+    background: #fff;
+    padding: 14px;
+    border-radius: 10px;
+    border: 1px solid #e6efe1;
+    box-shadow: var(--shadow-sm);
+    border-left: 4px solid var(--brand-500); /* vạch nhấn bên trái */
+  }
+}
+/* Segmented / pill tabs */
+.tabs.beauty {
+  --tab-h: 36px;
+
+  .tabbar {
+    display: flex;
+    gap: 6px;
+    padding: 6px;
+    border-radius: 999px;
+    background: #f4f9f2;
+    border: 1px solid #dfe9d9;
+    width: max-content;
+  }
+
+  .tab {
+    position: relative;
+    border: none;
+    background: transparent;
+    padding: 0 16px;
+    height: var(--tab-h);
+    line-height: var(--tab-h);
+    color: var(--ink-600);
+    border-radius: 999px;
+    cursor: pointer;
+    transition: color 0.15s ease;
+  }
+  .tab:hover {
+    color: #0f4d1f;
+  }
+
+  .tab.active {
+    color: #0f4d1f;
+    font-weight: 700;
+  }
+  .tab.active::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background: #fff;
+    border: 1px solid #dbe7d6;
+    border-radius: inherit;
+    box-shadow: 0 2px 6px rgba(16, 62, 29, 0.08);
+  }
+
+  .tabpane {
+    margin-top: 10px;
+    background: #fff;
+    border: 1px solid #e6efe1;
+    border-radius: 12px;
+    padding: 16px;
+    box-shadow: var(--shadow-sm);
+  }
+}
+
+/* Tab kiểu “connected”: viền nội dung bao luôn tên tab */
+.tabs.connected {
+  --bc: #dfe8db; /* màu viền */
+  --bg: #fff; /* nền panel */
+  --tab-bg: #f7faf6;
+
+  .tabbar {
+    display: flex;
+    gap: 6px;
+    margin-bottom: -1px; /* chồng lên viền của panel 1px */
+    position: relative;
+    z-index: 2; /* tab nằm trên panel */
+  }
+
+  .tab {
+    border: 1px solid var(--bc);
+    border-bottom: none; /* bỏ viền dưới để nối liền với panel */
+    background: var(--tab-bg);
+    color: #2c4234;
+    padding: 8px 14px;
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+    cursor: pointer;
+    transition: 0.15s ease;
+  }
+  .tab:hover {
+    background: #f0f7f2;
+  }
+
+  .tab.active {
+    background: var(--bg);
+    color: #0f4d1f;
+    font-weight: 700;
+    z-index: 3; /* cao hơn tab khác và panel */
+  }
+
+  .tabpane {
+    background: var(--bg);
+    border: 1px solid var(--bc);
+    border-radius: 12px;
+    /* vì tab đã “ăn” viền phía trên nên panel vẫn bo bình thường;
+       nếu muốn gọn như Windows-classic, có thể giảm bo phía trên: */
+    /* border-top-left-radius: 8px; border-top-right-radius: 8px; */
+    padding: 16px;
+    position: relative;
+    z-index: 1;
+  }
+}
+/* ===== Contact tab ===== */
+.contact-pane .contact-info {
+  margin-top: 10px;
+  padding: 10px;
+  border: 1px dashed var(--ink-300);
+  border-radius: 8px;
+  background: #fcfdfb;
+}
+.contact-pane .contact-info .label {
+  font-weight: 600;
+  color: var(--ink-700);
+  margin-bottom: 6px;
+}
+.contact-pane .contact-info .preview {
+  padding: 8px 10px;
+  background: #fff;
+  border: 1px solid #e7eee2;
+  border-radius: 6px;
+}
+
+/* Giữ hàng đã chọn trong bảng nổi bật hơn */
+.contact-pane table tbody tr.selected {
+  background: #eef8e8;
+}
+.toast {
+  position: fixed;
+  right: 16px;
+  bottom: 16px;
+  background: #0ea5e9; /* xanh dương dịu */
+  color: #fff;
+  padding: 10px 14px;
+  border-radius: 10px;
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.16);
+  font-weight: 600;
+  z-index: 99999;
+  animation: toastIn 0.18s ease;
+}
+@keyframes toastIn {
+  from {
+    transform: translateY(8px);
+    opacity: 0;
+  }
+  to {
+    transform: none;
+    opacity: 1;
+  }
+}
+
+.dialog-panel {
+  display: flex;
+  flex-direction: column;
+  max-height: 92vh; // tránh vượt màn hình
+}
+
+.dialog-title {
+  flex: 0 0 auto;
+}
+
+form.dialog-body {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  min-height: 0; // cho phép con co giãn
+}
+
+.tabs {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+.tabbar {
+  flex: 0 0 auto;
+}
+
+.tabpane {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: auto; // phần thừa cuộn trong tab
+  /* min-height được bind từ TS qua [style.minHeight.px] */
+}
+/* Card/fieldset khung nhóm */
+.gbox {
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  background: #fff;
+  margin: 12px 0 16px;
+  box-shadow: 0 1px 0 rgba(16, 24, 40, 0.03);
+}
+
+.gbox-title {
+  padding: 10px 14px;
+  font-weight: 700;
+  color: #0f172a;
+  background: linear-gradient(180deg, #f3faf1 0%, #e9f6e6 100%);
+  border-bottom: 1px solid #e5e7eb;
+  border-radius: 12px 12px 0 0;
+}
+
+.gbox-body {
+  padding: 14px;
+}
+
+/* Khoảng cách dọc gọn hơn một chút giữa các label trong khung */
+.gbox .grid3 > label,
+.gbox .grid2 > label {
+  margin-bottom: 10px;
+}
+
+/* Nút trong gbox */
+.gbox .btn {
+  border-radius: 10px;
+}
+
+/* Đặt 2 checkbox cạnh nhau trong cùng một ô của grid3 */
+.grid3 .checks-inline {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  /* container này là 1 cell của grid3, nên không cần label bọc ngoài */
+}
+.grid3 .checks-inline .chk {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0; /* sát nhau gọn gàng */
+}
+/* đường kẻ phân cách Billing vs Delivery trong grid3 */
+.addr-sep {
+  grid-column: 1 / -1; /* span cả 3 cột */
+  height: 2px;
+  margin: 6px 0 10px;
+  background: #cbd5e1; /* xám nhẹ */
+  border-radius: 2px;
+}
+/* nếu muốn giống hình có đầu bo & màu hơi nổi */
+.addr-sep.accent {
+  background: #b91c1c; /* đỏ nhạt */
+}
+.search1 {
+  width: 280px;
+  padding: 8px 10px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  outline: none;
+  transition: box-shadow 0.15s ease;
+}
+.search1:focus {
+  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.2);
+  border-color: #10b981;
+}

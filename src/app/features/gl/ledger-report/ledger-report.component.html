@@ -1,0 +1,117 @@
+<div class="page">
+  <!-- Header / Toolbar -->
+  <div class="titlebar">
+    <h1>Ledger Report</h1>
+
+    <div class="toolbar">
+      <label class="cap">From</label>
+      <input class="inp" type="date" [(ngModel)]="dateFrom" />
+
+      <label class="cap">To</label>
+      <input class="inp" type="date" [(ngModel)]="dateTo" />
+
+      <label class="cap">Account From</label>
+      <select class="inp" [(ngModel)]="accFrom">
+        <option *ngFor="let a of accounts" [value]="a.code">{{ a.code }} — {{ a.name }}</option>
+      </select>
+
+      <label class="cap">To</label>
+      <select class="inp" [(ngModel)]="accTo">
+        <option value="9999-999">9999-999 — (Max)</option>
+        <option *ngFor="let a of accounts" [value]="a.code">{{ a.code }} — {{ a.name }}</option>
+      </select>
+
+      <!-- <input class="search" [(ngModel)]="q" placeholder="Search doc no / description..." /> -->
+
+      <label class="chk">
+        <input type="checkbox" [(ngModel)]="includeZero" />
+        <span>Show zero-balance accounts</span>
+      </label>
+
+      <button class="btn ghost" (click)="setThisMonth()">This Month</button>
+      <span class="sp"></span>
+      <button class="btn" (click)="onExport()">Export</button>
+      <button class="btn" (click)="onRefresh()">Refresh</button>
+      <button class="btn" (click)="onPrint()">Print</button>
+    </div>
+  </div>
+
+  <!-- Content -->
+  <div class="card">
+    <div class="report">
+      <div class="group" *ngFor="let g of view()">
+        <div class="group-header">
+          <button class="toggle" (click)="toggle(g.acc.code)">{{ collapsed[g.acc.code] ? '+' : '−' }}</button>
+          <div class="acc">
+            <div class="code monospace">{{ g.acc.code }}</div>
+            <div class="name">{{ g.acc.name }}</div>
+          </div>
+          <div class="kpis">
+            <div class="k">
+              <div class="k-cap">Opening</div>
+              <div class="k-val" [class.neg]="g.opening<0">{{ g.opening | number:'1.2-2' }}</div>
+            </div>
+            <div class="k">
+              <div class="k-cap">Debit</div>
+              <div class="k-val">{{ g.totalDebit | number:'1.2-2' }}</div>
+            </div>
+            <div class="k">
+              <div class="k-cap">Credit</div>
+              <div class="k-val">{{ g.totalCredit | number:'1.2-2' }}</div>
+            </div>
+            <div class="k">
+              <div class="k-cap">Closing</div>
+              <div class="k-val" [class.neg]="g.closing<0">{{ g.closing | number:'1.2-2' }}</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="lines" *ngIf="!collapsed[g.acc.code]">
+          <table class="grid">
+            <thead>
+              <tr>
+                <th style="width:120px">Date</th>
+                <th style="width:120px">Source</th>
+                <th style="width:160px">Doc No</th>
+                <th>Description</th>
+                <th class="text-end" style="width:140px">Debit</th>
+                <th class="text-end" style="width:140px">Credit</th>
+                <th class="text-end" style="width:160px">Running Balance</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr class="opening">
+                <td colspan="6" class="text-end"><b>Opening Balance</b></td>
+                <td class="text-end"><b>{{ g.opening | number:'1.2-2' }}</b></td>
+              </tr>
+
+              <tr *ngFor="let r of g.lines; trackBy: trackRow">
+                <td>{{ r.date }}</td>
+                <td>{{ r.source || '—' }}</td>
+                <td class="monospace">{{ r.docNo }}</td>
+                <td class="cut">{{ r.description }}</td>
+                <td class="text-end">{{ r.debit  | number:'1.2-2' }}</td>
+                <td class="text-end">{{ r.credit | number:'1.2-2' }}</td>
+                <td class="text-end" [class.neg]="r.runBal<0">{{ r.runBal | number:'1.2-2' }}</td>
+              </tr>
+
+              <tr class="closing">
+                <td colspan="6" class="text-end"><b>Closing Balance</b></td>
+                <td class="text-end"><b>{{ g.closing | number:'1.2-2' }}</b></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="grand-total">
+        <div class="pill">Total Debit: <b>{{ reportTotalDebit()  | number:'1.2-2' }}</b></div>
+        <div class="pill">Total Credit: <b>{{ reportTotalCredit() | number:'1.2-2' }}</b></div>
+      </div>
+    </div>
+
+    <div class="footer">
+      Accounts: {{ view().length }}
+    </div>
+  </div>
+</div>

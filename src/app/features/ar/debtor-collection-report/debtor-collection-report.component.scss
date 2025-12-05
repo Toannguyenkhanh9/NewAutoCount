@@ -1,0 +1,1045 @@
+  .options .opt-row {
+    display: grid;
+    grid-template-columns: repeat(6, minmax(160px, 1fr));
+    gap: 12px;
+    align-items: end;
+  }
+  .field .lbl {
+    font-size: 12px;
+    color: #4b5563;
+    margin-bottom: 4px;
+  }
+  .field .ctl select,
+  .field .ctl input[type="date"] {
+    width: 100%;
+    padding: 8px 10px;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+  }
+  .field.inline {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+  }
+  .field.sm {
+    max-width: 140px;
+  }
+
+  .c {
+    text-align: center;
+  }
+  .r {
+    text-align: right;
+  }
+  .link {
+    color: #2563eb;
+    cursor: default;
+  }
+  .group-head td {
+    background: #eef2ff;
+    font-weight: 600;
+  }
+  .debtor td {
+    background: #fff;
+  }
+  .toggle {
+    width: 36px;
+  }
+  .toggle-btn {
+    width: 28px;
+    height: 28px;
+    border: 1px solid #e5e7eb;
+    background: #fff;
+    border-radius: 8px;
+    cursor: pointer;
+  }
+  .detail-wrap {
+    padding: 8px 0;
+  }
+  .detail {
+    width: 100%;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    overflow: hidden;
+  }
+  .detail thead th {
+    background: #f8fafc;
+    padding: 8px;
+    border-bottom: 1px solid #e5e7eb;
+  }
+  .detail td {
+    padding: 8px;
+    border-bottom: 1px solid #f1f5f9;
+  }
+  .arrow {
+    margin-left: 6px;
+    font-size: 12px;
+    color: #64748b;
+  }
+  /* Detail row full-width + nền vàng nhạt */
+  /* ✅ Chỉ hàng <tr> detail màu vàng */
+  .detail-row,
+  .detail-row > td {
+    background: #f7f4e1; /* vàng nhạt chỉ đúng hàng detail */
+  }
+
+  /* bỏ nền vàng của wrapper nếu trước đó đã set */
+  .detail-wrap.full {
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    padding: 8px 12px; /* có/không tuỳ bạn, để nội dung đỡ sát */
+  }
+
+  .detail-row .detail thead th,
+  .detail-row .detail td {
+    background: #fff; /* trắng toàn bộ ô trong bảng detail */
+    border-bottom: 1px solid #f3efd9;
+  }
+  /* 1) Không tô nền vàng cho cả hàng wrap của detail */
+  .detail-row,
+  .detail-row > td {
+    background: transparent !important; /* bỏ nền vàng toàn hàng */
+    padding: 0; /* sát khung bảng detail */
+    border-top: none;
+  }
+
+  /* 2) Khung bảng detail vẫn trắng + viền nhẹ */
+  .detail-row .detail {
+    width: 100%;
+    background: #fff; /* nền trắng cho bảng detail */
+    border: 1px solid #fde68a;
+    border-radius: 8px;
+  }
+
+  /* 3) Header của bảng detail: nền trắng */
+  .detail-row .detail thead th {
+    background: #fff !important;
+  }
+
+  /* 4) ✅ Chỉ các <tr> nội dung (tbody) màu vàng */
+  .detail-row .detail tbody tr {
+    background: #fff3b5; /* vàng nhạt cho từng hàng nội dung */
+  }
+
+  /* (tuỳ chọn) phân biệt hàng chẵn/lẻ nhẹ nhàng */
+  .detail-row .detail tbody tr:nth-child(even) {
+    background: #fff3b5;
+  }
+
+  /* giữ màu chữ của link chứng từ */
+  .detail-row .detail tbody a {
+    color: #2563eb;
+  }
+  /* === Subtable (detail) look & feel === */
+  /* Khung ngoài giống bảng cha */
+  .detail-row .detail {
+    --bd: #e5e7eb; /* màu viền (same table parent) */
+    --head: #f3f4f6; /* nền header (same table parent) */
+    background: #fff;
+    border: 1px solid var(--bd);
+    border-radius: 8px;
+    overflow: hidden; /* để bo góc header */
+    margin-top: 8px;
+  }
+
+  /* Cấu trúc bảng giống cha */
+  .detail-row .detail table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0; /* giống cha: không khoảng cách viền */
+    table-layout: auto;
+  }
+
+  /* Header của bảng detail: nền & font giống cha */
+  .detail-row .detail thead th {
+    background: var(--head) !important;
+    color: #111827;
+    font-weight: 600;
+    padding: 10px 12px;
+    border-bottom: 1px solid var(--bd);
+    white-space: nowrap;
+  }
+
+  /* Cell của bảng detail: padding & đường kẻ giống cha */
+  .detail-row .detail tbody td {
+    padding: 10px 12px;
+    border-top: 1px solid var(--bd);
+  }
+
+  /* Viền dọc mảnh giống grid của bảng cha (nếu cha có) */
+  .detail-row .detail thead th + th,
+  .detail-row .detail tbody td + td {
+    border-left: 1px solid var(--bd);
+  }
+
+  /* Bo góc trên cùng cho 2 cell đầu/cuối header (như cha) */
+  .detail-row .detail thead th:first-child {
+    border-top-left-radius: 8px;
+  }
+  .detail-row .detail thead th:last-child {
+    border-top-right-radius: 8px;
+  }
+
+  /* Giữ màu vàng CHỈ cho các hàng nội dung */
+  .detail-row .detail tbody tr {
+    background: #fff7cc;
+  }
+  .detail-row .detail tbody tr:nth-child(even) {
+    background: #fff3b5;
+  }
+
+  /* Link chứng từ vẫn hiển thị rõ */
+  .detail-row .detail tbody a {
+    color: #2563eb;
+    text-decoration: none;
+  }
+  .detail-row .detail tbody a:hover {
+    text-decoration: underline;
+  }
+
+  /* Dẹp nền vàng toàn hàng bọc detail (chỉ giữ cho tr nội dung) */
+  .detail-row,
+  .detail-row > td {
+    background: transparent !important;
+    padding: 0;
+    border-top: none;
+  }
+  .options {
+    padding: 10px 12px;
+    border-bottom: 1px solid #eef2f7;
+    background: #f8fbff;
+  }
+  .opt-grid {
+    display: grid;
+    grid-template-columns: 2fr 2fr 1fr;
+    gap: 12px;
+  }
+  /* Responsive: 2 ô/row khi màn < 1280px */
+  @media (max-width: 1280px) {
+    .opt-grid fieldset > label,
+    .opt-grid fieldset > .field {
+      grid-column: span 6;
+    }
+  }
+
+  /* 1 ô/row khi màn < 640px (mobile) */
+  @media (max-width: 640px) {
+    .opt-grid fieldset > label,
+    .opt-grid fieldset > .field {
+      grid-column: span 12;
+    }
+  }
+  .filters {
+    width: 100%;
+    background: #f8fafc; /* nền nhẹ */
+    border-radius: 12px;
+    padding: 12px 16px;
+    display: grid;
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    gap: 12px;
+    align-items: start;
+    border: 1px solid #eef2f7; /* viền mảnh */
+  }
+  .filters .f {
+    grid-column: span 2; /* 4 ô/row trên màn rộng */
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  /* Header bảng detail vẫn màu giống bảng cha */
+  .grid.detail-yellow thead th {
+    background-color: #f6f8fb;
+  }
+
+  /* Chỉ các hàng nội dung trong detail có nền vàng nhạt */
+  .grid.detail-yellow tbody tr > td {
+    background-color: #fff7cc !important; /* vàng nhạt */
+  }
+
+  /* (tuỳ chọn) zebra cho dễ nhìn */
+  .grid.detail-yellow tbody tr:nth-child(even) > td {
+    background-color: #fff3b0 !important;
+  }
+
+  /* (tuỳ chọn) hover nhẹ để phân biệt */
+  .grid.detail-yellow tbody tr:hover > td {
+    background-color: #ffefb5 !important;
+  }
+
+  .options {
+    padding: 10px 12px;
+    border-bottom: 1px solid #eef2f7;
+    background: #f8fbff;
+  }
+  .opt-grid {
+    display: grid;
+    grid-template-columns: 2fr 2fr 1fr;
+    gap: 12px;
+  }
+  fieldset {
+    border: 1px solid #d7deea;
+    border-radius: 8px;
+    padding: 10px;
+    background: #fff;
+  }
+  legend {
+    padding: 0 6px;
+    color: #0f2c61;
+    font-weight: 800;
+  }
+  label {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    font-weight: 600;
+    color: #334155;
+  }
+  input,
+  select {
+    border: 1px solid #d7deea;
+    border-radius: 8px;
+    padding: 6px 8px;
+    height: 34px;
+  }
+  label.chk {
+    flex-direction: row;
+    align-items: center;
+    gap: 8px;
+    font-weight: 600;
+  }
+  label.chk input {
+    height: auto;
+  }
+  .r {
+    text-align: right;
+  }
+  .c {
+    text-align: center;
+  }
+
+  tbody.group-head td {
+    background: #f0f7ff;
+    color: #0f2c61;
+    font-weight: 800;
+    border-top: 1px solid #d7e6ff;
+  }
+  tbody.group-total td {
+    background: #fafcff;
+    border-top: 1px solid #eef2f7;
+  }
+
+  .totals {
+    padding: 8px 12px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    align-items: flex-end;
+  }
+  .totals .row {
+    display: flex;
+    gap: 24px;
+    min-width: 320px;
+    justify-content: space-between;
+    color: #0f2c61;
+  }
+  .totals .row strong {
+    font-weight: 800;
+  }
+  .previewbox {
+    padding: 10px 12px;
+  }
+  .criteria {
+    margin-top: 6px;
+    color: #475569;
+    background: #f8fafc;
+    border: 1px dashed #d7deea;
+    padding: 8px;
+    border-radius: 8px;
+  }
+
+  @media (max-width: 1024px) {
+    .opt-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+  .page {
+    background: #fff;
+  }
+  .titlebar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .toolbar .btn {
+    margin-left: 0.5rem;
+  }
+  .options .opt-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(260px, 1fr));
+    gap: 16px;
+  }
+  fieldset {
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    padding: 12px 12px 10px;
+  }
+  .debtor-filter {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .debtor-filter .range input {
+    width: 130px;
+  }
+  .debtor-filter .multi {
+    min-width: 260px;
+    min-height: 100px;
+  }
+  .table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+  }
+  .table th,
+  .table td {
+    padding: 10px 12px;
+    border-bottom: 1px solid #edf1f4;
+  }
+  .table td.r,
+  .table th.r {
+    text-align: right;
+  }
+  .table td.c,
+  .table th.c {
+    text-align: center;
+  }
+  .table .link {
+    color: #2563eb;
+    cursor: pointer;
+  }
+  tfoot tr.sum {
+    background: #f8fafc;
+    font-weight: 600;
+  }
+  .group-head tr {
+    background: #f3f4f6;
+  }
+  .group-total tr {
+    background: #f8fafc;
+  }
+  .previewbox {
+    margin-top: 16px;
+    padding: 12px;
+    border: 1px dashed #d1d5db;
+    border-radius: 8px;
+  }
+  .sum-row {
+    background: #fafafa;
+  }
+  .sum-row td {
+    padding-top: 10px;
+    border-top: 1px solid #eee;
+  }
+  .r {
+    text-align: right;
+  }
+  .blue {
+    color: #1f6feb;
+    font-weight: 600;
+  }
+  /* canh top hai control trong dòng Debtor */
+  .debtor-line {
+    display: flex;
+    gap: 12px;
+    align-items: flex-start; /* 🔝 quan trọng */
+  }
+
+  /* tùy chọn: set kích thước cho đẹp */
+  .debtor-mode {
+    height: 38px;
+  } /* bằng chiều cao input thường */
+  .debtor-multi {
+    height: 120px;
+  }
+  th {
+    user-select: none;
+  }
+  th[ng-reflect-ng-class],
+  th[ng-reflect-ng-class] .arrow,
+  th.sorted {
+    cursor: pointer;
+  }
+  th.sorted {
+    text-decoration: underline;
+  }
+  th.sorted.desc .arrow {
+    transform: rotate(180deg);
+  }
+  .arrow {
+    margin-left: 4px;
+    font-size: 12px;
+  }
+  /* --- Options area full width & equal columns --- */
+  .options {
+    width: 100%;
+  }
+
+  .opt-grid fieldset {
+    width: 100%;
+    display: grid;
+    grid-template-columns: repeat(12, minmax(0, 1fr)); /* 12 cột chuẩn */
+    gap: 12px;
+    border: 0; /* nếu muốn bỏ khung */
+    padding: 0;
+    margin: 0;
+  }
+
+  /* Mặc định mỗi control chiếm 3 cột = 4 ô/row trên màn rộng */
+  .opt-grid fieldset > label,
+  .opt-grid fieldset > .field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    grid-column: span 3;
+  }
+
+  /* Tự full chiều ngang của ô */
+  .opt-grid fieldset input,
+  .opt-grid fieldset select {
+    width: 100%;
+  }
+
+  /* Debtor line: select + range/multi nằm cùng hàng, canh top */
+  .debtor-line {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+  }
+  .debtor-line .w-44 {
+    max-width: 200px;
+  } /* dropdown "Debtor mode" */
+  .debtor-line .range input {
+    width: 140px;
+  } /* From/To code */
+  .debtor-multi {
+    width: 100%;
+    min-height: 120px;
+  }
+
+  /* Responsive: 2 ô/row khi màn < 1280px */
+  @media (max-width: 1280px) {
+    .opt-grid fieldset > label,
+    .opt-grid fieldset > .field {
+      grid-column: span 6;
+    }
+  }
+
+  /* 1 ô/row khi màn < 640px (mobile) */
+  @media (max-width: 640px) {
+    .opt-grid fieldset > label,
+    .opt-grid fieldset > .field {
+      grid-column: span 12;
+    }
+  }
+  /* ===== Filter bar ===== */
+  .filters {
+    width: 100%;
+    background: #f8fafc; /* nền nhẹ */
+    border-radius: 12px;
+    padding: 12px 16px;
+    display: grid;
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    gap: 12px;
+    align-items: start;
+    border: 1px solid #eef2f7; /* viền mảnh */
+  }
+
+  .filters .f {
+    grid-column: span 2; /* 4 ô/row trên màn rộng */
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  @media (max-width: 1200px) {
+    .filters .f {
+      grid-column: span 6;
+    } /* 2 ô/row */
+  }
+  @media (max-width: 640px) {
+    .filters .f {
+      grid-column: span 12;
+    } /* 1 ô/row */
+  }
+
+  .lbl {
+    font-size: 12px;
+    font-weight: 600;
+    color: #4b5563;
+  }
+
+  .ctl select,
+  .ctl input {
+    height: 36px;
+    width: 100%;
+    padding: 0 12px;
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+    background: #fff;
+  }
+  .ctl select:focus,
+  .ctl input:focus {
+    outline: 0;
+    border-color: #34c759;
+    box-shadow: 0 0 0 3px rgba(52, 199, 89, 0.15);
+  }
+
+  /* icon nhỏ bên trái (cho Date) */
+  .icon-left {
+    position: relative;
+  }
+  .icon-left input {
+    padding-left: 38px;
+  }
+  .icon-left::before {
+    content: "";
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    width: 18px;
+    height: 18px;
+    transform: translateY(-50%);
+    opacity: 0.6;
+    background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" fill="%2399A3AD" viewBox="0 0 24 24"><path d="M7 2a1 1 0 0 1 1 1v1h8V3a1 1 0 1 1 2 0v1h1a2 2 0 0 1 2 2v13a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h1V3a1 1 0 1 1 2 0v1zm12 6H5v11h14V8z"/></svg>')
+      no-repeat center/18px;
+  }
+
+  /* Nút toolbar sẵn có có thể giữ nguyên; nếu cần trùng tone: */
+  .segment {
+    display: inline-flex;
+    gap: 6px;
+    margin-bottom: 8px;
+  }
+  .segment button {
+    height: 30px;
+    padding: 0 12px;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    background: #fff;
+    cursor: pointer;
+  }
+  .segment button.on {
+    background: #34c759;
+    border-color: #34c759;
+    color: #fff;
+  }
+  /* Item full-width trong grid */
+  .filters .gfull {
+    grid-column: 1 / -1;
+  }
+
+  /* Hàng nút actions */
+  .filters .actions {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 10px;
+    padding-top: 4px;
+  }
+  /* ===== Grid lines cho bảng chính (non-grouped) ===== */
+.gridwrap > table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+}
+.gridwrap > table thead th {
+  font-weight: 600;
+  padding: 10px 12px;
+  border-bottom: 1px solid #edf1f4;      /* kẻ ngang header */
+}
+.gridwrap > table thead th:first-child { border-top-left-radius: 8px; }
+.gridwrap > table thead th:last-child  { border-top-right-radius: 8px; }
+
+.gridwrap > table tbody td,
+.gridwrap > table tfoot td {
+  padding: 10px 12px;
+  border-bottom: 1px solid #edf1f4;      /* kẻ ngang body + footer */
+}
+/* kẻ dọc cho tất cả cột trừ cột đầu */
+.gridwrap > table thead th + th,
+.gridwrap > table tbody td + td,
+.gridwrap > table tfoot td + td {
+  border-left: 1px solid #edf1f4;
+}
+
+/* ===== Grid lines cho bảng grouped (.table) để đồng bộ look & feel ===== */
+.table thead th,
+.table tbody td,
+.table tfoot td {
+  padding: 10px 12px;
+  border-bottom: 1px solid #edf1f4;      /* kẻ ngang */
+}
+.table thead th + th,
+.table tbody td + td,
+.table tfoot td + td {
+  border-left: 1px solid #edf1f4;        /* kẻ dọc */
+}
+
+/* ===== Tăng lưới cho bảng detail vàng nhạt (nếu muốn rõ hơn) ===== */
+.grid.detail-yellow thead th + th,
+.grid.detail-yellow tbody td + td {
+  border-left: 1px solid #e5e7eb;        /* kẻ dọc detail */
+}
+.grid.detail-yellow tbody td {
+  border-bottom: 1px solid #e5e7eb;      /* kẻ ngang detail */
+}
+/* ===== Total row: make numbers blue ===== */
+:host {
+  --total-blue: #2563eb; /* thay đổi nếu bạn muốn màu khác */
+}
+
+/* Bảng thường */
+:host .gridwrap table tfoot.sum-row td.r,
+:host .gridwrap table tfoot.sum-row td.r * {
+  color: var(--total-blue) !important;
+  font-weight: 600;
+}
+
+/* Bảng grouped (class .table) */
+:host .gridwrap .table tfoot.sum-row td.r,
+:host .gridwrap .table tfoot.sum-row td.r * {
+  color: var(--total-blue) !important;
+  font-weight: 600;
+}
+/* Multi-select giả lập select box */
+.ms {
+  position: relative;
+  display: flex; align-items: center; justify-content: space-between;
+  min-width: 240px; height: 38px; padding: 0 10px;
+  border: 1px solid #dcdfe6; border-radius: 6px; background: #fff;
+  cursor: pointer;
+}
+.ms .caret { opacity: .6; }
+
+.ms-panel {
+  position: absolute; z-index: 30;
+  margin-top: 6px; width: 360px; max-height: 300px;
+  background: #fff; border: 1px solid #e5e7eb; border-radius: 8px;
+  box-shadow: 0 8px 20px rgba(0,0,0,.08); padding: 8px 8px 6px;
+}
+.ms-panel .row { display: flex; align-items: center; gap: 8px; padding: 6px 8px; }
+.ms-panel .row.all { border-bottom: 1px dashed #e5e7eb; margin-bottom: 6px; }
+.ms-panel .list { max-height: 220px; overflow: auto; }
+.ms-panel .actions { display: flex; gap: 8px; justify-content: flex-end; padding-top: 6px; }
+.btn.sm { height: 28px; padding: 0 10px; border-radius: 6px; }
+.btn.ghost { background: #f5f6f7; }
+/* ===== Debtor multi-select (checkbox dropdown) ===== */
+
+.options .f .ctl .ms {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 220px;             /* chiều rộng “ô select” */
+  height: 36px;
+  padding: 0 30px 0 12px;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  background: #fff;
+  cursor: pointer;
+  user-select: none;
+  transition: border-color .15s ease;
+}
+.options .f .ctl .ms:hover {
+  border-color: #cbd5e1;
+}
+.options .f .ctl .ms .ms-text {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  color: #0f172a;
+  font-size: 14px;
+}
+.options .f .ctl .ms .caret {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 12px;
+  color: #64748b;
+  pointer-events: none;
+}
+
+/* Panel xổ xuống */
+.options .f .ctl .ms-panel {
+  position: absolute;
+  z-index: 1000;
+  margin-top: 8px;
+  left: 0;
+  width: 420px;                 /* panel rộng hơn cho dễ đọc */
+  max-width: calc(100vw - 48px);
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  box-shadow: 0 14px 40px rgba(2, 6, 23, .12), 0 6px 16px rgba(2, 6, 23, .06);
+  overflow: hidden;
+}
+
+/* hàng checkbox – layout & hover */
+.options .f .ctl .ms-panel .row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  font-size: 14px;
+  line-height: 20px;
+  color: #0f172a;
+}
+.options .f .ctl .ms-panel .row:hover {
+  background: #f8fafc;
+}
+
+/* “Select all” sticky + gạch chân */
+.options .f .ctl .ms-panel .row.all {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  background: #fff;
+  border-bottom: 1px solid #eef2f7;
+}
+
+/* danh sách cuộn */
+.options .f .ctl .ms-panel .list {
+  max-height: 280px;
+  overflow: auto;
+}
+
+/* Nút OK / Clear */
+.options .f .ctl .ms-panel .actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  padding: 10px 12px;
+  border-top: 1px solid #eef2f7;
+  background: #fff;
+}
+.options .f .ctl .ms-panel .btn.sm {
+  padding: 6px 10px;
+  font-size: 13px;
+  border-radius: 8px;
+}
+.options .f .ctl .ms-panel .btn.sm.ghost {
+  background: transparent;
+  border: 1px solid #d1d5db;
+  color: #334155;
+}
+
+/* Checkbox gọn & màu nhấn */
+.options .f .ctl .ms-panel input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  accent-color: #0ea5e9;        /* xanh dương – đồng nhất với Total */
+}
+
+/* scrollbar nhẹ nhàng */
+.options .f .ctl .ms-panel .list::-webkit-scrollbar {
+  width: 10px;
+}
+.options .f .ctl .ms-panel .list::-webkit-scrollbar-thumb {
+  background: #e5e7eb;
+  border-radius: 6px;
+}
+.options .f .ctl .ms-panel .list::-webkit-scrollbar-thumb:hover {
+  background: #d1d5db;
+}
+/* Neo vị trí cho dropdown */
+.options .f .ctl {
+  position: relative;              /* << neo tuyệt đối cho panel */
+}
+
+/* Ô giả “select” */
+.options .f .ctl .ms {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 220px;
+  height: 36px;
+  padding: 0 30px 0 12px;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  background: #fff;
+  cursor: pointer;
+}
+
+/* Panel xổ xuống */
+.options .f .ctl .ms-panel {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;                         /* canh theo cạnh trái của ô */
+  min-width: 100%;                 /* luôn >= độ rộng ô */
+  width: 420px;                    /* nhưng tối đa 420px để dễ đọc */
+  max-width: min(420px, calc(100vw - 56px));
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  box-shadow: 0 14px 40px rgba(2,6,23,.12), 0 6px 16px rgba(2,6,23,.06);
+  overflow: hidden;
+  z-index: 1000;
+}
+
+/* Hàng checkbox */
+.options .f .ctl .ms-panel .row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  font-size: 14px;
+  line-height: 20px;
+}
+
+/* “Select all” cố định ở đầu khi cuộn */
+.options .f .ctl .ms-panel .row.all {
+  position: sticky;
+  top: 0;
+  background: #fff;
+  border-bottom: 1px solid #eef2f7;
+  z-index: 1;
+}
+
+/* Danh sách có cuộn */
+.options .f .ctl .ms-panel .list {
+  max-height: 280px;
+  overflow: auto;
+}
+
+/* Nút OK/Clear */
+.options .f .ctl .ms-panel .actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  padding: 10px 12px;
+  border-top: 1px solid #eef2f7;
+}
+
+/* Chuẩn hoá checkbox để không đè chữ */
+.options .f .ctl .ms-panel input[type="checkbox"] {
+  position: static;                /* tránh absolute từ global */
+  flex: 0 0 auto;
+  width: 16px;
+  height: 16px;
+  margin: 0 6px 0 0;
+  accent-color: #0ea5e9;
+}
+
+/* Text nằm gọn, không bị checkbox đè */
+.options .f .ctl .ms-panel .row span {
+  flex: 1 1 auto;
+  display: block;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Scrollbar nhẹ */
+.options .f .ctl .ms-panel .list::-webkit-scrollbar { width: 10px; }
+.options .f .ctl .ms-panel .list::-webkit-scrollbar-thumb {
+  background: #e5e7eb; border-radius: 6px;
+}
+.options .f .ctl .ms-panel .list::-webkit-scrollbar-thumb:hover {
+  background: #d1d5db;
+}
+@media (max-width: 640px) {
+  .options .f .ctl .ms-panel { left: 0; right: 0; margin-inline: auto; }
+}
+/* Neo panel ngay dưới ô Debtor, không bị cách xa */
+.options .f .ctl { position: relative; }     /* neo theo ô ctl */
+.options .f .ctl .ms-panel{
+  position: absolute;
+  top: calc(100% + 2px);   /* << chỉ cách 2px cho “sát” textbox */
+  left: 0;
+  min-width: 100%;
+  width: 420px;
+  max-width: min(420px, calc(100vw - 56px));
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  box-shadow: 0 14px 40px rgba(2,6,23,.12), 0 6px 16px rgba(2,6,23,.06);
+  z-index: 1000;
+  overflow: hidden;
+}
+
+/* Hàng checkbox – text luôn cùng 1 hàng */
+.options .f .ctl .ms-panel label.row{
+  display: grid !important;                 /* chắc chắn không bị ghi đè */
+  grid-template-columns: 18px 1fr;          /* 1 cột cho checkbox, 1 cột cho text */
+  align-items: center;
+  column-gap: 10px;
+  padding: 10px 14px;
+  font-size: 14px;
+  line-height: 20px;
+}
+
+.options .f .ctl .ms-panel label.row.all{
+  position: sticky; top: 0;
+  background: #fff; z-index: 1;
+  border-bottom: 1px solid #eef2f7;
+}
+
+/* Chuẩn hoá checkbox để không nhảy hàng / đè text */
+.options .f .ctl .ms-panel label.row input[type="checkbox"]{
+  display: inline-block !important;
+  width: 16px; height: 16px;
+  margin: 0;                               /* bỏ margin khiến canh không đều */
+  vertical-align: middle;
+  accent-color: #0ea5e9;
+}
+
+/* Text luôn chiếm phần còn lại, không tràn */
+.options .f .ctl .ms-panel label.row span{
+  overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+}
+
+/* Khu vực danh sách có cuộn */
+.options .f .ctl .ms-panel .list{
+  max-height: 280px; overflow: auto;
+}
+.options .f .ctl .ms-panel .list::-webkit-scrollbar { width: 10px; }
+.options .f .ctl .ms-panel .list::-webkit-scrollbar-thumb{
+  background: #e5e7eb; border-radius: 6px;
+}
+.options .f .ctl .ms-panel .list::-webkit-scrollbar-thumb:hover{
+  background: #d1d5db;
+}
+th.sortable{ cursor:pointer; user-select:none; }
+.sort::after{ content:''; margin-left:6px; border:5px solid transparent; display:inline-block; }
+.sort.asc::after{ border-bottom-color:#666; transform:translateY(-2px); }
+.sort.desc::after{ border-top-color:#666; transform:translateY(2px); }
+/* ========== Chỉ áp dụng cho dropdown Creditor ========== */
+
+.ms-panel.creditor-panel {
+  max-height: 320px;          /* giới hạn tổng chiều cao panel */
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;           /* phần list bên trong sẽ scroll */
+}
+
+/* vùng danh sách creditor có scroll riêng, không che footer */
+.ms-panel.creditor-panel .list {
+  flex: 1 1 auto;
+  max-height: 240px;          /* chỉnh tuỳ ý */
+  overflow-y: auto;
+}
+
+/* scrollbar gọn gàng (optional) */
+.ms-panel.creditor-panel .list::-webkit-scrollbar {
+  width: 6px;
+}
+
+.ms-panel.creditor-panel .list::-webkit-scrollbar-thumb {
+  background: #d1d5db;
+  border-radius: 999px;
+}

@@ -1,0 +1,1416 @@
+<div class="page">
+  <div class="titlebar">
+    <h1>Account Maintenance</h1>
+    <div class="titlebar-actions">
+      <button class="btn primary" (click)="print()">
+        Print Chart of Account
+      </button>
+    </div>
+  </div>
+
+  <!-- Top filter bar -->
+  <div class="options">
+    <fieldset class="filters">
+      <div class="f">
+        <div class="lbl">Account Type</div>
+        <div class="ctl">
+          <select [(ngModel)]="selectedType">
+            <option *ngFor="let t of accountTypes" [value]="t.id">
+              {{ t.label }}
+            </option>
+          </select>
+        </div>
+      </div>
+
+      <div class="f">
+        <div class="lbl">Find</div>
+        <div class="ctl">
+          <input [(ngModel)]="findText" (keyup.enter)="doFind()" />
+        </div>
+      </div>
+
+      <div class="f">
+        <div class="lbl">Up-To-Date</div>
+        <div class="ctl"><input type="date" [(ngModel)]="upToDate" /></div>
+      </div>
+    </fieldset>
+  </div>
+
+  <div class="content twocol">
+    <!-- LEFT SIDEBAR -->
+    <aside class="actions">
+      <button class="chip primary" (click)="openNewNormal()">
+        New Normal Account
+      </button>
+
+      <div class="actions-group">
+        <div class="actions-title">Special Accounts</div>
+        <button class="chip primary" (click)="openFixedAsset()">
+          Fixed Asset
+        </button>
+        <button class="chip primary" (click)="openBankCash()">
+          Bank, Cash, Deposit
+        </button>
+        <button class="chip primary" (click)="openDebtorCtrl()">
+          Debtor Control
+        </button>
+        <button class="chip primary" (click)="openCreditorCtrl()">
+          Creditor Control
+        </button>
+        <button class="chip primary" (click)="openStock()">Stock</button>
+        <button class="chip primary" (click)="openRetained()">
+          Retained Earning
+        </button>
+      </div>
+
+      <button class="chip primary" (click)="openFixedLinks()">
+        Maintain Fixed Assets Links
+      </button>
+    </aside>
+
+    <!-- RIGHT: TABLE -->
+    <section class="gridwrap">
+      <table class="grid">
+        <thead>
+          <tr>
+            <th class="desc">Description</th>
+            <th class="code">Acc. No.</th>
+            <th class="sp" style="width: 200px">Special Account Type</th>
+            <th class="cur">Currency</th>
+            <th class="bal r">Up-To-Date Balance</th>
+            <th class="opt r" style="width: 120px">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <ng-container *ngFor="let r of flat">
+            <tr
+              [id]="'row-' + r.node.id"
+              (click)="onRowSelect(r)"
+              [class.type]="r.node.kind === 'type'"
+              [class.special]="r.node.kind === 'special'"
+              [class.selected]="selectedNodeId === r.node.id"
+            >
+              <td class="desc">
+                <span [style.paddingLeft.px]="r.depth * 18"></span>
+                <button
+                  *ngIf="r.node.children?.length"
+                  class="toggle"
+                  type="button"
+                  (click)="onToggle(r.node, $event)"
+                >
+                  {{ r.node.expanded ? "−" : "+" }}
+                </button>
+                <span *ngIf="!r.node.children?.length" class="dot">•</span>
+                <span class="name">{{ r.node.desc }}</span>
+              </td>
+
+              <td class="code">{{ r.node.code || "" }}</td>
+              <td class="sp">{{ r.node.specialCode || "" }}</td>
+              <td class="cur">{{ r.node.currency || "" }}</td>
+
+              <td class="bal r">
+                {{ r.node.balance ?? "" | number : "1.2-2" }}
+              </td>
+
+              <!-- ONLY Edit + Delete -->
+              <td class="opt r">
+                <div class="row-actions">
+                  <button
+                    class="icon-btn icon-blue"
+                    *ngIf="r.node.kind !== 'type'"
+                    title="Edit"
+                    (click)="
+                      $event.preventDefault();
+                      $event.stopPropagation();
+                      openEdit(r.node)
+                    "
+                  >
+                    <svg
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2.1"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    >
+                      <path d="M12 20h9"></path>
+                      <path
+                        d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5z"
+                      ></path>
+                    </svg>
+                  </button>
+
+                  <button
+                    class="btn btn-danger"
+                    title="Delete"
+                    *ngIf="canDelete(r.node)"
+                    (click)="
+                      $event.preventDefault();
+                      $event.stopPropagation();
+                      askDelete(r.node)
+                    "
+                  >
+                  <span class="ico trash"></span>
+                  </button>
+                </div>
+              </td>
+            </tr>
+          </ng-container>
+        </tbody>
+      </table>
+    </section>
+  </div>
+
+  <!-- ======= MODALS (giữ nguyên) ======= -->
+
+  <!-- New Normal Account -->
+  <div class="dialog" *ngIf="ui.newNormalOpen">
+    <div class="dialog-panel">
+      <div class="dialog-title">
+        New Normal Account
+        <button class="x" (click)="ui.newNormalOpen = false">✕</button>
+      </div>
+      <div class="dialog-body">
+        <div class="grid3">
+          <label
+            >Parent Account/Type
+            <select [(ngModel)]="newNormal.parentId">
+              <optgroup label="Account Types">
+                <option *ngFor="let p of getTypesOnly()" [value]="p.id">
+                  {{ p.desc }}
+                </option>
+              </optgroup>
+              <optgroup label="Normal Accounts (can carry children)">
+                <option *ngFor="let p of getParents()" [value]="p.id">
+                  {{ p.desc }} ({{ p.code || p.id }})
+                </option>
+              </optgroup>
+            </select>
+          </label>
+
+          <label>
+            Account No.
+            <input
+              name="newNormalAccNo"
+              [ngModel]="newNormal.code"
+              (ngModelChange)="
+                newNormal.code = normalizeAcc($event);
+                validateNewNormalAccNo(newNormal.code)
+              "
+              [pattern]="accPattern"
+              required
+              #newNormalAccNo="ngModel"
+              placeholder="e.g. 410-0000"
+            />
+            <div
+              class="field-errors"
+              *ngIf="newNormalAccNo.invalid || newNormalAccNoDup"
+            >
+              <small class="err" *ngIf="newNormalAccNo.errors?.['pattern']">
+                Format must be 3 digits, a dash, and 4 chars (e.g. 410-0000).
+              </small>
+              <small class="err" *ngIf="newNormalAccNoDup">
+                This Account No. already exists under the selected parent.
+              </small>
+            </div>
+          </label>
+
+          <label
+            >Description
+            <input
+              [(ngModel)]="newNormal.desc"
+              placeholder="e.g. MARKETING EXPENSES"
+            />
+          </label>
+
+          <label
+            >Currency
+            <select [(ngModel)]="newNormal.currency">
+              <option *ngFor="let c of currencies" [value]="c">{{ c }}</option>
+            </select>
+          </label>
+
+          <label
+            >Cash Flow Category
+            <select [(ngModel)]="newNormal.cashflow">
+              <option>Operating Activities</option>
+              <option>Investing Activities</option>
+              <option>Financing Activities</option>
+            </select>
+          </label>
+        </div>
+      </div>
+      <div class="dialog-actions">
+        <button class="btn cancel" (click)="ui.newNormalOpen = false">
+          Cancel
+        </button>
+        <button
+          class="btn primary"
+          (click)="saveNewNormal()"
+          [disabled]="
+            newNormalAccNo?.invalid || newNormalAccNoDup || !newNormal.code
+          "
+        >
+          Save
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Fixed Asset -->
+  <div class="dialog" *ngIf="ui.fixedAssetOpen">
+    <div class="dialog-panel lg">
+      <div class="dialog-title">
+        Create New Fixed Asset Account
+        <button class="x" (click)="ui.fixedAssetOpen = false">✕</button>
+      </div>
+
+      <div class="dialog-body section-stack">
+        <!-- SECTION 1 -->
+        <div class="section">
+          <div class="section-title">
+            <span class="badge">1</span> Fixed Asset Account
+          </div>
+          <div class="grid2">
+            <label
+              >Parent Account/Type
+              <select [(ngModel)]="fixedAsset.parentIdAsset">
+                <optgroup label="Account Types">
+                  <option *ngFor="let p of getTypesOnly()" [value]="p.id">
+                    {{ p.desc }}
+                  </option>
+                </optgroup>
+                <optgroup label="Normal Accounts (can carry children)">
+                  <option *ngFor="let p of getParents()" [value]="p.id">
+                    {{ p.desc }} ({{ p.code || p.id }})
+                  </option>
+                </optgroup>
+              </select>
+            </label>
+
+            <label
+              >Currency Code
+              <select [(ngModel)]="fixedAsset.currency">
+                <option *ngFor="let c of currencies" [value]="c">
+                  {{ c }}
+                </option>
+              </select>
+            </label>
+
+            <label>
+              Account No.
+              <input
+                name="faAssetAccNo"
+                [ngModel]="fixedAsset.assetCode"
+                (ngModelChange)="
+                  fixedAsset.assetCode = normalizeAcc($event);
+                  validateFaAssetAccNo(fixedAsset.assetCode)
+                "
+                [pattern]="accPattern"
+                required
+                #faAssetAccNo="ngModel"
+                placeholder="e.g. 220-0000"
+              />
+              <div
+                class="field-errors"
+                *ngIf="faAssetAccNo.invalid || faAssetAccNoDup"
+              >
+                <small class="err" *ngIf="faAssetAccNo.errors?.['pattern']">
+                  Format must be 3 digits, a dash, and 4 chars (e.g. 220-0000).
+                </small>
+                <small class="err" *ngIf="faAssetAccNoDup">
+                  This Account No. already exists under the selected parent.
+                </small>
+              </div>
+            </label>
+
+            <label
+              >Cash Flow Category
+              <select [(ngModel)]="fixedAsset.cashflow">
+                <option>Investing Activities</option>
+                <option>Operating Activities</option>
+                <option>Financing Activities</option>
+              </select>
+            </label>
+
+            <label
+              >Description
+              <input
+                [(ngModel)]="fixedAsset.assetDesc"
+                (ngModelChange)="onFixedAssetNameChange($event)"
+                placeholder="e.g. COMPUTERS"
+              />
+            </label>
+
+            <label
+              >2nd Description
+              <input [(ngModel)]="fixedAsset.assetDesc2" />
+            </label>
+          </div>
+        </div>
+
+        <!-- SECTION 2 -->
+        <div class="section">
+          <div class="section-title">
+            <span class="badge">2</span> Accumulated Depreciation Account
+          </div>
+          <div class="grid2">
+            <label
+              >Parent Account/Type
+              <select [(ngModel)]="fixedAsset.parentIdDepr">
+                <optgroup label="Account Types">
+                  <option *ngFor="let p of getTypesOnly()" [value]="p.id">
+                    {{ p.desc }}
+                  </option>
+                </optgroup>
+                <optgroup label="Normal Accounts (can carry children)">
+                  <option *ngFor="let p of getParents()" [value]="p.id">
+                    {{ p.desc }} ({{ p.code || p.id }})
+                  </option>
+                </optgroup>
+              </select>
+            </label>
+
+            <label
+              >Currency Code
+              <select [(ngModel)]="fixedAsset.currency">
+                <option *ngFor="let c of currencies" [value]="c">
+                  {{ c }}
+                </option>
+              </select>
+            </label>
+
+            <label>
+              Account No.
+              <input
+                name="faDeprAccNo"
+                [ngModel]="fixedAsset.deprCode"
+                (ngModelChange)="
+                  fixedAsset.deprCode = normalizeAcc($event);
+                  validateFaDeprAccNo(fixedAsset.deprCode)
+                "
+                required
+                [pattern]="accPattern"
+                #faDeprAccNo="ngModel"
+                placeholder="e.g. 220-1005"
+              />
+              <div
+                class="field-errors"
+                *ngIf="faDeprAccNo.invalid || faDeprAccNoDup"
+              >
+                <small class="err" *ngIf="faDeprAccNo.errors?.['pattern']">
+                  Format must be 3 digits, a dash, and 4 chars (e.g. 220-1005).
+                </small>
+                <small class="err" *ngIf="faDeprAccNoDup">
+                  This Account No. already exists under the selected parent.
+                </small>
+              </div>
+            </label>
+
+            <label
+              >Cash Flow Category
+              <select [(ngModel)]="fixedAsset.cashflow">
+                <option>Investing Activities</option>
+                <option>Operating Activities</option>
+                <option>Financing Activities</option>
+              </select>
+            </label>
+
+            <label
+              >Description
+              <input
+                [(ngModel)]="fixedAsset.deprDesc"
+                placeholder="ACCUM. DEPRN. COMPUTERS"
+              />
+            </label>
+
+            <label
+              >2nd Description
+              <input [(ngModel)]="fixedAsset.deprDesc2" />
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <div class="dialog-actions">
+        <button class="btn cancel" (click)="ui.fixedAssetOpen = false">
+          Cancel
+        </button>
+        <button
+          class="btn primary"
+          (click)="saveFixedAsset()"
+          [disabled]="
+            faAssetAccNo?.invalid ||
+            faDeprAccNo?.invalid ||
+            faAssetAccNoDup ||
+            faDeprAccNoDup ||
+            !fixedAsset.assetCode ||
+            !fixedAsset.deprCode
+          "
+        >
+          Save
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Fixed Asset Links -->
+  <div class="dialog" *ngIf="ui.fixedLinksOpen">
+    <div class="dialog-panel lg">
+      <div class="dialog-title">
+        Fixed Asset Links
+        <button class="x" (click)="ui.fixedLinksOpen = false">✕</button>
+      </div>
+
+      <div class="dialog-body">
+        <table class="grid list">
+          <thead>
+            <tr>
+              <th>Asset A/C No.</th>
+              <th>Asset A/C Description</th>
+              <th>Asset Deprn. A/C No.</th>
+              <th>Asset Deprn. A/C Description</th>
+              <th style="width: 60px"></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let row of fixedLinks">
+              <td>{{ row.assetCode }}</td>
+              <td>{{ row.assetDesc }}</td>
+              <td>{{ row.deprCode }}</td>
+              <td>{{ row.deprDesc }}</td>
+              <td class="r">
+                <button
+                  class="btn btn-danger"
+                  title="Delete pair"
+                  (click)="askDeleteFixed(row)"
+                >
+                <span class="ico trash"></span>
+                </button>
+              </td>
+            </tr>
+            <tr *ngIf="!fixedLinks.length">
+              <td colspan="5" class="muted">
+                No links yet. Add a Fixed Asset to create a pair.
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="dialog-actions">
+        <button class="btn cancel" (click)="ui.fixedLinksOpen = false">
+          Cancel
+        </button>
+        <button class="btn primary" (click)="addFixedFromLinks()">Add</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bank / Cash / Deposit -->
+  <div class="dialog" *ngIf="ui.bankCashOpen">
+    <div class="dialog-panel xl">
+      <div class="dialog-title">
+        Create New Cash or Bank or Deposit Account
+        <button class="x" (click)="ui.bankCashOpen = false">✕</button>
+      </div>
+
+      <div class="dialog-body">
+        <div class="section">
+          <div class="section-title"><span class="badge">1</span> Account</div>
+          <div class="grid3">
+            <label
+              >Parent Account/Type
+              <select [(ngModel)]="bankCash.parentId">
+                <optgroup label="Account Types">
+                  <option *ngFor="let p of getTypesOnly()" [value]="p.id">
+                    {{ p.desc }}
+                  </option>
+                </optgroup>
+                <optgroup label="Normal Accounts (can carry children)">
+                  <option *ngFor="let p of getParents()" [value]="p.id">
+                    {{ p.desc }} ({{ p.code || p.id }})
+                  </option>
+                </optgroup>
+              </select>
+            </label>
+
+            <label
+              >Account Mode
+              <select [(ngModel)]="bankCash.mode">
+                <option>Bank</option>
+                <option>Cash</option>
+                <option>Deposit</option>
+              </select>
+            </label>
+
+            <label
+              >Under Account Type of…
+              <select
+                [(ngModel)]="bankCash.underType"
+                [disabled]="bankCash.underTypeLocked"
+              >
+                <option>Current Assets</option>
+                <option>Current Liabilities</option>
+              </select>
+              <small *ngIf="bankCash.underTypeLocked" class="muted"
+                >locked by parent selection</small
+              >
+            </label>
+
+            <label
+              >Currency
+              <select [(ngModel)]="bankCash.currency">
+                <option *ngFor="let c of currencies" [value]="c">
+                  {{ c }}
+                </option>
+              </select>
+            </label>
+
+            <label>
+              Account No.
+              <input
+                name="bankAccNo"
+                [ngModel]="bankCash.code"
+                (ngModelChange)="
+                  bankCash.code = normalizeAcc($event);
+                  validateBankAccNo(bankCash.code)
+                "
+                required
+                [pattern]="accPattern"
+                #bankAccNo="ngModel"
+                placeholder="e.g. 311-0110"
+              />
+              <div
+                class="field-errors"
+                *ngIf="bankAccNo.invalid || bankAccNoDup"
+              >
+                <small class="err" *ngIf="bankAccNo.errors?.['pattern']">
+                  Format must be 3 digits, a dash, and 4 chars (e.g. 311-0110).
+                </small>
+                <small class="err" *ngIf="bankAccNoDup">
+                  This Account No. already exists under the selected parent.
+                </small>
+              </div>
+            </label>
+
+            <label
+              >Description
+              <input
+                [ngModel]="bankCash.desc"
+                (ngModelChange)="onBankDescInput($event)"
+                placeholder="e.g. CBB 1234-5116-7890"
+              />
+            </label>
+
+            <label
+              >Cash Flow Category
+              <select [(ngModel)]="bankCash.cashflow">
+                <option>Operating Activities</option>
+                <option>Investing Activities</option>
+                <option>Financing Activities</option>
+              </select>
+            </label>
+          </div>
+        </div>
+
+        <br />
+        <div class="section">
+          <div class="section-title">
+            <span class="badge">2</span> Payment Method
+          </div>
+
+          <div class="toolbar">
+            <button class="btn primary" (click)="addPaymentMethod()">
+              Add Payment Method
+            </button>
+          </div>
+
+          <table class="grid list dense">
+            <thead>
+              <tr>
+                <th>Payment Method</th>
+                <th style="width: 150px">Journal Type</th>
+                <th>Bank Charge A/C</th>
+                <th class="r">Bank Charge %</th>
+                <th style="width: 80px"></th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr
+                *ngFor="let m of bankCash.methods; let i = index"
+                (click)="selectMethod(i)"
+                [class.selected]="bankCash.selectedMethodIndex === i"
+              >
+                <td>
+                  <input  [(ngModel)]="m.name" placeholder="Unique name" />
+                </td>
+                <td>
+                  <select [(ngModel)]="m.journalType" style="width: 120px">
+                    <option>BANK</option>
+                    <option>CASH</option>
+                    <option>DEPOSIT</option>
+                  </select>
+                </td>
+                <td>
+                  <input
+                    [(ngModel)]="m.bankChargeAcc"
+                    placeholder="e.g. 6xx-CHARGE"
+                  />
+                </td>
+                <td class="r">
+                  <input
+                    type="number"
+                    step="0.01"
+                    [(ngModel)]="m.bankChargeRate"
+                  />
+                </td>
+                <td class="r">
+                  <button
+                    class="btn btn-danger"
+                    title="Remove method"
+                    (click)="askRemoveMethod(i); $event.stopPropagation()"
+                  >
+                  <span class="ico trash"></span>
+                  </button>
+                </td>
+              </tr>
+              <tr *ngIf="!bankCash.methods.length">
+                <td colspan="5" class="muted">
+                  No payment methods. Add one above.
+                </td>
+              </tr>
+            </tbody>
+          </table>
+
+          <div class="section" *ngIf="selectedMethod() as s; else selectPM">
+            <div class="grid3">
+              <label
+                >Payment By
+                <input [(ngModel)]="s.paymentBy" placeholder="e.g. CHEQUE"
+              /></label>
+              <label
+                >Over Draft Limit
+                <input type="number" [(ngModel)]="bankCash.odLimit"
+              /></label>
+              <label
+                >Payment Type
+                <select [(ngModel)]="s.paymentType">
+                  <option>Cash</option>
+                  <option>Credit Card</option>
+                  <option>Multi</option>
+                  <option>Other</option>
+                </select>
+              </label>
+            </div>
+            <br />
+            <div class="row flags">
+              <label class="inline">
+                <input type="checkbox" [(ngModel)]="s.mergeBankCharge" />
+                Merge Bank Charges in Bank Reconciliation Transaction
+              </label>
+              <label class="inline">
+                <input type="checkbox" [(ngModel)]="s.requireExtraInfo" />
+                Need to specify additional information such as cheque number or
+                credit card number
+              </label>
+            </div>
+            <br />
+            <div class="section">
+              <div class="section-title">Document Numbering Format</div>
+              <div class="grid2">
+                <label
+                  >Payment Document Numbering Format
+                  <select [(ngModel)]="s.pvFormat">
+                    <option *ngFor="let o of docPvOptions" [ngValue]="o">
+                      {{ o }}
+                    </option>
+                  </select>
+                </label>
+                <label
+                  >Receipt Document Numbering Format
+                  <select [(ngModel)]="s.orFormat">
+                    <option *ngFor="let o of docOrOptions" [ngValue]="o">
+                      {{ o }}
+                    </option>
+                  </select>
+                </label>
+              </div>
+            </div>
+          </div>
+          <ng-template #selectPM>
+            <div class="muted" style="margin-top: 8px">
+              Select a payment method row to edit details below.
+            </div>
+          </ng-template>
+        </div>
+      </div>
+
+      <div class="dialog-actions">
+        <button class="btn cancel" (click)="ui.bankCashOpen = false">
+          Cancel
+        </button>
+        <button
+          class="btn primary"
+          (click)="saveBankCash()"
+          [disabled]="bankAccNo?.invalid || bankAccNoDup || !bankCash.code"
+        >
+          <!-- NEW: !bankCash.code -->
+          Save
+        </button>
+      </div>
+    </div>
+  </div>
+  <!-- Debtor Control -->
+  <div class="dialog" *ngIf="ui.debtorCtrlOpen">
+    <div class="dialog-panel">
+      <div class="dialog-title">
+        Create Debtor Control Account
+        <button class="x" (click)="ui.debtorCtrlOpen = false">✕</button>
+      </div>
+
+      <div class="dialog-body">
+        <!-- Hàng 1 -->
+        <div class="grid3">
+          <label
+            >Parent Account (&lt;&lt; CURRENT ASSETS &gt;&gt;)
+            <select [(ngModel)]="debtorCtrl.parentId">
+              <option *ngFor="let p of getTypesOnly()" [value]="p.id">
+                {{ p.desc }}
+              </option>
+            </select>
+          </label>
+
+          <label
+            >Account No.
+            <input
+              name="debtorAccNo"
+              [(ngModel)]="debtorCtrl.code"
+              #debtorAccNo="ngModel"
+              required
+              pattern="^\d{3}-\d{4}$"
+              placeholder="e.g. 333-0000"
+              (ngModelChange)="validateDebtorAccNo($event)"
+            />
+            <div
+              class="field-errors"
+              *ngIf="debtorAccNo.invalid || debtorAccNoDup"
+            >
+              <small class="err" *ngIf="debtorAccNo.errors?.['required']">
+                Account No. is required.
+              </small>
+              <small class="err" *ngIf="debtorAccNo.errors?.['pattern']">
+                Format must be 3 digits, a dash, and 4 digits (e.g. 333-0000).
+              </small>
+              <small class="err" *ngIf="debtorAccNoDup">
+                This Account No. already exists under the selected parent.
+              </small>
+            </div>
+          </label>
+
+          <label
+            >Currency Code
+            <select [(ngModel)]="debtorCtrl.currency">
+              <option *ngFor="let c of currencies" [value]="c">{{ c }}</option>
+            </select>
+          </label>
+        </div>
+
+        <!-- Hàng 2 -->
+        <div class="grid3">
+          <label
+            >Cash Flow Category
+            <select [(ngModel)]="debtorCtrl.cashflow">
+              <option>Operating Activities</option>
+              <option>Investing Activities</option>
+              <option>Financing Activities</option>
+            </select>
+          </label>
+
+          <label
+            >Description
+            <input
+              [(ngModel)]="debtorCtrl.desc"
+              placeholder="e.g. DEBTOR CONTROL (NORTHERN)"
+            />
+          </label>
+
+          <label
+            >2nd Description
+            <input [(ngModel)]="debtorCtrl.desc2" />
+          </label>
+        </div>
+      </div>
+
+      <div class="dialog-actions">
+        <button class="btn cancel" (click)="ui.debtorCtrlOpen = false">
+          Cancel
+        </button>
+        <button
+          class="btn primary"
+          (click)="saveDebtorCtrl()"
+          [disabled]="
+            !debtorCtrl.code || debtorAccNo?.invalid || debtorAccNoDup
+          "
+        >
+          Save
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Creditor Control -->
+  <div class="dialog" *ngIf="ui.creditorCtrlOpen">
+    <div class="dialog-panel">
+      <div class="dialog-title">
+        Create Creditor Control Account
+        <button class="x" (click)="ui.creditorCtrlOpen = false">✕</button>
+      </div>
+
+      <div class="dialog-body">
+        <!-- Hàng 1 -->
+        <div class="grid3">
+          <label>
+            Parent Account (&lt;&lt; CURRENT LIABILITIES &gt;&gt;)
+            <select [(ngModel)]="creditorCtrl.parentId">
+              <option *ngFor="let p of getTypesOnly()" [value]="p.id">
+                {{ p.desc }}
+              </option>
+            </select>
+          </label>
+
+          <label>
+            Account No.
+            <input
+              name="creditorAccNo"
+              [(ngModel)]="creditorCtrl.code"
+              #creditorAccNo="ngModel"
+              required
+              pattern="^\d{3}-\d{4}$"
+              placeholder="e.g. 440-0000"
+              (ngModelChange)="validateCreditorAccNo($event)"
+            />
+            <div
+              class="field-errors"
+              *ngIf="creditorAccNo.invalid || creditorAccNoDup"
+            >
+              <small class="err" *ngIf="creditorAccNo.errors?.['required']">
+                Account No. is required.
+              </small>
+              <small class="err" *ngIf="creditorAccNo.errors?.['pattern']">
+                Format must be 3 digits, a dash, and 4 digits (e.g. 440-0000).
+              </small>
+              <small class="err" *ngIf="creditorAccNoDup">
+                This Account No. already exists under the selected parent.
+              </small>
+            </div>
+          </label>
+
+          <label>
+            Currency Code
+            <select [(ngModel)]="creditorCtrl.currency">
+              <option *ngFor="let c of currencies" [value]="c">{{ c }}</option>
+            </select>
+          </label>
+        </div>
+
+        <!-- Hàng 2 -->
+        <div class="grid3">
+          <label>
+            Cash Flow Category
+            <select [(ngModel)]="creditorCtrl.cashflow">
+              <option>Operating Activities</option>
+              <option>Investing Activities</option>
+              <option>Financing Activities</option>
+            </select>
+          </label>
+
+          <label>
+            Description
+            <input
+              [(ngModel)]="creditorCtrl.desc"
+              placeholder="e.g. CREDITOR CONTROL (NORTHERN)"
+            />
+          </label>
+
+          <label>
+            2nd Description
+            <input [(ngModel)]="creditorCtrl.desc2" />
+          </label>
+        </div>
+      </div>
+
+      <div class="dialog-actions">
+        <button class="btn cancel" (click)="ui.creditorCtrlOpen = false">
+          Cancel
+        </button>
+        <button
+          class="btn primary"
+          (click)="saveCreditorCtrl()"
+          [disabled]="
+            !creditorCtrl.code || creditorAccNo?.invalid || creditorAccNoDup
+          "
+        >
+          Save
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Stock accounts -->
+  <div class="dialog" *ngIf="ui.stockOpen">
+    <div class="dialog-panel lg">
+      <div class="dialog-title">
+        Create New Stock Accounts
+        <button class="x" (click)="ui.stockOpen = false">✕</button>
+      </div>
+
+      <div class="dialog-body section-stack">
+        <!-- 1. Open Stock Account -->
+        <div class="section">
+          <div class="section-title">
+            <span class="badge">1</span> Open Stock Account
+          </div>
+          <div class="grid3">
+            <label
+              >Parent Account
+              <select [(ngModel)]="stock.open.parentId">
+                <optgroup label="Account Types">
+                  <option *ngFor="let p of getTypesOnly()" [value]="p.id">
+                    {{ p.desc }}
+                  </option>
+                </optgroup>
+              </select>
+            </label>
+
+            <label
+              >Currency Code
+              <select [(ngModel)]="stock.open.currency">
+                <option *ngFor="let c of currencies" [value]="c">
+                  {{ c }}
+                </option>
+              </select>
+            </label>
+
+            <label
+              >Cash Flow Category
+              <select [(ngModel)]="stock.open.cashflow">
+                <option>Operating Activities</option>
+                <option>Investing Activities</option>
+                <option>Financing Activities</option>
+              </select>
+            </label>
+
+            <label
+              >Account No.
+              <input
+                [class.invalid]="accError(stock.open.code)"
+                [ngModel]="stock.open.code"
+                (ngModelChange)="stock.open.code = normalizeAcc($event)"
+                placeholder="600-0000"
+              />
+            </label>
+            <div class="form-error" *ngIf="accError(stock.open.code) as e">
+              {{ e }}
+            </div>
+
+            <label
+              >Description
+              <input
+                [(ngModel)]="stock.open.desc"
+                placeholder="OPENING STOCK"
+              />
+            </label>
+
+            <label
+              >2nd Description
+              <input [(ngModel)]="stock.open.desc2" />
+            </label>
+          </div>
+        </div>
+
+        <!-- 2. Close Stock Account -->
+        <div class="section">
+          <div class="section-title">
+            <span class="badge">2</span> Close Stock Account
+          </div>
+          <div class="grid3">
+            <label
+              >Parent Account
+              <select [(ngModel)]="stock.close.parentId">
+                <optgroup label="Account Types">
+                  <option *ngFor="let p of getTypesOnly()" [value]="p.id">
+                    {{ p.desc }}
+                  </option>
+                </optgroup>
+              </select>
+            </label>
+
+            <label
+              >Currency Code
+              <select [(ngModel)]="stock.close.currency">
+                <option *ngFor="let c of currencies" [value]="c">
+                  {{ c }}
+                </option>
+              </select>
+            </label>
+
+            <label
+              >Cash Flow Category
+              <select [(ngModel)]="stock.close.cashflow">
+                <option>Operating Activities</option>
+                <option>Investing Activities</option>
+                <option>Financing Activities</option>
+              </select>
+            </label>
+
+            <label
+              >Account No.
+              <input
+                [class.invalid]="accError(stock.close.code)"
+                [ngModel]="stock.close.code"
+                (ngModelChange)="stock.close.code = normalizeAcc($event)"
+                placeholder="699-0000"
+              />
+            </label>
+            <div class="form-error" *ngIf="accError(stock.close.code) as e">
+              {{ e }}
+            </div>
+
+            <label
+              >Description
+              <input
+                [(ngModel)]="stock.close.desc"
+                placeholder="CLOSING STOCK"
+              />
+            </label>
+
+            <label
+              >2nd Description
+              <input [(ngModel)]="stock.close.desc2" />
+            </label>
+          </div>
+        </div>
+
+        <!-- 3. Balance Stock Account -->
+        <div class="section">
+          <div class="section-title">
+            <span class="badge">3</span> Balance Stock Account
+          </div>
+          <div class="grid3">
+            <label
+              >Parent Account
+              <select [(ngModel)]="stock.balance.parentId">
+                <optgroup label="Account Types">
+                  <option *ngFor="let p of getTypesOnly()" [value]="p.id">
+                    {{ p.desc }}
+                  </option>
+                </optgroup>
+              </select>
+            </label>
+
+            <label
+              >Currency Code
+              <select [(ngModel)]="stock.balance.currency">
+                <option *ngFor="let c of currencies" [value]="c">
+                  {{ c }}
+                </option>
+              </select>
+            </label>
+
+            <label
+              >Cash Flow Category
+              <select [(ngModel)]="stock.balance.cashflow">
+                <option>Operating Activities</option>
+                <option>Investing Activities</option>
+                <option>Financing Activities</option>
+              </select>
+            </label>
+
+            <label
+              >Account No.
+              <input
+                [class.invalid]="accError(stock.balance.code)"
+                [ngModel]="stock.balance.code"
+                (ngModelChange)="stock.balance.code = normalizeAcc($event)"
+                placeholder="600-0000"
+              />
+            </label>
+            <div class="form-error" *ngIf="accError(stock.balance.code) as e">
+              {{ e }}
+            </div>
+
+            <label
+              >Description
+              <input
+                [(ngModel)]="stock.balance.desc"
+                placeholder="BALANCE SHEET STOCK"
+              />
+            </label>
+
+            <label
+              >2nd Description
+              <input [(ngModel)]="stock.balance.desc2" />
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <div class="dialog-actions">
+        <button class="btn cancel" (click)="ui.stockOpen = false">
+          Cancel
+        </button>
+        <button
+          class="btn primary"
+          (click)="saveStock()"
+          [disabled]="
+            accError(stock.open.code) ||
+            accError(stock.close.code) ||
+            accError(stock.balance.code)
+          "
+        >
+          Save
+        </button>
+      </div>
+    </div>
+  </div>
+  <!-- Retained Earning -->
+  <div class="dialog" *ngIf="ui.retainedOpen">
+    <div class="dialog-panel">
+      <div class="dialog-title">
+        Add New Retained Earning Account
+        <button class="x" (click)="ui.retainedOpen = false">✕</button>
+      </div>
+
+      <div class="dialog-body">
+        <div class="grid3">
+          <!-- Parent Account -->
+          <label>
+            Parent Account (&lt;&lt; RETAINED EARNING &gt;&gt;)
+            <select [(ngModel)]="retained.parentId">
+              <option *ngFor="let p of getTypesOnly()" [value]="p.id">
+                {{ p.desc }}
+              </option>
+            </select>
+          </label>
+
+          <!-- Account No. + validate -->
+          <label>
+            Account No.
+            <input
+              name="retainedAccNo"
+              [ngModel]="retained.code"
+              (ngModelChange)="
+                retained.code = normalizeAcc($event);
+                validateRetainedAccNo(retained.code)
+              "
+              required
+              [pattern]="accPattern"
+              #retainedAccNo="ngModel"
+              placeholder="150-0000"
+            />
+            <div
+              class="field-errors"
+              *ngIf="retainedAccNo.invalid || retainedAccNoDup"
+            >
+              <small class="err" *ngIf="retainedAccNo.errors?.['pattern']">
+                Format must be 3 digits, a dash, and 4 digits (e.g. 150-0000).
+              </small>
+              <small class="err" *ngIf="retainedAccNoDup">
+                This Account No. already exists under the selected parent.
+              </small>
+            </div>
+          </label>
+
+          <!-- Currency Code -->
+          <label>
+            Currency Code
+            <select [(ngModel)]="retained.currency">
+              <option *ngFor="let c of currencies" [value]="c">{{ c }}</option>
+            </select>
+          </label>
+
+          <!-- Cash Flow Category -->
+          <label>
+            Cash Flow Category
+            <select [(ngModel)]="retained.cashflow">
+              <option>Operating Activities</option>
+              <option>Investing Activities</option>
+              <option>Financing Activities</option>
+            </select>
+          </label>
+
+          <!-- Description -->
+          <label>
+            Description
+            <input [(ngModel)]="retained.desc" placeholder="RETAINED EARNING" />
+          </label>
+
+          <!-- 2nd Description -->
+          <label>
+            2nd Description
+            <input [(ngModel)]="retained.desc2" />
+          </label>
+        </div>
+      </div>
+
+      <div class="dialog-actions">
+        <button class="btn cancel" (click)="ui.retainedOpen = false">
+          Cancel
+        </button>
+        <button
+          class="btn primary"
+          (click)="saveRetained()"
+          [disabled]="
+            !retained.code || retainedAccNo?.invalid || retainedAccNoDup
+          "
+        >
+          Save
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Edit -->
+  <div class="dialog" *ngIf="ui.editOpen">
+    <div class="dialog-panel">
+      <div class="dialog-title">
+        Edit Account
+        <button class="x" (click)="ui.editOpen = false">✕</button>
+      </div>
+      <div class="dialog-body">
+        <div class="grid3">
+          <label
+            >Parent Account/Type
+            <select
+              [(ngModel)]="edit.parentId"
+              [disabled]="editLockParent"
+              [title]="editLockReason"
+            >
+              <optgroup label="Account Types">
+                <option *ngFor="let p of getTypesOnly()" [value]="p.id">
+                  {{ p.desc }}
+                </option>
+              </optgroup>
+              <optgroup label="Normal Accounts (can carry children)">
+                <option *ngFor="let p of getParents()" [value]="p.id">
+                  {{ p.desc }} ({{ p.code || p.id }})
+                </option>
+              </optgroup>
+            </select>
+          </label>
+          <label
+            >Account No. <input [disabled]="true" [(ngModel)]="edit.code"
+          /></label>
+          <label>Description <input [(ngModel)]="edit.desc" /></label>
+          <label
+            >Currency
+            <select [(ngModel)]="edit.currency" [disabled]="true">
+              <option *ngFor="let c of currencies" [value]="c">{{ c }}</option>
+            </select>
+          </label>
+        </div>
+      </div>
+      <div class="dialog-actions">
+        <button class="btn cancel" (click)="ui.editOpen = false">Cancel</button>
+        <button class="btn primary" (click)="saveEdit()">Save</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Confirm Delete -->
+  <div class="dialog" *ngIf="ui.confirmDeleteOpen">
+    <div class="dialog-panel-small" role="dialog" aria-modal="true">
+      <div class="dialog-title">
+        Delete Account
+        <button class="x" (click)="closeConfirm()" aria-label="Close">✕</button>
+      </div>
+      <div class="dialog-body">
+        <p>
+          Are you sure you want to delete <b>{{ confirmNode?.desc }}</b>
+          <span *ngIf="confirmNode?.code">({{ confirmNode?.code }})</span> ?
+        </p>
+        <div *ngIf="!confirmCanDelete" class="warn" style="margin-top: 8px">
+          {{ confirmReason }}
+        </div>
+      </div>
+      <div class="dialog-actions">
+        <button class="btn cancel" (click)="closeConfirm()">Cancel</button>
+        <button
+          class="btn danger"
+          [disabled]="!confirmCanDelete"
+          (click)="confirmDelete()"
+        >
+          Delete
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Confirm Delete Fixed Link -->
+  <div class="dialog" *ngIf="ui.confirmFixedLinkOpen">
+    <div class="dialog-panel-small" role="dialog" aria-modal="true">
+      <div class="dialog-title">Confirm delete
+                <button class="x" (click)="closeConfirmFixed()" aria-label="Close">✕</button>
+      </div>
+      <div class="dialog-body">
+        <p>Are you sure you want to delete this fixed asset link?</p>
+        <div class="muted" *ngIf="pendingFixedLink">
+          <div>
+            <strong>Asset:</strong> {{ pendingFixedLink.assetCode }}
+            {{ pendingFixedLink.assetDesc }}
+          </div>
+          <div>
+            <strong>Depr:</strong> {{ pendingFixedLink.deprCode }}
+            {{ pendingFixedLink.deprDesc }}
+          </div>
+        </div>
+      </div>
+      <div class="dialog-actions">
+        <button class="btn cancel" (click)="closeConfirmFixed()">Cancel</button>
+        <button class="btn danger" (click)="confirmDeleteFixed()">
+          Delete
+        </button>
+      </div>
+    </div>
+  </div>
+  <!-- Confirm Remove Payment Method -->
+<div class="dialog" *ngIf="ui.confirmRemoveMethodOpen">
+  <div class="dialog-panel-small">
+    <div class="dialog-title">Confirm delete
+       <button class="x" (click)="closeConfirmRemoveMethod()" aria-label="Close">✕</button>
+    </div>
+
+    <div class="dialog-body">
+      <p>Are you sure you want to remove this payment method?</p>
+
+      <ng-container *ngIf="pendingMethodIndex !== null">
+        <div class="muted">
+          <div>
+            <strong>Name:</strong>
+            {{ bankCash.methods[pendingMethodIndex]?.name || '(unnamed)' }}
+          </div>
+          <div>
+            <strong>Journal Type:</strong>
+            {{ bankCash.methods[pendingMethodIndex]?.journalType }}
+          </div>
+          <div>
+            <strong>PV Format:</strong>
+            {{ bankCash.methods[pendingMethodIndex]?.pvFormat }}
+          </div>
+          <div>
+            <strong>OR Format:</strong>
+            {{ bankCash.methods[pendingMethodIndex]?.orFormat }}
+          </div>
+        </div>
+      </ng-container>
+    </div>
+
+    <div class="dialog-actions">
+      <button class="btn cancel" (click)="closeConfirmRemoveMethod()">Cancel</button>
+      <button class="btn danger" (click)="confirmRemoveMethod()">Remove</button>
+    </div>
+  </div>
+</div>
+
+</div>

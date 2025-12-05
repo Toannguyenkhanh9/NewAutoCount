@@ -1,0 +1,175 @@
+<div class="page">
+  <!-- Header / Toolbar -->
+  <div class="titlebar">
+    <h1>View Transaction Summary</h1>
+
+    <div class="toolbar">
+      <label class="cap">From</label>
+      <input class="inp" type="date" [(ngModel)]="dateFrom" />
+
+      <label class="cap">To</label>
+      <input class="inp" type="date" [(ngModel)]="dateTo" />
+
+      <select class="inp" [(ngModel)]="moduleFilter">
+        <option *ngFor="let m of modules" [value]="m">{{ m }}</option>
+      </select>
+
+      <select class="inp" [(ngModel)]="typeFilter">
+        <option *ngFor="let t of types" [value]="t">{{ t }}</option>
+      </select>
+
+      <!-- <input class="search" [(ngModel)]="q" placeholder="Search doc/party/description..." /> -->
+
+      <button class="btn ghost" (click)="quickThisMonth()">This Month</button>
+      <button class="btn ghost" (click)="quickLastMonth()">Last Month</button>
+      <button class="btn ghost" (click)="quickThisYear()">This Year</button>
+
+      <span class="sp"></span>
+      <button class="btn" (click)="onExport()">Export</button>
+      <button class="btn" (click)="onRefresh()">Refresh</button>
+      <button class="btn" (click)="onPrint()">Print</button>
+    </div>
+  </div>
+
+  <!-- Content layout -->
+  <div class="gridwrap">
+    <!-- Left: list -->
+    <div class="card">
+      <table>
+        <thead>
+          <tr>
+            <th style="width:120px">Date</th>
+            <th style="width:110px">Module</th>
+            <th style="width:130px">Type</th>
+            <th style="width:160px">Doc No</th>
+            <th style="width:180px">Party</th>
+            <th>Description</th>
+            <th class="text-end" style="width:140px">Debit</th>
+            <th class="text-end" style="width:140px">Credit</th>
+            <th class="text-end" style="width:120px">Net</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          <tr *ngFor="let r of filtered(); trackBy: trackById"
+              (click)="pick(r)"
+              [class.active]="isPicked(r)"
+              (dblclick)="openDetail()">
+            <td>{{ r.docDate }}</td>
+            <td><span class="badge">{{ r.module }}</span></td>
+            <td>{{ r.type }}</td>
+            <td class="monospace">{{ r.docNo }}</td>
+            <td class="cut">
+              <ng-container *ngIf="r.partyCode || r.partyName; else dash">
+                {{ r.partyCode }} — {{ r.partyName }}
+              </ng-container>
+              <ng-template #dash>—</ng-template>
+            </td>
+            <td class="cut">{{ r.description }}</td>
+            <td class="text-end">{{ r.debit  | number:'1.2-2' }}</td>
+            <td class="text-end">{{ r.credit | number:'1.2-2' }}</td>
+            <td class="text-end" [class.neg]="(r.debit - r.credit) < 0">
+              {{ (r.debit - r.credit) | number:'1.2-2' }}
+            </td>
+          </tr>
+        </tbody>
+
+        <tfoot>
+          <tr>
+            <td colspan="6" class="text-end"><b>Totals</b></td>
+            <td class="text-end"><b>{{ totalDebit()  | number:'1.2-2' }}</b></td>
+            <td class="text-end"><b>{{ totalCredit() | number:'1.2-2' }}</b></td>
+            <td class="text-end" [class.neg]="totalNet() < 0"><b>{{ totalNet() | number:'1.2-2' }}</b></td>
+          </tr>
+        </tfoot>
+      </table>
+
+      <div class="footer">
+        Records: {{ filtered().length }}
+        <span class="sep">•</span>
+        Double-click a row to view details
+      </div>
+    </div>
+
+    <!-- Right: summary -->
+    <div class="summary card">
+      <div class="sum-title">Summary by Type</div>
+
+      <div class="row hdr">
+        <div>Type</div>
+        <div class="num">Debit</div>
+        <div class="num">Credit</div>
+        <div class="num">Net</div>
+      </div>
+
+      <div class="row" *ngFor="let t of totalsByType()">
+        <div>{{ t.type }}</div>
+        <div class="num">{{ t.debit  | number:'1.2-2' }}</div>
+        <div class="num">{{ t.credit | number:'1.2-2' }}</div>
+        <div class="num" [class.neg]="t.net < 0">{{ t.net | number:'1.2-2' }}</div>
+      </div>
+
+      <hr />
+
+      <div class="row strong">
+        <div>Total</div>
+        <div class="num">{{ totalDebit()  | number:'1.2-2' }}</div>
+        <div class="num">{{ totalCredit() | number:'1.2-2' }}</div>
+        <div class="num" [class.neg]="totalNet() < 0">{{ totalNet() | number:'1.2-2' }}</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Detail Modal -->
+<div class="modal-layer" *ngIf="showDetail">
+  <div class="modal-panel" role="dialog" aria-modal="true">
+    <div class="modal-header">
+      <div class="modal-title">Transaction Detail — {{ selected?.docNo }}</div>
+      <button class="x" (click)="closeDetail()">✕</button>
+    </div>
+
+    <div class="modal-body">
+      <div class="meta">
+        <div><b>Date:</b> {{ selected?.docDate }}</div>
+        <div><b>Module:</b> {{ selected?.module }}</div>
+        <div><b>Type:</b> {{ selected?.type }}</div>
+        <div><b>Party:</b> {{ selected?.partyCode || '—' }} {{ selected?.partyName ? ('— ' + selected?.partyName) : '' }}</div>
+        <div class="full"><b>Description:</b> {{ selected?.description }}</div>
+      </div>
+
+      <table class="grid mini">
+        <thead>
+          <tr>
+            <th style="width:160px">Account</th>
+            <th>Account Name</th>
+            <th>Remark</th>
+            <th class="text-end" style="width:140px">Debit</th>
+            <th class="text-end" style="width:140px">Credit</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let l of detailLines()">
+            <td class="monospace">{{ l.acc }}</td>
+            <td>{{ l.accName }}</td>
+            <td class="cut">{{ l.remark }}</td>
+            <td class="text-end">{{ l.debit  | number:'1.2-2' }}</td>
+            <td class="text-end">{{ l.credit | number:'1.2-2' }}</td>
+          </tr>
+        </tbody>
+        <tfoot>
+          <tr>
+            <td colspan="3" class="text-end"><b>Total</b></td>
+            <td class="text-end"><b>{{ detailTotal('debit')  | number:'1.2-2' }}</b></td>
+            <td class="text-end"><b>{{ detailTotal('credit') | number:'1.2-2' }}</b></td>
+          </tr>
+        </tfoot>
+      </table>
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn ghost" (click)="closeDetail()">Close</button>
+      <button class="btn primary" (click)="onPrint()">Print</button>
+    </div>
+  </div>
+</div>

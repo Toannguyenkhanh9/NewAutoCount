@@ -1,0 +1,189 @@
+.page { padding: 6px 10px; }
+.titlebar { display:flex; align-items:center; justify-content:space-between; }
+.titlebar .toolbar { display:flex; gap:8px; align-items:center; }
+.titlebar .inline { display:flex; gap:6px; align-items:center; }
+
+.panel { margin-top:10px; background:#fff; border-radius:8px; padding:10px; box-shadow:0 1px 2px rgba(0,0,0,.05); }
+
+.grid { width:100%; border-collapse:collapse; font-size:13px; }
+.grid th, .grid td { border:1px solid #e5e7eb; padding:6px 8px; background:#fff; }
+.grid thead th { background:#f3f6f9; font-weight:600; }
+.w-320{width:320px} .w-110{width:110px} .w-70{width:70px}
+.text-end{text-align:right} .text-right{text-align:right} .mono{font-family:ui-monospace, SFMono-Regular, Menlo, monospace}
+
+.desc { display:flex; align-items:center; gap:6px; }
+.desc .indent { display:inline-block; }
+.tw{ border:none; background:transparent; cursor:pointer; font-size:14px; line-height:1; }
+.dot{ color:#777; margin-right:2px; }
+
+.amt{ width:100%; text-align:right; border:1px solid #e5e7eb; border-radius:6px; padding:4px 6px; background:#fcfcfc; }
+
+.total td{ background:#f9fafb; font-weight:600; }
+
+.panel-foot{
+  margin-top:10px; display:flex; align-items:center; justify-content:space-between;
+}
+.panel-foot .actions{ display:flex; gap:8px; }
+.btn{ padding:6px 10px; border-radius:8px; border:1px solid #d1d5db; background:#f8fafc; cursor:pointer; }
+.btn:hover{ background:#eef2f7; }
+.titlebar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.toolbar { display: flex; gap: 8px; }
+
+.panel { margin-top: 10px; background: #fff; border-radius: 8px; padding: 10px; box-shadow: 0 1px 2px rgba(0,0,0,.05); }
+
+.panel-tools {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.panel-tools .inline { display: inline-flex; align-items: center; gap: 6px; }
+
+.grid { width: 100%; border-collapse: collapse; font-size: 13px; }
+.grid th, .grid td { border: 1px solid #e5e7eb; padding: 6px 8px; background: #fff; }
+.grid thead th { background: #f3f6f9; font-weight: 600; }
+.w-320 { width: 320px; } .w-110 { width: 110px; } .w-70 { width: 70px; }
+.text-end { text-align: right; } .text-right { text-align: right; }
+.mono { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
+
+.desc { display: flex; align-items: center; gap: 6px; }
+.indent { display: inline-block; }
+.tw { border: none; background: transparent; cursor: pointer; font-size: 14px; line-height: 1; }
+.dot { color: #777; margin-right: 2px; }
+
+.amt { width: 100%; text-align: right; border: 1px solid #e5e7eb; border-radius: 6px; padding: 4px 6px; background: #fcfcfc; }
+
+.total td { background: #f9fafb; font-weight: 600; }
+
+.panel-foot {
+  margin-top: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.btn { padding: 6px 10px; border-radius: 8px; border: 1px solid #d1d5db; background: #f8fafc; cursor: pointer; }
+.btn:hover { background: #eef2f7; }
+.btn.primary { background: #16a34a; border-color: #16a34a; color: #fff; }
+.btn.primary:hover { background: #15803d; }
+.panel-tools{
+  display: flex;
+  align-items: center;      /* canh giữa theo chiều dọc */
+  gap: 10px;
+  padding: 4px 0;
+}
+
+.fy-label{
+  white-space: nowrap;      /* không xuống dòng chữ "Fiscal Year:" */
+  font-weight: 600;
+}
+
+.inp.fy{
+  min-width: 90px;          /* cho combobox đều tay */
+  height: 32px;
+}
+
+.panel .grid{ margin-top: 8px; }
+/* Hàng cha (group) nổi bật, nền nhạt, chữ đậm */
+tr.group-row {
+  background: #f6faf6;
+  font-weight: 600;
+
+  .desc { color: #1f6e43; }
+  .group-cell {
+    opacity: .6;
+    background: #f2f5f2;
+    border-radius: 6px;
+    height: 34px;
+    line-height: 34px;
+    text-align: center;
+    border: 1px solid #e7ece7;
+  }
+  .amt { display: none; } /* an toàn, dù HTML không render input cho group */
+}
+
+/* Hàng con (leaf) có chấm đầu dòng */
+.desc .dot { margin-right: 6px; color: #6b7280; }
+
+/* Input số: canh phải + màu theo dấu */
+input.amt {
+  text-align: right;
+  &.neg { color: #c62828; }  /* đỏ */
+  &.pos { color: #2e7d32; }  /* xanh */
+}
+
+/* Tổng cột cũng tô màu */
+.total .neg { color: #c62828; }
+.total .pos { color: #2e7d32; }
+ /* tạo khoảng cách nhỏ xuống bảng */
+ .panel-foot {
+  display: flex;
+  align-items: center;
+}
+
+.chk.inline {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;          /* khoảng cách giữa ô check và text */
+  margin: 0;         /* tránh label xuống dòng */
+  line-height: 1;    /* canh đều theo chiều dọc */
+}
+
+.chk.inline input {
+  margin: 0;         /* bỏ margin mặc định của checkbox */
+  vertical-align: middle;
+}
+.panel-foot {
+  display: flex;
+  align-items: center;
+}
+
+/* Put the checkbox + text on the same line */
+.panel-foot .chk.inline {
+  display: inline-flex !important;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  white-space: nowrap;
+}
+
+/* Kill any global “input { display:block;width:100% }” for this checkbox */
+.panel-foot .chk.inline .chkbox {
+  display: inline-block !important;
+  width: auto !important;
+  height: auto !important;
+  margin: 0 !important;
+  vertical-align: middle !important;
+  line-height: normal !important;
+}
+
+/* Đảm bảo bản thân checkbox không bị style cũ đẩy xuống dòng */
+.panel-foot .chk > input {
+  display: inline-block !important;
+  margin: 0;
+  vertical-align: middle;
+}
+.sub-total {
+  background: #f7fbf5;
+  & .desc .label {
+    font-weight: 600;
+    color: #14532d;
+  }
+  td {
+    border-top: 1px dashed #d9e9d3;
+  }
+}
+.group-row .desc { font-weight: 700; }
+.mono { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace; }
+.pos { color: #1c7c3b; }
+.neg { color: #c2410c; }
+
+
+
+

@@ -1,0 +1,204 @@
+
+.options{padding:10px 12px;border-bottom:1px solid #eef2f7;background:#f8fbff;}
+.opt-grid{display:grid;grid-template-columns:2fr 2fr 1fr;gap:12px;}
+fieldset{border:1px solid #d7deea;border-radius:8px;padding:10px;background:#fff;}
+legend{padding:0 6px;color:#0f2c61;font-weight:800;}
+label{display:flex;flex-direction:column;gap:6px;font-weight:600;color:#334155;}
+input,select{border:1px solid #d7deea;border-radius:8px;padding:6px 8px;height:34px;}
+label.chk{flex-direction:row;align-items:center;gap:8px;font-weight:600;}
+label.chk input{height:auto;}
+.r{text-align:right}.c{text-align:center}
+
+tbody.group-head td{background:#f0f7ff;color:#0f2c61;font-weight:800;border-top:1px solid #d7e6ff;}
+tbody.group-total td{background:#fafcff;border-top:1px solid #eef2f7;}
+
+.totals{padding:8px 12px 16px;display:flex;flex-direction:column;gap:6px;align-items:flex-end;}
+.totals .row{display:flex;gap:24px;min-width:320px;justify-content:space-between;color:#0f2c61;}
+.totals .row strong{font-weight:800;}
+.previewbox{padding:10px 12px;}
+.criteria{margin-top:6px;color:#475569;background:#f8fafc;border:1px dashed #d7deea;padding:8px;border-radius:8px;}
+
+@media (max-width:1024px){ .opt-grid{grid-template-columns:1fr;}}
+.page { background: #fff; }
+.titlebar { display:flex; justify-content:space-between; align-items:center; }
+.toolbar .btn { margin-left:.5rem; }
+.options .opt-grid { display:grid; grid-template-columns: repeat(3, minmax(260px, 1fr)); gap:16px; }
+fieldset { border:1px solid #e5e7eb; border-radius:8px; padding:12px 12px 10px; }
+.debtor-filter { display:flex; align-items:center; gap:8px; }
+.debtor-filter .range input { width:130px; }
+.debtor-filter .multi { min-width:260px;min-height: 100px; }
+.table { width:100%; border-collapse:separate; border-spacing:0; }
+.table th, .table td { padding:10px 12px; border-bottom:1px solid #edf1f4; }
+.table td.r, .table th.r { text-align: right; }
+.table td.c, .table th.c { text-align: center; }
+.table .link { color:#2563eb; cursor:pointer; }
+tfoot tr.sum { background:#f8fafc; font-weight:600; }
+.group-head tr { background:#f3f4f6; }
+.group-total tr { background:#f8fafc; }
+.previewbox { margin-top:16px; padding:12px; border:1px dashed #d1d5db; border-radius:8px; }
+.sum-row {
+  background: #fafafa;
+}
+.sum-row td {
+  padding-top: 10px;
+  border-top: 1px solid #eee;
+}
+.r { text-align: right; }
+.blue { color: #1f6feb; font-weight: 600; }
+/* canh top hai control trong dòng Debtor */
+.debtor-line {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start; /* 🔝 quan trọng */
+}
+
+/* tùy chọn: set kích thước cho đẹp */
+.debtor-mode { height: 38px; }         /* bằng chiều cao input thường */
+.debtor-multi {height: 120px; }
+th {
+  user-select: none;
+}
+th[ng-reflect-ng-class], th[ng-reflect-ng-class] .arrow, th.sorted {
+  cursor: pointer;
+}
+th.sorted { text-decoration: underline; }
+th.sorted.desc .arrow { transform: rotate(180deg); }
+.arrow { margin-left: 4px; font-size: 12px; }
+/* --- Options area full width & equal columns --- */
+.options {
+  width: 100%;
+}
+
+.opt-grid fieldset {
+  width: 100%;
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr)); /* 12 cột chuẩn */
+  gap: 12px;
+  border: 0; /* nếu muốn bỏ khung */
+  padding: 0;
+  margin: 0;
+}
+
+/* Mặc định mỗi control chiếm 3 cột = 4 ô/row trên màn rộng */
+.opt-grid fieldset > label,
+.opt-grid fieldset > .field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  grid-column: span 3;
+}
+
+/* Tự full chiều ngang của ô */
+.opt-grid fieldset input,
+.opt-grid fieldset select {
+  width: 100%;
+}
+
+/* Debtor line: select + range/multi nằm cùng hàng, canh top */
+.debtor-line {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+}
+.debtor-line .w-44 { max-width: 200px; }       /* dropdown "Debtor mode" */
+.debtor-line .range input { width: 140px; }    /* From/To code */
+.debtor-multi { width: 100%; min-height: 120px; }
+
+/* Responsive: 2 ô/row khi màn < 1280px */
+@media (max-width: 1280px) {
+  .opt-grid fieldset > label,
+  .opt-grid fieldset > .field {
+    grid-column: span 6;
+  }
+}
+
+/* 1 ô/row khi màn < 640px (mobile) */
+@media (max-width: 640px) {
+  .opt-grid fieldset > label,
+  .opt-grid fieldset > .field {
+    grid-column: span 12;
+  }
+}
+/* ===== Filter bar ===== */
+.filters{
+  width:100%;
+  background:#f8fafc;            /* nền nhẹ */
+  border-radius:12px;
+  padding:12px 16px;
+  display:grid;
+  grid-template-columns:repeat(12, minmax(0,1fr));
+  gap:12px;
+  align-items:start;
+  border:1px solid #eef2f7;       /* viền mảnh */
+}
+
+.filters .f{
+  grid-column:span 2;             /* 4 ô/row trên màn rộng */
+  min-width:0;
+  display:flex;
+  flex-direction:column;
+  gap:6px;
+}
+
+@media (max-width:1200px){
+  .filters .f{ grid-column:span 6; }   /* 2 ô/row */
+}
+@media (max-width:640px){
+  .filters .f{ grid-column:span 12; }  /* 1 ô/row */
+}
+
+.lbl{
+  font-size:12px;
+  font-weight:600;
+  color:#4b5563;
+}
+
+.ctl select,
+.ctl input{
+  height:36px;
+  width:100%;
+  padding:0 12px;
+  border:1px solid #e5e7eb;
+  border-radius:10px;
+  background:#fff;
+}
+.ctl select:focus,
+.ctl input:focus{
+  outline:0;
+  border-color:#34c759;
+  box-shadow:0 0 0 3px rgba(52,199,89,.15);
+}
+
+/* icon nhỏ bên trái (cho Date) */
+.icon-left{ position:relative; }
+.icon-left input{ padding-left:38px; }
+.icon-left::before{
+  content:"";
+  position:absolute; left:12px; top:50%;
+  width:18px; height:18px; transform:translateY(-50%);
+  opacity:.6;
+  background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" fill="%2399A3AD" viewBox="0 0 24 24"><path d="M7 2a1 1 0 0 1 1 1v1h8V3a1 1 0 1 1 2 0v1h1a2 2 0 0 1 2 2v13a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h1V3a1 1 0 1 1 2 0v1zm12 6H5v11h14V8z"/></svg>') no-repeat center/18px;
+}
+
+/* Nút toolbar sẵn có có thể giữ nguyên; nếu cần trùng tone: */
+.segment{ display:inline-flex; gap:6px; margin-bottom:8px; }
+.segment button{
+  height:30px; padding:0 12px; border:1px solid #e5e7eb;
+  border-radius:8px; background:#fff; cursor:pointer;
+}
+.segment button.on{
+  background:#34c759; border-color:#34c759; color:#fff;
+}
+/* Item full-width trong grid */
+.filters .gfull { grid-column: 1 / -1; }
+
+/* Hàng nút actions */
+.filters .actions{
+  display:flex;
+  justify-content:flex-end;
+  align-items:center;
+  gap:10px;
+  padding-top:4px;
+}
+
+

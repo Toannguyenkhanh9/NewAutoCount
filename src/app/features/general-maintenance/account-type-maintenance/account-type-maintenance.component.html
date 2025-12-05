@@ -1,0 +1,199 @@
+<div class="page">
+  <div class="titlebar">
+    <h1>Account Type Maintenance</h1>
+
+    <div class="toolbar">
+      <input
+        class="search1"
+        type="text"
+        placeholder="Search code / description / category…"
+        [(ngModel)]="q"
+        (input)="page = 1"
+      />
+      <button class="btn primary" (click)="openNew()">New</button>
+      <button class="btn" [disabled]="!selected" (click)="openEdit()">
+        Edit
+      </button>
+      <button class="btn danger" [disabled]="!canDelete()" (click)="onDelete()">
+        Delete
+      </button>
+    </div>
+  </div>
+
+  <div class="gridwrap">
+    <table>
+      <thead>
+        <tr>
+          <th style="width: 110px">AccType</th>
+          <th>Description</th>
+          <th>2nd Description</th>
+          <th style="width: 190px">Reporting Category</th>
+          <th style="width: 150px">System/User Defined</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        <tr
+          *ngFor="
+            let r of filtered()
+              | slice : (page - 1) * pageSize : (page - 1) * pageSize + pageSize
+          "
+          (click)="selected = r"
+          [class.is-selected]="selected === r"
+        >
+          <td class="mono">{{ r.code }}</td>
+          <td class="clip" [title]="r.description">{{ r.description }}</td>
+          <td class="clip" [title]="r.secondDesc">{{ r.secondDesc || "-" }}</td>
+          <td>{{ r.category }}</td>
+          <td>
+            <span class="pill" [class.ok]="r.system">
+              {{ r.system ? "System" : "User Defined" }}
+            </span>
+          </td>
+        </tr>
+
+        <tr *ngIf="(filtered() || []).length === 0">
+          <td class="empty" colspan="5">No data</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="panel-foot">
+    <div class="rec">Records: {{ filtered().length }}</div>
+    <div class="pager">
+      <button class="pg" [disabled]="page === 1" (click)="page = 1">
+        &laquo;
+      </button>
+      <button class="pg" [disabled]="page === 1" (click)="page = page - 1">
+        &lsaquo;
+      </button>
+      <span class="pg-label">Page {{ page }} / {{ pageCount() }}</span>
+      <button
+        class="pg"
+        [disabled]="page === pageCount()"
+        (click)="page = page + 1"
+      >
+        &rsaquo;
+      </button>
+      <button
+        class="pg"
+        [disabled]="page === pageCount()"
+        (click)="page = pageCount()"
+      >
+        &raquo;
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Dialog -->
+<div class="dialog" *ngIf="showDialog">
+  <div class="dialog-panel">
+    <div class="dialog-title">
+      {{ editMode ? "Edit Account Type" : "New Account Type" }}
+      <button class="x" (click)="closeDialog()">✕</button>
+    </div>
+
+    <div class="dialog-body">
+      <div class="grid2">
+        <label class="lbl"
+          >AccType
+          <input
+            class="inp mono"
+            [(ngModel)]="form.code"
+            [readOnly]="editMode"
+            [class.readonly]="editMode"
+            required
+            placeholder="e.g. BK"
+            #typeCodeModel="ngModel"
+          />
+          <div class="err" *ngIf="submitted && typeCodeModel.invalid">
+            Type Code is required
+          </div>
+        </label>
+        <label class="lbl"
+          >Description
+          <input
+            class="inp"
+            [(ngModel)]="form.description"
+            required
+            #descModel="ngModel"
+          />
+          <div class="err" *ngIf="submitted && descModel.invalid">
+            Description is required
+          </div>
+        </label>
+        <label class="lbl"
+          >2nd Description
+          <input class="inp" [(ngModel)]="form.secondDesc" name="secondDesc" />
+        </label>
+        <label class="lbl"
+          >Reporting Category
+          <select class="inp" [(ngModel)]="form.category">
+            <option>Balance Sheet Type</option>
+            <option>Profit and Loss Type</option>
+          </select>
+        </label>
+        <label class="lbl" *ngIf="false">
+          System/User
+          <select class="inp" [(ngModel)]="form.system" disabled>
+            <option [ngValue]="false">User Defined</option>
+          </select>
+        </label>
+      </div>
+    </div>
+
+    <div class="dialog-actions">
+      <button class="btn cancel" (click)="closeDialog()">Cancel</button>
+      <button
+        class="btn primary"
+        (click)="save(typeCodeModel.invalid || descModel.invalid)"
+        [disabled]="typeCodeModel.invalid || descModel.invalid"
+      >
+        {{ editMode ? "Save" : "Create" }}
+      </button>
+    </div>
+  </div>
+</div>
+<div class="dialog" *ngIf="showDeleteConfirm">
+  <div class="dialog-panel-small" role="dialog" aria-modal="true">
+    <div class="dialog-title">
+      Delete Debtor Type &nbsp;<button
+        class="x"
+        (click)="closeDeleteConfirm()"
+        aria-label="Close"
+      >
+        ×
+      </button>
+    </div>
+
+    <div class="dialog-body">
+      <p>
+        Are you sure you want to delete
+        <b>{{ selected?.code }}</b>
+        ?
+      </p>
+    </div>
+
+    <div class="dialog-actions">
+      <button class="btn" (click)="closeDeleteConfirm()">Cancel</button>
+      <button class="btn danger" (click)="delete()">Delete</button>
+    </div>
+  </div>
+</div>
+<div class="dialog" *ngIf="showSuccess">
+  <div class="dialog-panel-small" role="dialog" aria-modal="true" style="min-width: 360px">
+    <div class="dialog-title" style="background: linear-gradient(180deg,#9be28a 0%, #62c84f 100%);">
+       Success
+      <button class="x" (click)="closeSuccess()" aria-label="Close">×</button>
+    </div>
+    <div class="dialog-body">
+      <p style="margin: 8px 0; font-weight:600; color:#14532d">{{ successMsg }}</p>
+    </div>
+    <div class="dialog-actions">
+      <button class="btn primary" (click)="closeSuccess()">OK</button>
+    </div>
+  </div>
+</div>
+

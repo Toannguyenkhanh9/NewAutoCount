@@ -1,0 +1,290 @@
+<div class="cp-page">
+  <div class="panel">
+    <div class="titlebar">
+      <div class="panel-title">Company Profile</div>
+      <div class="toolbar">
+        <button class="btn" (click)="edit()" [disabled]="isEdit">Edit</button>
+        <button class="btn btn-save" (click)="save()" [disabled]="!isEdit">
+          Save
+        </button>
+        <button class="btn" (click)="cancel()" [disabled]="!isEdit">
+          Cancel
+        </button>
+      </div>
+    </div>
+
+    <div class="panel-body">
+      <div class="layout">
+        <!-- Left -->
+        <div class="col">
+          <div class="group">
+            <div class="group-title">Company Information</div>
+            <div class="form-grid">
+              <div class="col-span-2">
+                <label class="lbl">Company Name</label>
+                <input
+                  class="inp"
+                  [(ngModel)]="form.name"
+                  [readonly]="!isEdit"
+                />
+              </div>
+
+              <div>
+                <label class="lbl">Registration No.</label>
+                <input
+                  class="inp mono"
+                  [(ngModel)]="form.regNo"
+                  [readonly]="!isEdit"
+                />
+              </div>
+              <div>
+                <label class="lbl">Tax Reg. No. (GST/SST/VAT)</label>
+                <input
+                  class="inp mono"
+                  [(ngModel)]="form.taxRegNo"
+                  [readonly]="!isEdit"
+                />
+              </div>
+
+              <div>
+                <label class="lbl">Remark</label>
+                <div class="row-inline">
+                  <input
+                    class="inp mono"
+                    [(ngModel)]="form.remark"
+                    [readonly]="!isEdit"
+                    [ngStyle]="{
+                      'background-color': form.remarkColor || '',
+                      color: getContrast(form.remarkColor)
+                    }"
+                  />
+
+                  <!-- Nút Color (input color đè lên) -->
+                  <div class="color-btn-wrap" [class.disabled]="!isEdit">
+                    <button
+                      type="button"
+                      class="btn small primary color-pick"
+                      [disabled]="!isEdit"
+                    >
+                      Color
+                    </button>
+                    <input
+                      type="color"
+                      class="color-overlay"
+                      [(ngModel)]="form.remarkColor"
+                      (input)="onRemarkColorChange()"
+                      [disabled]="!isEdit"
+                      aria-label="Pick remark color"
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="group">
+            <div class="group-title">Contact & Address</div>
+            <div class="form-grid">
+              <div class="col-span-2">
+                <label class="lbl">Address</label>
+                <input
+                  class="inp"
+                  [(ngModel)]="form.address1"
+                  [readonly]="!isEdit"
+                />
+              </div>
+              <div>
+                <label class="lbl">Post Code</label>
+                <input
+                  class="inp"
+                  [(ngModel)]="form.postcode"
+                  [readonly]="!isEdit"
+                />
+              </div>
+              <div>
+                <label class="lbl">Phone</label>
+                <input
+                  class="inp"
+                  [(ngModel)]="form.phone"
+                  [readonly]="!isEdit"
+                />
+              </div>
+              <div>
+                <label class="lbl">Fax</label>
+                <input
+                  class="inp"
+                  [(ngModel)]="form.fax"
+                  [readonly]="!isEdit"
+                />
+              </div>
+              <div>
+                <label class="lbl">Email</label>
+                <input
+                  class="inp"
+                  [(ngModel)]="form.email"
+                  [readonly]="!isEdit"
+                />
+              </div>
+              <div class="col-span-2">
+                <label class="lbl">Contact Person</label>
+                <input
+                  class="inp"
+                  [(ngModel)]="form.contactPerson"
+                  [readonly]="!isEdit"
+                />
+              </div>
+            </div>
+          </div>
+
+          <!-- Delivery Info -->
+          <div class="group">
+            <div class="group-title">Delivery Info</div>
+            <div class="form-grid two-cols">
+              <div>
+                <label class="lbl">Delivery Address</label>
+                <input
+                  class="inp"
+                  [(ngModel)]="form.deliveryAddress1"
+                  [readonly]="!isEdit"
+                />
+              </div>
+              <div>
+                <label class="lbl">Phone</label>
+                <input
+                  class="inp"
+                  [(ngModel)]="form.deliveryPhone"
+                  [readonly]="!isEdit"
+                />
+              </div>
+              <div>
+                <label class="lbl">Fax</label>
+                <input
+                  class="inp"
+                  [(ngModel)]="form.deliveryFax"
+                  [readonly]="!isEdit"
+                />
+              </div>
+
+              <div class="col-span-2">
+                <label class="lbl">Post Code</label>
+                <input
+                  class="inp"
+                  [(ngModel)]="form.deliveryPostcode"
+                  [readonly]="!isEdit"
+                />
+              </div>
+
+              <div class="col-span-2">
+                <label class="lbl">Delivery Contact Person</label>
+                <input
+                  class="inp"
+                  [(ngModel)]="form.deliveryContactPerson"
+                  [readonly]="!isEdit"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right -->
+        <div class="col side">
+          <div class="group sticky">
+            <div class="group-title title-stack">
+              <div class="title-main">Company Logo</div>
+              <div class="title-sub">(96×96 px)</div>
+            </div>
+            <!-- THÊM LỚP BỌC group-content -->
+            <div class="group-content">
+              <div class="logo-box">
+                <ng-container *ngIf="form.logoDataUrl; else noLogo">
+                  <img [src]="form.logoDataUrl" alt="logo" />
+                </ng-container>
+                <ng-template #noLogo
+                  ><div class="logo-ph">No logo</div></ng-template
+                >
+              </div>
+
+              <div class="logo-actions">
+                <label
+                  class="btn small primary upload-btn"
+                  [class.disabled]="!isEdit"
+                >
+                  Upload
+                  <input
+                    #logoInput
+                    type="file"
+                    accept="image/*"
+                    hidden
+                    [disabled]="!isEdit"
+                    (click)="resetFileInput(logoInput)"
+                    (change)="onLogoSelected($event)"
+                    aria-label="Choose logo image"
+                  />
+                </label>
+
+                <button
+                  class="btn small danger"
+                  (click)="clearLogo()"
+                  [disabled]="!isEdit || !form.logoDataUrl"
+                >
+                  Remove
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div class="group">
+            <div class="group-title">Report Header</div>
+
+            <div class="group-content report-hdr">
+              <!-- Quick start -->
+              <div class="header-actions">
+                <div class="hint-strong">Quick start:</div>
+                <button
+                  type="button"
+                  class="btn primary lg"
+                  (click)="setDefaultHeader()"
+                  [disabled]="!isEdit"
+                >
+                  <span class="icon">↻</span>
+                  Set Default Report Header
+                </button>
+              </div>
+
+              <!-- Toolbar + Editor của Quill -->
+              <quill-editor
+                theme="snow"
+                [modules]="quillModules"
+                [readOnly]="!isEdit"
+                (onEditorCreated)="onQuillReady($event)"
+                (onContentChanged)="onQuillChangeHtml($event.html)"
+              >
+              </quill-editor>
+            </div>
+          </div>
+
+          <div class="print-note">
+            <div class="muted">Hint:</div>
+            <ul>
+              <li>
+                This information is used for printing invoices and documents..
+              </li>
+              <li>
+                Fields with white background are editable when enabled.
+                <b>Edit</b>.
+              </li>
+              <li>
+                The <b>Print</b> button will print the page in “Preview” format.
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel-foot">
+      <div class="muted">Last saved locally (localStorage).</div>
+      <div class="spacer"></div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,372 @@
+<!-- Cash Book Entry - Listing -->
+<div class="page">
+  <div class="titlebar">
+    <h1>Cash Book Entry</h1>
+    <div class="toolbar">
+      <select class="filter" style="width: 200px;" [(ngModel)]="typeFilter">
+        <option>All</option>
+        <option>Receipt</option>
+        <option>Payment</option>
+      </select>
+      <input
+        class="search1"
+        [(ngModel)]="q"
+        placeholder="Search type / doc no ..."
+      />
+      <button class="btn primary" type="button" (click)="openNewChoice()">
+        <span class="ico plus"></span> New
+      </button>
+      <button class="btn" [disabled]="!selected" (click)="openEdit(selected!)">
+        <span class="ico edit"></span>Edit
+      </button>
+      <button class="btn danger" [disabled]="!selected" (click)="askDelete()">
+        <span class="ico trash"></span>Delete
+      </button>
+    </div>
+  </div>
+
+  <div class="gridwrap">
+    <table>
+      <thead>
+        <tr>
+          <th style="width: 140px">Doc No.</th>
+          <th style="width: 120px">Doc Date</th>
+          <th style="width: 100px">Type</th>
+          <th>Payer / Payee</th>
+          <th>Description</th>
+          <th class="text-end" style="width: 140px">Net Total</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr
+          *ngFor="let r of filtered(); trackBy: trackById"
+          (click)="pick(r)"
+          [class.selected]="r === selected"
+          [class.active]="isPicked(r)"
+        >
+          <td class="monospace">{{ r.docNo }}</td>
+          <td>{{ r.docDate }}</td>
+                    <td>
+            <span
+              class="pill"
+              [class.receipt]="r.type === 'Receipt'"
+              [class.payment]="r.type === 'Payment'"
+              >{{ r.type }}</span
+            >
+          </td>
+          <td>{{ r.payerPayee }}</td>
+          <td class="cut">{{ r.description }}</td>
+          <td class="text-end">
+            <b>{{ r.localAmount | number : "1.2-2" }}</b>
+          </td>
+        </tr>
+      </tbody>
+      <tfoot>
+        <tr>
+          <td colspan="5" class="text-end"><b>Total</b></td>
+          <td class="text-end blue">
+            <b>{{ totalLocal() | number : "1.2-2" }}</b>
+          </td>
+        </tr>
+      </tfoot>
+    </table>
+  </div>
+</div>
+
+<!-- 1) New choice modal -->
+<div class="dialog" *ngIf="choiceOpen">
+  <div class="dialog-panel">
+    <div class="dialog-title">
+      Select a New Cash Transaction Entry
+      <button class="x" (click)="closeChoice()">✕</button>
+    </div>
+    <div class="choice">
+      <button class="chip primary" (click)="openVoucher('Receipt')">
+        New Receipt Voucher
+      </button>
+      <button class="chip primary" (click)="openVoucher('Payment')">
+        New Payment Voucher
+      </button>
+    </div>
+    <div class="modal-footer">
+      <button class="btn cancel" (click)="closeChoice()">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- 2) Voucher modal -->
+<div class="dialog" *ngIf="voucherOpen">
+  <div class="dialog-panel" role="dialog" aria-modal="true">
+    <div class="dialog-title">
+      {{ voucher.type === "Receipt" ? "Receipt Voucher" : "Payment Voucher" }}
+      <button class="x" (click)="closeVoucher()">✕</button>
+    </div>
+
+    <div class="dialog-body">
+      <div class="grid2">
+        <label
+          >{{ voucher.type === "Receipt" ? "Receive From" : "Pay To" }}
+          <input
+            class="inp"
+            [(ngModel)]="voucher.payerPayee"
+            placeholder="Name / Company"
+            [class.invalid]="errors.payerPayee"
+            [attr.aria-invalid]="!!errors.payerPayee"
+            required
+          />
+          <div class="field-errors" *ngIf="errors.payerPayee">
+            <span class="req">{{ voucher.type === "Receipt" ? "Receive From" : "Pay To" }}  is required</span>
+          </div>
+        </label>
+        <label
+          >Voucher No.
+          <input
+            class="inp monospace"
+            [(ngModel)]="voucher.docNo"
+            placeholder="e.g. PV/OR-1000"
+          />
+        </label>
+        <label
+          >Date
+          <input class="inp" type="date" [(ngModel)]="voucher.docDate" />
+        </label>
+
+        <label
+          >2nd Voucher No.
+          <input class="inp" [(ngModel)]="voucher.secondDocNo" />
+        </label>
+
+        <!-- <label>Cash/Bank Account</label>
+        <select class="inp" [(ngModel)]="voucher.cashBook">
+          <option *ngFor="let c of cashBooks" [value]="c">{{ c }}</option>
+        </select>
+
+        <label>Currency</label>
+        <select class="inp" [(ngModel)]="voucher.currency" (change)="onCurChange()">
+          <option value="MYR">MYR</option>
+          <option value="USD">USD</option>
+        </select>
+
+        <label>Rate</label>
+        <input class="inp" type="number" step="0.0001" [(ngModel)]="voucher.rate" (input)="recalcTotals()" />
+
+        <label>Remark</label>
+        <input class="inp" [(ngModel)]="voucher.remark" placeholder="Optional" /> -->
+      </div>
+      <br />
+      <!-- Payment Methods -->
+      <div>
+        <table class="table bordered">
+          <thead>
+            <tr>
+              <th style="width: 160px">Payment Method</th>
+              <th style="width: 150px">Cheque No.</th>
+              <th class="text-end" style="width: 140px">Payment Amount</th>
+              <th class="text-end" style="width: 120px">Bank Charge</th>
+              <th style="width: 170px">Payment By</th>
+              <th style="width: 90px">Is RCHQ</th>
+              <th style="width: 160px">RCHQ Date</th>
+              <th style="width: 40px"></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let m of voucher.methods; let i = index">
+              <td>
+                <select class="inp" [(ngModel)]="m.method">
+                  <option *ngFor="let p of paymentMethods" [value]="p">
+                    {{ p }}
+                  </option>
+                </select>
+              </td>
+              <td><input class="inp" [(ngModel)]="m.chequeNo" /></td>
+              <td>
+                <input
+                  class="inp text-end"
+                  type="number"
+                  step="0.01"
+                  [(ngModel)]="m.amount"
+                  (input)="recalcTotals()"
+                  appAmount
+                />
+              </td>
+              <td>
+                <input
+                  class="inp text-end"
+                  type="number"
+                  step="0.01"
+                  [(ngModel)]="m.bankCharge"
+                  (input)="recalcTotals()"
+                  appAmount
+                />
+              </td>
+              <td>
+                <input
+                  class="inp"
+                  [(ngModel)]="m.paymentBy"
+                  placeholder=""
+                />
+              </td>
+              <td class="text-center">
+                <input type="checkbox" [(ngModel)]="m.isRchq" />
+              </td>
+              <td>
+                <input class="inp" type="date" [(ngModel)]="m.rchqDate" />
+              </td>
+              <td class="text-center">
+                <button
+                   class="btn btn-danger"
+                  title="Delete"
+                  (click)="askRemoveMethod(i)"
+                >
+                <span class="ico trash"></span>
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <div class="panel-actions">
+          <button class="btn primary" (click)="addMethod()">
+            + Add Method
+          </button>
+          <div class="totals-grid">
+            <div class="label">Total Payment:</div>
+            <div class="value">
+              <div class="pill pill--sm pill--center">{{ voucherTotal() | number : "1.2-2" }}</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <br>
+      <!-- G/L Details -->
+      <div>
+        <table class="table bordered">
+          <thead>
+            <tr>
+              <th style="width: 140px">Acc. No.</th>
+              <th>Account Desc.</th>
+              <th>Description</th>
+              <th class="text-end" style="width: 140px">Amount</th>
+              <th style="width: 40px"></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let d of voucher.details; let i = index">
+              <td>
+                <input
+                  class="inp monospace"
+                  [(ngModel)]="d.accNo"
+                  (blur)="fillAccDesc(d)"
+                  placeholder="e.g. 561-1000"
+                />
+              </td>
+              <td>
+                <input
+                  class="inp"
+                  [(ngModel)]="d.accDesc"
+                  placeholder="Auto when Acc. No selected"
+                />
+              </td>
+              <td><input class="inp" [(ngModel)]="d.description" /></td>
+              <td>
+                <input
+                  class="inp text-end"
+                  type="number"
+                  step="0.01"
+                  [(ngModel)]="d.amount"
+                  (input)="recalcTotals()"
+                  appAmount
+                />
+              </td>
+              <td class="text-center">
+                <button
+                   class="btn btn-danger"
+                  title="Delete"
+                  (click)="askRemoveDetail(i)"
+                >
+                <span class="ico trash"></span>
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <div class="panel-actions">
+          <button class="btn primary" (click)="addDetail()">+ Add Row</button>
+          <div class="totals-grid">
+            <div class="label">Net Total:</div>
+            <div class="value">
+                <div class="pill pill--sm pill--center">{{ detailsTotal() | number : "1.2-2" }}</div>
+            </div>
+          </div>
+        </div>
+        <div style="font-size:smaller;color: dimgray;padding-top: 5px;">* Note: Total Payment must equal Net Total.</div>
+        <br>
+        <label class="chk"
+            ><input type="checkbox" [(ngModel)]="voucher.postDetailToGL" /> Post
+            Detail Description to G/L</label
+          >
+      </div>
+
+      <!-- <div class="sumline">
+        <div><b>Total Payment</b>: {{ voucherTotal() | number:'1.2-2' }}</div>
+        <div><b>Rate</b>: {{ voucher.rate | number:'1.2-4' }}</div>
+        <div><b>Local Amount</b>: {{ localTotal() | number:'1.2-2' }}</div>
+      </div> -->
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn cancel" (click)="closeVoucher()">Cancel</button>
+  <button class="btn primary"
+          [disabled]="!canSaveVoucher()"
+          (click)="saveVoucher()">Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- Confirm delete (list) -->
+<div class="dialog" *ngIf="confirmListOpen">
+  <div class="dialog-panel-small">
+    <div class="dialog-title">
+      Confirm delete
+      <button class="x" (click)="confirmListOpen = false" aria-label="Close">
+        ✕
+      </button>
+    </div>
+    <div class="dialog-body">
+      Delete this entry? This action cannot be undone.
+    </div>
+    <div class="dialog-actions">
+      <button class="btn cancel" (click)="confirmListOpen = false">
+        Cancel
+      </button>
+      <button class="btn danger" (click)="doDelete()">Delete</button>
+    </div>
+  </div>
+</div>
+
+<!-- Confirm delete (method/detail) -->
+<div class="dialog" *ngIf="confirmRowOpen">
+  <div class="dialog-panel-small">
+    <div class="dialog-title">
+      Confirm delete
+      <button class="x" (click)="confirmRowOpen = false" aria-label="Close">
+        ✕
+      </button>
+    </div>
+    <div class="dialog-body">
+      <p>
+        {{
+          confirmRowCtx?.kind === "method"
+            ? "Remove payment method?"
+            : "Remove G/L row?"
+        }}
+        This action cannot be undone.
+      </p>
+    </div>
+    <div class="dialog-actions">
+      <button class="btn cancel" (click)="confirmRowOpen = false">
+        Cancel
+      </button>
+      <button class="btn danger" (click)="doRemoveRow()">Remove</button>
+    </div>
+  </div>
+</div>

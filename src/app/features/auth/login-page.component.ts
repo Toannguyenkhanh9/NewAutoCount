@@ -70,7 +70,7 @@ export class LoginPageComponent implements OnInit {
     this.companiesLoading = true;
     this.companiesError = '';
 
-    this.api.get<CompanyDto[]>('/books/get-list-server').subscribe({
+    this.api.get<CompanyDto[]>('api/books/get-list-server').subscribe({
       next: (res) => {
         this.companies = res ?? [];
         this.companiesLoading = false;
@@ -83,26 +83,34 @@ export class LoginPageComponent implements OnInit {
     });
   }
 
-  submit() {
-    if (this.form.invalid) {
-      this.form.markAllAsTouched();
-      return;
-    }
-
-    const { username, password, company } = this.form.value;
-
-    const ok = this.auth.login(
-      (username ?? '').trim(),
-      (password ?? '').trim(),
-      company ?? ''
-    );
-
-    if (!ok) {
-      this.errorMessage = 'Sai username hoặc password hoặc chưa chọn Company.';
-      return;
-    }
-
-    this.errorMessage = '';
-    this.router.navigateByUrl('/dashboard');
+submit() {
+  if (this.form.invalid) {
+    this.form.markAllAsTouched();
+    return;
   }
+
+  const { username, password, company } = this.form.value;
+
+  const ok = this.auth.login(
+    (username ?? '').trim(),
+    (password ?? '').trim(),
+    company ?? ''
+  );
+
+  if (!ok) {
+    // gán message chung
+    this.errorMessage = 'Invalid username or password';
+
+    // gắn error lên 2 control cho Angular biết là invalid
+    this.form.get('username')?.setErrors({ invalid: true });
+    this.form.get('password')?.setErrors({ invalid: true });
+
+    return;
+  }
+
+  // login ok thì xoá lỗi
+  this.errorMessage = '';
+  this.router.navigateByUrl('/dashboard');
+}
+
 }

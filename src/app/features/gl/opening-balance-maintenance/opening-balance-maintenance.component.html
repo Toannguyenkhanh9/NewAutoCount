@@ -1,0 +1,113 @@
+<div class="page">
+  <!-- Header / Toolbar -->
+  <div class="titlebar">
+    <h1>Opening Balance Maintenance</h1>
+
+    <div class="toolbar">
+      <input class="search" [(ngModel)]="q" placeholder="Search account code / name / remark..." />
+      <button class="btn" (click)="onNew()">New</button>
+      <button class="btn" [disabled]="!selected" (click)="onEdit()">Edit</button>
+      <button class="btn danger" [disabled]="!selected" (click)="onDelete()">Delete</button>
+      <span class="sp"></span>
+      <button class="btn" (click)="onImport()">Import</button>
+      <button class="btn" (click)="onExport()">Export</button>
+      <button class="btn" (click)="onRefresh()">Refresh</button>
+      <button class="btn" (click)="onPrint()">Print</button>
+    </div>
+  </div>
+
+  <!-- Grid -->
+  <div class="gridwrap">
+    <table>
+      <thead>
+        <tr>
+          <th style="width:160px">Account Code</th>
+          <th>Account Name</th>
+          <th style="width:130px">As of</th>
+          <th class="text-end" style="width:150px">Opening Debit</th>
+          <th class="text-end" style="width:150px">Opening Credit</th>
+          <th class="text-end" style="width:150px">Net (Dr - Cr)</th>
+          <th>Remark</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        <tr *ngFor="let r of filtered(); trackBy: trackByCode"
+            (click)="pick(r)"
+            [class.active]="isPicked(r)">
+          <td class="monospace">{{ r.accountCode }}</td>
+          <td>{{ r.accountName }}</td>
+          <td>{{ r.asOf }}</td>
+          <td class="text-end">{{ r.openingDebit  | number:'1.2-2' }}</td>
+          <td class="text-end">{{ r.openingCredit | number:'1.2-2' }}</td>
+          <td class="text-end" [class.neg]="netOf(r) < 0">{{ netOf(r) | number:'1.2-2' }}</td>
+          <td>{{ r.remark }}</td>
+        </tr>
+      </tbody>
+
+      <tfoot>
+        <tr>
+          <td colspan="3" class="text-end"><b>Totals</b></td>
+          <td class="text-end"><b>{{ totalDebit()  | number:'1.2-2' }}</b></td>
+          <td class="text-end"><b>{{ totalCredit() | number:'1.2-2' }}</b></td>
+          <td class="text-end" [class.neg]="totalNet() < 0"><b>{{ totalNet() | number:'1.2-2' }}</b></td>
+          <td></td>
+        </tr>
+      </tfoot>
+    </table>
+
+    <div class="footer">
+      Records: {{ filtered().length }}
+    </div>
+  </div>
+</div>
+
+<!-- Modal -->
+<div class="modal-layer" *ngIf="showModal">
+  <div class="modal-panel" role="dialog" aria-modal="true">
+    <div class="modal-header">
+      <div class="modal-title">{{ isEdit ? 'Edit Opening Balance' : 'New Opening Balance' }}</div>
+      <button class="x" (click)="closeModal()">✕</button>
+    </div>
+
+    <div class="modal-body">
+      <div class="form">
+        <label>Account Code</label>
+        <select class="inp" [(ngModel)]="form.accountCode" (change)="onAccountChange()" [disabled]="isEdit">
+          <option value="">-- Select --</option>
+          <option *ngFor="let a of accounts" [value]="a.code">{{ a.code }} — {{ a.name }}</option>
+        </select>
+
+        <label>Account Name</label>
+        <input class="inp" [(ngModel)]="form.accountName" readonly />
+
+        <label>As of Date</label>
+        <input class="inp" type="date" [(ngModel)]="form.asOf" />
+
+        <label>Opening Debit</label>
+        <input class="inp" type="number" min="0" step="0.01" [(ngModel)]="form.openingDebit" (input)="normalizeAmount('debit')" />
+
+        <label>Opening Credit</label>
+        <input class="inp" type="number" min="0" step="0.01" [(ngModel)]="form.openingCredit" (input)="normalizeAmount('credit')" />
+
+        <label>Remark</label>
+        <input class="inp" [(ngModel)]="form.remark" placeholder="Optional" />
+      </div>
+
+      <div class="preview">
+        <div class="cap">Net (Dr - Cr)</div>
+        <div class="sample" [class.neg]="(form.openingDebit - form.openingCredit) < 0">
+          {{ (form.openingDebit || 0) - (form.openingCredit || 0) | number:'1.2-2' }}
+        </div>
+        <div class="tips">
+          Opening Balance sẽ được dùng để khởi tạo số dư đầu kỳ cho tài khoản.
+        </div>
+      </div>
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn ghost" (click)="closeModal()">Cancel</button>
+      <button class="btn primary" (click)="save()">Save</button>
+    </div>
+  </div>
+</div>

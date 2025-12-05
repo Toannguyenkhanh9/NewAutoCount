@@ -1,0 +1,342 @@
+<div class="page">
+  <div class="titlebar">
+    <h1>Currency Maintenance</h1>
+
+    <div class="toolbar">
+      <input
+        class="search1"
+        [(ngModel)]="q"
+        placeholder="Search code / word / symbol..."
+      />
+      <button class="btn primary" (click)="onNew()">New</button>
+      <button class="btn" [disabled]="!selected" (click)="onEdit()">
+        Edit
+      </button>
+      <button
+        class="btn danger"
+        [disabled]="!selected || isBase(selected)"
+        (click)="onDelete()"
+      >
+        Delete
+      </button>
+      <div class="spacer"></div>
+      <button class="btn primary" (click)="openRateManager()">
+        Currency Rate
+      </button>
+    </div>
+  </div>
+
+  <div class="card">
+    <table class="grid">
+      <thead>
+        <tr>
+          <th class="col-flag"></th>
+          <th style="width: 140px">Currency Code</th>
+          <th>Currency Word</th>
+          <th style="width: 120px">Currency Symbol</th>
+          <th class="text-end" style="width: 140px">Bank Buy Rate</th>
+          <th class="text-end" style="width: 140px">Bank Sell Rate</th>
+          <th style="width: 170px">Exchange Gain Account</th>
+          <th style="width: 170px">Exchange Loss Account</th>
+          <th style="width: 180px">Exchange Gain/Loss Journal</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr
+          *ngFor="let r of filteredRows(); trackBy: trackByCode"
+          (click)="pick(r)"
+          [class.active]="isPicked(r)"
+        >
+        <td class="col-flag">
+          <span *ngIf="isBase(r)" class="flag-dot" title="Base Currency"></span>
+        </td>
+          <td class="monospace">
+            {{ r.code }}
+          </td>
+          <td class="clip" [title]="r.word1">{{ r.word1 }}</td>
+          <td class="monospace">{{ r.symbol }}</td>
+          <td class="text-end">{{ r.bankBuyRate | number : "1.4-4" }}</td>
+          <td class="text-end">{{ r.bankSellRate | number : "1.4-4" }}</td>
+          <td>{{ r.gainAcc }}</td>
+          <td>{{ r.lossAcc }}</td>
+          <td>{{ r.journal }}</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="footer">Records: {{ filteredRows().length }}</div>
+  </div>
+</div>
+
+<!-- Currency Edit Dialog -->
+<div class="dialog" *ngIf="showModal">
+  <div class="dialog-panel">
+    <div class="dialog-title">
+      {{ isEdit ? "Edit Currency" : "New Currency" }}
+      <button class="x" (click)="closeModal()">✕</button>
+    </div>
+
+    <div class="dialog-body">
+      <div class="grid2">
+        <label
+          >Currency Code
+          <input
+            class="inp code-field"
+            [(ngModel)]="form.code"
+            [readonly]="isEdit"
+            placeholder="USD"
+          />
+        </label>
+
+        <label
+          >Currency Symbol
+          <input class="inp" [(ngModel)]="form.symbol" placeholder="USD / $" />
+        </label>
+      </div>
+      <br />
+      <div class="grid2">
+        <label
+          >Currency Word
+          <input class="inp" [(ngModel)]="form.word1" placeholder="US Dollar" />
+        </label>
+
+        <label
+          >Currency Word 2
+          <input
+            class="inp"
+            [(ngModel)]="form.word2"
+            placeholder="(optional)"
+          />
+        </label>
+      </div>
+      <br />
+      <div class="grid2">
+        <label
+          >Bank Buy Rate
+          <input
+            class="inp"
+            appAmount
+            type="text"
+            [decimals]="2"
+            [(ngModel)]="form.bankBuyRate"
+          />
+        </label>
+
+        <label
+          >Bank Sell Rate
+          <input
+            class="inp"
+            appAmount
+            type="text"
+            [decimals]="2"
+            [(ngModel)]="form.bankSellRate"
+          />
+        </label>
+      </div>
+      <br />
+      <div class="group">
+        <div class="group-title" style="font-size: 15px; font-weight: bold">
+          Account and Journal Type Setting for Currency Exchange Gain/Loss
+        </div>
+        <div class="form-grid">
+          <label
+            >Exchange Gain Account
+            <select class="inp" [(ngModel)]="form.gainAcc">
+              <option *ngFor="let a of accounts" [ngValue]="a">{{ a }}</option>
+            </select>
+          </label>
+          <br />
+          <label
+            >Exchange Loss Account
+            <select class="inp" [(ngModel)]="form.lossAcc">
+              <option *ngFor="let a of accounts" [ngValue]="a">{{ a }}</option>
+            </select>
+          </label>
+          <br />
+          <label
+            >Exchange Gain/Loss Journal
+            <select class="inp" [(ngModel)]="form.journal">
+              <option *ngFor="let j of journals" [ngValue]="j">{{ j }}</option>
+            </select>
+          </label>
+        </div>
+      </div>
+    </div>
+
+    <div class="dialog-actions">
+      <button class="btn cancel" (click)="closeModal()">Cancel</button>
+      <button class="btn primary" (click)="save()">OK</button>
+    </div>
+  </div>
+</div>
+
+<!-- Currency Rate Maintenance -->
+<div class="dialog" *ngIf="showRateMgr">
+  <div class="dialog-panel wide">
+    <div class="dialog-title">
+      Currency Rate Maintenance — {{ rateForCode }}
+      <button class="x" (click)="closeRateMgr()">✕</button>
+    </div>
+
+    <div class="dialog-body">
+      <table class="grid">
+        <thead>
+          <tr>
+            <th style="width: 140px">From Date</th>
+            <th style="width: 140px">To Date</th>
+            <th class="text-end" style="width: 160px">Bank Buy Rate</th>
+            <th class="text-end" style="width: 160px">Bank Sell Rate</th>
+            <th style="width: 220px"></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let r of rateRows; let i = index">
+            <td>{{ r.from }}</td>
+            <td>{{ r.to || "-" }}</td>
+            <td class="text-end">{{ r.buy | number : "1.4-4" }}</td>
+            <td class="text-end">{{ r.sell | number : "1.4-4" }}</td>
+            <td class="text-end">
+              <button class="btn primary" (click)="editRate(i)">Edit</button>&nbsp;
+              <button class="btn small danger" (click)="askDeleteRate(i)">
+                Delete
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="toolbar" style="margin-top: 10px">
+        <button class="btn primary" (click)="addRate()">Add</button>
+        <div class="spacer"></div>
+        <button class="btn primary" (click)="commitRates()">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Small Rate Form -->
+<div class="dialog" *ngIf="showRateForm">
+  <div class="dialog-panel small">
+    <div class="dialog-title">
+      Currency Rate Maintenance
+      <button class="x" (click)="showRateForm = false">✕</button>
+    </div>
+    <div class="dialog-body">
+      <div class="grid2">
+        <label
+          >From Date
+          <input class="inp" type="date" [(ngModel)]="rateForm.from" />
+        </label>
+        <label
+          >To Date
+          <input class="inp" type="date" [(ngModel)]="rateForm.to" />
+        </label>
+      </div>
+      <br>
+      <div class="grid2">
+        <label
+          >Bank Buy Rate
+          <input
+            class="inp"
+            appAmount
+            type="text"
+            [decimals]="2"
+            [(ngModel)]="rateForm.buy"
+          />
+        </label>
+        <label
+          >Bank Sell Rate
+          <input
+            class="inp"
+            appAmount
+            type="text"
+            [decimals]="2"
+            [(ngModel)]="rateForm.sell"
+          />
+        </label>
+      </div>
+    </div>
+    <div class="dialog-actions">
+      <button class="btn cancel" (click)="showRateForm = false">Cancel</button>
+      <button class="btn primary" (click)="saveRateForm()">OK</button>
+    </div>
+  </div>
+</div>
+<div class="dialog" *ngIf="showDeleteConfirm">
+  <div class="dialog-panel-small" role="dialog" aria-modal="true">
+    <div class="dialog-title">
+      Delete Currency &nbsp;<button
+        class="x"
+        (click)="closeDeleteConfirm()"
+        aria-label="Close"
+      >
+        ×
+      </button>
+    </div>
+
+    <div class="dialog-body">
+      <p>
+        Are you sure you want to delete
+        <b>{{ selected?.code }}</b>
+        ?
+      </p>
+    </div>
+
+    <div class="dialog-actions">
+      <button class="btn cancel" (click)="closeDeleteConfirm()">Cancel</button>
+      <button class="btn danger" (click)="Delete()">Delete</button>
+    </div>
+  </div>
+</div>
+<!-- Confirm delete a rate row -->
+<div class="dialog" *ngIf="showRateDeleteConfirm">
+  <div class="dialog-panel-small" role="dialog" aria-modal="true">
+    <div class="dialog-title">
+      Delete Currency Rate
+      <button class="x" (click)="cancelDeleteRate()">✕</button>
+    </div>
+
+    <div class="dialog-body">
+      <p>
+        Are you sure you want to delete the rate
+        <b>from {{ rateToDeletePreview?.from }}</b>
+        <span *ngIf="rateToDeletePreview?.to">
+          to {{ rateToDeletePreview?.to }}</span
+        >?
+      </p>
+      <p class="muted">
+        Buy: {{ rateToDeletePreview?.buy | number : "1.4-4" }} — Sell:
+        {{ rateToDeletePreview?.sell | number : "1.4-4" }}
+      </p>
+    </div>
+
+    <div class="dialog-actions">
+      <button class="btn cancel" (click)="cancelDeleteRate()">Cancel</button>
+      <button class="btn danger" (click)="confirmDeleteRate()">Delete</button>
+    </div>
+  </div>
+</div>
+<div class="dialog" *ngIf="showSuccess">
+  <div
+    class="dialog-panel-small"
+    role="dialog"
+    aria-modal="true"
+    style="min-width: 360px"
+  >
+    <div
+      class="dialog-title"
+      style="background: linear-gradient(180deg, #9be28a 0%, #62c84f 100%)"
+    >
+      Success
+      <button class="x" (click)="closeSuccess()" aria-label="Close">×</button>
+    </div>
+    <div class="dialog-body">
+      <p style="margin: 8px 0; font-weight: 600; color: #14532d">
+        {{ successMsg }}
+      </p>
+    </div>
+    <div class="dialog-actions">
+      <button class="btn primary" (click)="closeSuccess()">OK</button>
+    </div>
+  </div>
+</div>

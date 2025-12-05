@@ -1,0 +1,92 @@
+<div class="page">
+  <!-- Header / Toolbar -->
+  <div class="titlebar">
+    <h1>Balance Sheet Statement</h1>
+
+    <div class="toolbar">
+      <label class="cap">As of</label>
+      <input class="inp" type="date" [(ngModel)]="asOf" />
+      <!-- <input class="search" [(ngModel)]="q" placeholder="Search account code / name..." /> -->
+
+      <label class="chk">
+        <input type="checkbox" [(ngModel)]="includeZero" />
+        <span>Show zero-balance lines</span>
+      </label>
+
+      <button class="btn ghost" (click)="setToday()">Today</button>
+      <span class="sp"></span>
+      <button class="btn" (click)="onExport()">Export</button>
+      <button class="btn" (click)="onRefresh()">Refresh</button>
+      <button class="btn" (click)="onPrint()">Print</button>
+    </div>
+  </div>
+
+  <!-- KPI / Check strip -->
+  <div class="kpi-strip">
+    <div class="kpi">
+      <div class="cap">Total Assets</div>
+      <div class="val">{{ totalAssets() | number:'1.2-2' }}</div>
+    </div>
+    <div class="kpi">
+      <div class="cap">Total Liabilities + Equity</div>
+      <div class="val">{{ totalLiabEq() | number:'1.2-2' }}</div>
+    </div>
+    <div class="kpi">
+      <div class="cap">Difference</div>
+      <div class="val" [class.neg]="difference() !== 0">{{ difference() | number:'1.2-2' }}</div>
+    </div>
+  </div>
+
+  <!-- Content -->
+  <div class="card">
+    <div class="section" *ngFor="let cat of categories">
+      <!-- Section header -->
+      <div class="section-header">
+        <button class="toggle" (click)="toggle(cat)">{{ isCollapsed(cat) ? '+' : '−' }}</button>
+        <div class="name">{{ labels[cat] }}</div>
+        <div class="totals">
+          <div class="cap">As of {{ asOf }}</div>
+          <div class="val">{{ group(cat).total | number:'1.2-2' }}</div>
+        </div>
+      </div>
+
+      <!-- Lines -->
+      <div class="lines" *ngIf="!isCollapsed(cat)">
+        <table class="grid">
+          <thead>
+            <tr>
+              <th style="width:160px">Account</th>
+              <th>Name</th>
+              <th class="text-end" style="width:180px">Amount</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let l of group(cat).lines; trackBy: trackLine">
+              <td class="monospace">{{ l.acc }}</td>
+              <td class="cut">{{ l.name }}</td>
+              <td class="text-end">{{ l.amount | number:'1.2-2' }}</td>
+            </tr>
+          </tbody>
+          <tfoot>
+            <tr>
+              <td colspan="2" class="text-end"><b>Subtotal</b></td>
+              <td class="text-end"><b>{{ group(cat).total | number:'1.2-2' }}</b></td>
+            </tr>
+          </tfoot>
+        </table>
+      </div>
+    </div>
+
+    <!-- Summary -->
+    <div class="summary strong">
+      <div class="label">Check</div>
+      <div class="val">{{ totalAssets() | number:'1.2-2' }}</div>
+      <div class="val">{{ totalLiabEq() | number:'1.2-2' }}</div>
+      <div class="val" [class.neg]="difference() !== 0">{{ difference() | number:'1.2-2' }}</div>
+    </div>
+
+    <div class="footer">
+      As of: {{ asOf }}
+    </div>
+  </div>
+</div>
