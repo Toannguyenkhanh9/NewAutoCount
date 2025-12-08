@@ -37,3 +37,599 @@ body {
 
 html, body { height: 100%; }
 body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+/* ============================
+   AUTOCOUNT XERO-LIKE GLOBAL THEME
+   Place in src/styles.scss
+   ============================ */
+
+/* 1. VARIABLES & BASE
+   -------------------------------------------------- */
+$ac-primary: #0078d4;
+$ac-primary-dark: #005a9e;
+$ac-primary-light: #e5f2ff;
+$ac-danger: #d7263d;
+$ac-border: #dfe5ec;
+$ac-border-soft: #edf1f7;
+$ac-bg-page: #f5f7fa;
+$ac-text: #222222;
+$ac-text-muted: #666666;
+$ac-radius: 3px;
+$ac-radius-lg: 4px;
+$ac-shadow-card: 0 1px 2px rgba(0, 0, 0, 0.1);
+$ac-font: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
+  sans-serif;
+
+:root {
+  --ac-primary: #{$ac-primary};
+  --ac-primary-dark: #{$ac-primary-dark};
+  --ac-bg-page: #{$ac-bg-page};
+  --ac-border: #{$ac-border};
+  --ac-radius: #{$ac-radius};
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  font-family: $ac-font;
+  color: $ac-text;
+  background-color: $ac-bg-page;
+}
+
+/* Links */
+a {
+  color: $ac-primary;
+  text-decoration: none;
+}
+a:hover {
+  text-decoration: underline;
+}
+
+/* Headings */
+h1,
+h2,
+h3,
+h4,
+h5 {
+  font-weight: 600;
+  color: $ac-text;
+}
+
+/* 2. LAYOUT HELPERS (PAGE, CARD)
+   -------------------------------------------------- */
+.ac-page {
+  padding: 16px 24px;
+  box-sizing: border-box;
+}
+
+.ac-page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+
+  .ac-page-title {
+    font-size: 18px;
+    font-weight: 600;
+  }
+
+  .ac-page-subtitle {
+    font-size: 13px;
+    color: $ac-text-muted;
+  }
+}
+
+.ac-card {
+  background: #ffffff;
+  border-radius: $ac-radius-lg;
+  border: 1px solid $ac-border;
+  box-shadow: $ac-shadow-card;
+  padding: 16px;
+  box-sizing: border-box;
+}
+
+/* Section title trong card */
+.ac-section-title {
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+/* 3. BUTTONS
+   -------------------------------------------------- */
+.ac-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px 14px;
+  border-radius: $ac-radius;
+  font-size: 13px;
+  font-weight: 600;
+  border: 1px solid transparent;
+  cursor: pointer;
+  background: #ffffff;
+  color: $ac-primary;
+  border-color: $ac-primary;
+}
+
+.ac-btn-primary {
+  background: $ac-primary;
+  color: #ffffff;
+  border-color: $ac-primary;
+}
+.ac-btn-primary:hover {
+  background: $ac-primary-dark;
+  border-color: $ac-primary-dark;
+}
+
+.ac-btn-danger {
+  background: $ac-danger;
+  color: #ffffff;
+  border-color: $ac-danger;
+}
+
+.ac-btn-ghost {
+  background: #ffffff;
+  border-color: $ac-border;
+  color: $ac-text;
+}
+
+.ac-btn[disabled],
+.ac-btn:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+/* 4. BASIC INPUTS (HTML input/select/textarea)
+   -------------------------------------------------- */
+
+/* Input + select: cùng chiều cao */
+input[type='text'],
+input[type='number'],
+input[type='email'],
+input[type='password'],
+input[type='date'],
+select {
+  font-family: $ac-font;
+  font-size: 13px;
+  padding: 6px 8px;
+  border-radius: $ac-radius;
+  border: 1px solid $ac-border;
+  background: #ffffff;
+  color: $ac-text;
+  width: 100%;
+  box-sizing: border-box;
+
+  /* 👇 chiều cao chuẩn cho cả textbox & select */
+  height: 32px;
+  line-height: 20px;
+}
+textarea {
+  font-family: $ac-font;
+  font-size: 13px;
+  padding: 6px 8px;
+  border-radius: $ac-radius;
+  border: 1px solid $ac-border;
+  background: #ffffff;
+  color: $ac-text;
+  width: 100%;
+  box-sizing: border-box;
+  min-height: 60px;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+  outline: none;
+  border-color: $ac-primary;
+  box-shadow: 0 0 0 1px rgba($ac-primary, 0.15);
+}
+
+/* Checkbox / radio (native) */
+input[type='checkbox'],
+input[type='radio'] {
+  accent-color: $ac-primary;
+}
+
+/* Form row helper */
+.ac-form-row {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+.ac-form-field {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+.ac-form-label {
+  font-size: 12px;
+  margin-bottom: 3px;
+  color: $ac-text-muted;
+}
+.ac-form-hint {
+  font-size: 11px;
+  color: $ac-text-muted;
+}
+
+/* 5. ANGULAR MATERIAL OVERRIDES
+   (form field, select, checkbox, dialog)
+   -------------------------------------------------- */
+
+/* Form field outline giống Xero */
+.mat-mdc-form-field {
+  font-size: 13px;
+}
+
+.mat-mdc-form-field-appearance-outline .mat-mdc-text-field-wrapper {
+  border-radius: $ac-radius;
+  background-color: #ffffff;
+}
+
+.mat-mdc-form-field-appearance-outline
+  .mat-mdc-notched-outline
+  .mdc-notched-outline__notch {
+  border-radius: $ac-radius;
+}
+
+.mat-mdc-form-field-appearance-outline .mdc-notched-outline__leading,
+.mat-mdc-form-field-appearance-outline .mdc-notched-outline__notch,
+.mat-mdc-form-field-appearance-outline .mdc-notched-outline__trailing {
+  border-color: $ac-border;
+}
+
+.mat-mdc-form-field-appearance-outline.mat-focused
+  .mdc-notched-outline__leading,
+.mat-mdc-form-field-appearance-outline.mat-focused
+  .mdc-notched-outline__notch,
+.mat-mdc-form-field-appearance-outline.mat-focused
+  .mdc-notched-outline__trailing {
+  border-color: $ac-primary;
+}
+
+/* Hint & error */
+.mdc-text-field--outlined .mdc-floating-label {
+  font-size: 12px;
+}
+.mat-mdc-form-field-subscript-wrapper {
+  font-size: 11px;
+}
+
+/* Select (Material) */
+.mat-mdc-select-trigger {
+  font-size: 13px;
+}
+.mat-mdc-select-panel {
+  border-radius: $ac-radius;
+}
+
+/* Checkbox (Material) */
+.mat-mdc-checkbox .mdc-checkbox__background {
+  border-radius: 3px;
+  border-color: $ac-border;
+}
+.mat-mdc-checkbox.mat-mdc-checkbox-checked .mdc-checkbox__background {
+  background-color: $ac-primary;
+  border-color: $ac-primary;
+}
+
+/* Dialog / popup (Material) */
+.mat-mdc-dialog-container {
+  border-radius: 4px !important;
+  padding: 0 !important;
+  overflow: hidden !important;
+}
+
+.ac-dialog-header {
+  padding: 12px 16px;
+  border-bottom: 1px solid $ac-border;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.ac-dialog-body {
+  padding: 16px;
+}
+
+.ac-dialog-footer {
+  padding: 10px 16px;
+  border-top: 1px solid $ac-border;
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+/* 6. TABLES (giống Xero: border mảnh, header nhạt)
+   -------------------------------------------------- */
+
+.ac-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+  background: #ffffff;
+  border: 1px solid $ac-border;
+}
+
+.ac-table th,
+.ac-table td {
+  padding: 6px 8px;
+  border-bottom: 1px solid $ac-border-soft;
+}
+
+.ac-table th {
+  background: #f3f6fb;
+  font-weight: 600;
+  text-align: left;
+  color: #444;
+}
+
+.ac-table tr:nth-child(even) td {
+  background: #fbfcff;
+}
+
+.ac-table tr:hover td {
+  background: #f0f7ff;
+}
+
+.ac-table .ac-num {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.ac-table .ac-cell-link {
+  color: $ac-primary;
+  cursor: pointer;
+}
+
+/* 7. TABS (cho report, invoice, …)
+   -------------------------------------------------- */
+
+.ac-tabs {
+  display: flex;
+  border-bottom: 1px solid $ac-border;
+  margin-bottom: 12px;
+}
+.ac-tab {
+  padding: 6px 12px;
+  font-size: 13px;
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+}
+.ac-tab--active {
+  border-bottom-color: $ac-primary;
+  font-weight: 600;
+}
+
+/* 8. INVOICE GRID (row giống Xero)
+   -------------------------------------------------- */
+
+.ac-grid-header,
+.ac-grid-row {
+  display: grid;
+  grid-template-columns:
+    minmax(80px, 1.5fr)
+    minmax(120px, 2.5fr)
+    minmax(60px, 0.8fr)
+    minmax(80px, 1fr)
+    minmax(70px, 0.8fr)
+    minmax(120px, 1.5fr)
+    minmax(90px, 1fr)
+    minmax(90px, 1fr)
+    minmax(90px, 1fr);
+  column-gap: 4px;
+  align-items: center;
+}
+
+.ac-grid-header {
+  font-size: 11px;
+  font-weight: 600;
+  color: $ac-text-muted;
+  border-bottom: 1px solid $ac-border;
+  padding: 4px 0;
+}
+
+.ac-grid-row {
+  padding: 4px 0;
+  border-bottom: 1px solid $ac-border-soft;
+}
+
+/* 9. REPORT HEADER (sales tax report)
+   -------------------------------------------------- */
+
+.ac-report-header {
+  text-align: center;
+  margin-bottom: 12px;
+
+  .ac-report-title {
+    font-size: 16px;
+    font-weight: 600;
+  }
+  .ac-report-company {
+    font-size: 14px;
+    margin-top: 4px;
+  }
+  .ac-report-period {
+    font-size: 12px;
+    color: $ac-text-muted;
+    margin-top: 2px;
+  }
+}
+
+.ac-report-toolbar {
+  margin-top: 12px;
+  padding: 8px;
+  background: #f3f6fb;
+  border-radius: 0 0 $ac-radius-lg $ac-radius-lg;
+  border-top: 1px solid $ac-border;
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+/* 10. SMALL BADGES/LABELS
+   -------------------------------------------------- */
+
+.ac-badge-blue {
+  display: inline-block;
+  padding: 2px 6px;
+  border-radius: 10px;
+  background: $ac-primary-light;
+  color: $ac-primary-dark;
+  font-size: 11px;
+}
+
+.ac-badge-grey {
+  display: inline-block;
+  padding: 2px 6px;
+  border-radius: 10px;
+  background: #eef1f6;
+  color: #555;
+  font-size: 11px;
+}
+/* Force chiều cao input & select trong các dialog kiểu AutoCount */
+.ac-dialog-body input[type='text'],
+.ac-dialog-body input[type='number'],
+.ac-dialog-body input[type='email'],
+.ac-dialog-body input[type='password'],
+.ac-dialog-body input[type='date'],
+.ac-dialog-body select,
+input.inp,
+select.inp {
+  height: 32px !important;
+  line-height: 20px !important;
+  padding: 6px 8px !important;
+  box-sizing: border-box;
+}
+
+.ac-form-control,
+.inp { // alias cho các input cũ đang xài class "inp"
+  display: block;
+  width: 100%;
+  box-sizing: border-box;
+
+  height: 32px;
+  line-height: 20px;
+  padding: 6px 8px;
+
+  font-family: $ac-font;
+  font-size: 13px;
+  color: $ac-text;
+
+  border: 1px solid $ac-border;
+  border-radius: $ac-radius;
+  background: #ffffff;
+}
+
+/* Textarea riêng – cho phép cao hơn */
+textarea.ac-form-control,
+textarea.inp {
+  min-height: 60px;
+  height: auto;
+  line-height: 1.4;
+}
+/* =========================================
+   GLOBAL DIALOG / POPUP STYLES (Xero-like)
+   ========================================= */
+
+/* Overlay mờ */
+.ac-dialog-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.35);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+/* Panel size (kết hợp với .ac-card) */
+.ac-dialog-panel-lg {
+  width: 640px;
+  max-width: 95vw;
+}
+
+.ac-dialog-panel-sm {
+  width: 420px;
+  max-width: 90vw;
+}
+
+/* Header / body / footer */
+.ac-dialog-header {
+  padding: 10px 14px;
+  border-bottom: 1px solid #dfe5ec;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.ac-dialog-close {
+  border: none;
+  background: transparent;
+  font-size: 18px;
+  line-height: 1;
+  cursor: pointer;
+  padding: 0 2px;
+}
+
+.ac-dialog-body {
+  padding: 14px 16px;
+  font-size: 13px;
+}
+
+.ac-dialog-footer {
+  padding: 10px 16px;
+  border-top: 1px solid #dfe5ec;
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+/* Form grid 2 cột trong dialog */
+.ac-dialog-form-grid-2 {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px 16px;
+}
+
+/* Nếu muốn đảm bảo tất cả input/select trong grid này full-width & cùng height */
+.ac-dialog-form-grid-2 input,
+.ac-dialog-form-grid-2 select {
+  width: 100%;
+  box-sizing: border-box;
+  height: 32px;
+  line-height: 20px;
+  padding: 6px 8px;
+}
+
+/* Field readonly & error dùng chung */
+.ac-dialog-field-readonly {
+  background: #f3f6fb;
+  color: #555;
+}
+
+.ac-dialog-field-error {
+  margin-top: 2px;
+  font-size: 11px;
+  color: #d7263d;
+}
+
+/* Dialog success dùng chung */
+.ac-dialog-success {
+  min-width: 360px;
+}
+
+.ac-dialog-success-header {
+  color: #0a2f16;
+}
+
+.ac-dialog-success-text {
+  margin: 8px 0;
+  font-weight: 600;
+  color: #14532d;
+}

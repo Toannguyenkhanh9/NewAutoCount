@@ -1,5 +1,249 @@
-<!-- src/app/features/dashboard/dashboard-page.component.html -->
-<section class="page">
-  <h1>Dashboard</h1>
-  <p>Quick overview of your company’s financials will go here.</p>
-</section>
+<div class="x-dashboard">
+  <div class="x-grid">
+    <!-- LEFT COLUMN -->
+    <div class="x-column">
+      <!-- Bank 1 -->
+      <section class="x-card x-card-bank">
+        <header class="x-card-header">
+          <div>
+            <div class="x-card-title">{{ bankName }}</div>
+            <div class="x-card-sub">{{ bankAccountNo }}</div>
+          </div>
+          <button class="x-tag">Widget Preview</button>
+        </header>
+
+        <div class="x-bank-top">
+          <button class="x-primary-btn">
+            Reconcile {{ unreconciledCount }} items
+          </button>
+
+          <div class="x-bank-balances">
+            <div>
+              <div class="x-bank-label">Balance in Xero</div>
+              <div class="x-bank-value">
+                {{ balanceInXero | number : '1.2-2' }}
+              </div>
+            </div>
+            <div>
+              <div class="x-bank-label">
+                Statement balance (17 Jul)
+              </div>
+              <div class="x-bank-value">
+                {{ statementBalance | number : '1.2-2' }}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="x-bank-chart">
+          <div class="x-bank-line">
+            <div
+              class="x-bank-point"
+              *ngFor="let p of bankTimeline; let i = index"
+              [class.negative]="p.value < 0"
+            >
+              <span class="x-bank-dot"></span>
+              <span class="x-bank-label-tick" *ngIf="i === 0 || i === bankTimeline.length - 1">
+                {{ p.label }}
+              </span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Total cash in and out -->
+      <section class="x-card">
+        <header class="x-card-header">
+          <div class="x-card-title">Total cash in and out</div>
+          <button class="x-tag">Widget Preview</button>
+        </header>
+
+        <div class="x-bars">
+          <div
+            class="x-bar-item"
+            *ngFor="let b of invoicesBars; let i = index"
+          >
+            <div class="x-bar-stack">
+              <div
+                class="x-bar x-bar-grey"
+                [style.height.%]="(b.value / maxInvoiceValue) * 100"
+              ></div>
+              <div
+                class="x-bar x-bar-blue"
+                [style.height.%]="(b.value / maxInvoiceValue) * 60"
+              ></div>
+            </div>
+            <div class="x-bar-label">{{ b.label }}</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Accounts watchlist -->
+      <section class="x-card">
+        <header class="x-card-header">
+          <div class="x-card-title">Accounts watchlist</div>
+          <button class="x-tag">Widget Preview</button>
+        </header>
+
+        <table class="x-table">
+          <thead>
+            <tr>
+              <th>Account</th>
+              <th>Budget</th>
+              <th>This month</th>
+              <th>YTD</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let a of watchAccounts">
+              <td>{{ a.name }}</td>
+              <td class="x-num">{{ a.budget | number : '1.2-2' }}</td>
+              <td class="x-num">{{ a.thisMonth | number : '1.2-2' }}</td>
+              <td class="x-num x-link">
+                {{ a.ytd | number : '1.2-2' }}
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
+
+      <!-- Expense claims -->
+      <section class="x-card">
+        <header class="x-card-header">
+          <div class="x-card-title">Expense claims</div>
+          <button class="x-tag">Widget Preview</button>
+        </header>
+
+        <div class="x-card-row">
+          <button class="x-secondary-btn">New expense</button>
+        </div>
+
+        <div class="x-expense-list">
+          <div
+            class="x-expense-item"
+            *ngFor="let e of expenseItems"
+          >
+            <div class="x-expense-avatar">
+              {{ e.name[0] }}
+            </div>
+            <div class="x-expense-main">
+              <div class="x-expense-name">{{ e.name }}</div>
+              <div class="x-expense-status x-link">
+                {{ e.status }}
+              </div>
+            </div>
+            <div class="x-expense-total">
+              {{ e.total | number : '1.2-2' }}
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <!-- RIGHT COLUMN -->
+    <div class="x-column">
+      <!-- Invoices owed to you -->
+      <section class="x-card">
+        <header class="x-card-header">
+          <div class="x-card-title">Invoices owed to you</div>
+          <button class="x-tag">Widget Preview</button>
+        </header>
+
+        <div class="x-card-row">
+          <button class="x-secondary-btn">New sales invoice</button>
+        </div>
+
+        <div class="x-invoice-links">
+          <a href="javascript:void(0)">4 draft invoices</a>
+          <a href="javascript:void(0)">10 awaiting payment</a>
+          <a href="javascript:void(0)" class="x-danger">8 overdue</a>
+          <div class="x-invoice-total x-num">2,058.00</div>
+          <div class="x-invoice-total x-num">18,073.95</div>
+          <div class="x-invoice-total x-num x-danger">14,653.95</div>
+        </div>
+
+        <div class="x-bars">
+          <div
+            class="x-bar-item"
+            *ngFor="let b of invoicesBars; let i = index"
+          >
+            <div class="x-bar-stack">
+              <div
+                class="x-bar x-bar-grey"
+                [style.height.%]="(b.value / maxInvoiceValue) * 100"
+              ></div>
+              <div
+                class="x-bar x-bar-blue"
+                [style.height.%]="(b.value / maxInvoiceValue) * 80"
+              ></div>
+            </div>
+            <div class="x-bar-label">{{ b.label }}</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Bills you need to pay -->
+      <section class="x-card">
+        <header class="x-card-header">
+          <div class="x-card-title">Bills you need to pay</div>
+          <button class="x-tag">Widget Preview</button>
+        </header>
+
+        <div class="x-card-row">
+          <button class="x-secondary-btn">New bill</button>
+        </div>
+
+        <div class="x-invoice-links">
+          <a href="javascript:void(0)">1 draft bill</a>
+          <a href="javascript:void(0)">3 to pay</a>
+          <a href="javascript:void(0)" class="x-danger">8 overdue</a>
+          <div class="x-invoice-total x-num">2,058.00</div>
+          <div class="x-invoice-total x-num">18,073.95</div>
+          <div class="x-invoice-total x-num x-danger">14,653.95</div>
+        </div>
+
+        <div class="x-bars">
+          <div
+            class="x-bar-item"
+            *ngFor="let b of billsBars; let i = index"
+          >
+            <div class="x-bar-stack">
+              <div
+                class="x-bar x-bar-grey"
+                [style.height.%]="(b.value / maxBillValue) * 100"
+              ></div>
+              <div
+                class="x-bar x-bar-blue-light"
+                [style.height.%]="(b.value / maxBillValue) * 80"
+              ></div>
+            </div>
+            <div class="x-bar-label">{{ b.label }}</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Tax and reporting -->
+      <section class="x-card">
+        <header class="x-card-header">
+          <div class="x-card-title">Tax and reporting</div>
+          <button class="x-tag">Widget Preview</button>
+        </header>
+
+        <ul class="x-link-list">
+          <li><a href="javascript:void(0)">Profit and Loss</a></li>
+          <li><a href="javascript:void(0)">GST Reconciliation</a></li>
+        </ul>
+      </section>
+
+      <!-- Explore apps -->
+      <section class="x-card x-card-explore">
+        <div class="x-card-title">Explore apps that connect with AutoCount</div>
+        <div class="x-explore-text">
+          Discover add-ons and integrations to enhance your accounting
+          workflow.
+        </div>
+        <a href="javascript:void(0)" class="x-link">Learn more ▾</a>
+      </section>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,10 @@
+
+.col-flag { width: 34px; text-align: center; }
+.flag-dot{
+  display:inline-block; width:12px; height:12px; border-radius:50%;
+  background:#22c55e; box-shadow:0 0 0 3px rgba(34,197,94,.18);
+}
+
+/* tuỳ chọn: nhấn nhẹ dòng đang login */
+tr.current td { background: #f0fff4; }
+

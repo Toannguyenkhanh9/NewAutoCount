@@ -1,86 +1,135 @@
-<div class="login-wrapper">
-  <mat-card class="login-card">
-    <div class="login-header">
-      <div class="login-logo">AC</div>
-      <div class="login-title-group">
-        <h1>Sign in</h1>
-        <p>AutoCount Accounting</p>
-      </div>
+<div class="xero-login-page">
+  <div class="xero-card">
+    <!-- Logo tròn -->
+    <div class="xero-logo-circle">
+      AC
     </div>
 
-    <form [formGroup]="form" (ngSubmit)="submit()" class="login-form">
-      <mat-form-field appearance="outline">
+    <!-- Tiêu đề -->
+    <h1 class="xero-title">Log in to AutoCount</h1>
+
+    <!-- Form -->
+    <form
+      class="xero-form"
+      [formGroup]="form"
+      (ngSubmit)="submit()"
+      novalidate
+      autocomplete="off"
+    >
+      <!-- Username -->
+      <mat-form-field appearance="outline" class="xero-field">
         <mat-label>Username</mat-label>
-        <input matInput formControlName="username" autocomplete="username" />
-        <mat-error *ngIf="
+        <input
+          matInput
+          formControlName="username"
+          autocomplete="username"
+        />
+
+        <mat-error
+          *ngIf="
             form.controls['username'].hasError('required') &&
             form.controls['username'].touched
-          ">
+          "
+        >
           Username is required
         </mat-error>
-        <mat-error *ngIf="
-      form.controls['username'].hasError('invalid') &&
-      !form.controls['username'].hasError('required')
-    ">
+
+        <mat-error
+          *ngIf="
+            form.controls['username'].hasError('invalid') &&
+            !form.controls['username'].hasError('required')
+          "
+        >
           Invalid username or password
         </mat-error>
       </mat-form-field>
 
-      <mat-form-field appearance="outline">
+      <!-- Password -->
+      <mat-form-field appearance="outline" class="xero-field">
         <mat-label>Password</mat-label>
-        <input matInput [type]="hidePassword ? 'password' : 'text'" formControlName="password"
-          autocomplete="current-password" />
-        <button mat-icon-button matSuffix type="button" (click)="hidePassword = !hidePassword">
+        <input
+          matInput
+          [type]="hidePassword ? 'password' : 'text'"
+          formControlName="password"
+          autocomplete="current-password"
+        />
+        <button
+          mat-icon-button
+          matSuffix
+          type="button"
+          (click)="hidePassword = !hidePassword"
+        >
           <mat-icon>{{
             hidePassword ? 'visibility_off' : 'visibility'
-            }}</mat-icon>
+          }}</mat-icon>
         </button>
-        <mat-error *ngIf="
+
+        <mat-error
+          *ngIf="
             form.controls['password'].hasError('required') &&
             form.controls['password'].touched
-          ">
+          "
+        >
           Password is required
         </mat-error>
-        <mat-error *ngIf="
-      form.controls['password'].hasError('invalid') &&
-      !form.controls['password'].hasError('required')
-    ">
+
+        <mat-error
+          *ngIf="
+            form.controls['password'].hasError('invalid') &&
+            !form.controls['password'].hasError('required')
+          "
+        >
           Invalid username or password
         </mat-error>
       </mat-form-field>
 
-      <mat-form-field appearance="outline">
+      <!-- Company -->
+      <mat-form-field appearance="outline" class="xero-field">
         <mat-label>Company</mat-label>
         <mat-select formControlName="company">
-          <mat-option *ngIf="companiesLoading" disabled>Loading...</mat-option>
-
-          <mat-option *ngFor="let c of companies" [value]="c.Id">
+          <mat-option *ngIf="companiesLoading" disabled>
+            Loading...
+          </mat-option>
+          <mat-option
+            *ngFor="let c of companies"
+            [value]="c.Database"
+          >
             {{ c.Company }}
           </mat-option>
         </mat-select>
 
-        <mat-error *ngIf="
-      form.controls['company'].hasError('required') &&
-      form.controls['company'].touched
-    ">
+        <mat-error
+          *ngIf="
+            form.controls['company'].hasError('required') &&
+            form.controls['company'].touched
+          "
+        >
           Company is required
         </mat-error>
       </mat-form-field>
 
-      <div class="error-message" *ngIf="companiesError">
-        {{ companiesError }}
-      </div>
-      <div class="error-message" *ngIf="errorMessage">
+      <!-- Thông báo lỗi chung -->
+      <div class="xero-error-message" *ngIf="errorMessage">
         {{ errorMessage }}
       </div>
 
-      <button mat-raised-button color="primary" class="login-button" type="submit">
-        Login
+      <!-- Nút login -->
+      <button
+        mat-raised-button
+        color="primary"
+        class="xero-submit"
+        type="submit"
+        [disabled]="form.invalid"
+      >
+        Log in
       </button>
-
-      <div class="hint">
-        Demo: <strong>admin / 123456</strong>
-      </div>
     </form>
-  </mat-card>
+
+    <!-- Link footer -->
+    <div class="xero-footer-links">
+      <a href="javascript:void(0)">Forgot password?</a>
+      <span>•</span>
+      <a href="javascript:void(0)">Can't log in?</a>
+    </div>
+  </div>
 </div>

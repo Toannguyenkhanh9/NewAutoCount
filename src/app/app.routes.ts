@@ -44,7 +44,7 @@ import { DebtorStatementReportComponent } from './features/ar/debtor-statement-r
 import { ArInvoicePageComponent } from './features/ar/invoice-entry/ar-invoice-page.component';
 import { ArOutstandingReportComponent } from './features/ar/outstanding-ar-invoice-report/ar-outstanding-report.component';
 import { ArReceivePaymentPageComponent } from './features/ar/receive-payment/ar-receive-payment-page.component';
-
+import { ManageAccountBookComponent } from './features/book/manage-account-book/manage-account-book.component';
 export const routes: Routes = [
   { path: 'login', component: LoginPageComponent, title: 'Login' },
 
@@ -55,6 +55,17 @@ export const routes: Routes = [
     component: DashboardPageComponent,
     title: 'Dashboard',
     canActivate: [authGuard],
+  },
+  {
+    path: 'book',
+    canActivate: [authGuard],
+    children: [
+      {
+        path: 'manage-account-book',
+        component: ManageAccountBookComponent,
+        title: 'Manage Account Book',
+      },
+    ],
   },
   {
     path: 'general-maintenance',
@@ -212,7 +223,6 @@ export const routes: Routes = [
         component: ApPaymentPageComponent,
         title: 'A/P Payment',
       },
-
     ],
   },
   {
@@ -269,7 +279,6 @@ export const routes: Routes = [
         component: ArReceivePaymentPageComponent,
         title: 'A/R Receive Payment',
       },
-
     ],
   },
   { path: '**', redirectTo: 'dashboard' },

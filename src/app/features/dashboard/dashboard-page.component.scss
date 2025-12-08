@@ -1,0 +1,316 @@
+.x-dashboard {
+  padding: 24px;
+  background: #f5f7fa;
+  min-height: calc(100vh - 56px); // trừ chiều cao top-nav
+  box-sizing: border-box;
+}
+
+.x-grid {
+  display: grid;
+  grid-template-columns: 1.4fr 1.1fr;
+  gap: 16px;
+}
+
+@media (max-width: 1024px) {
+  .x-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.x-column {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.x-card {
+  background: #ffffff;
+  border-radius: 3px;
+  border: 1px solid #dfe5ec;
+  padding: 16px;
+  box-sizing: border-box;
+}
+
+.x-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.x-card-title {
+  font-weight: 600;
+  font-size: 14px;
+  color: #333;
+}
+
+.x-card-sub {
+  font-size: 12px;
+  color: #777;
+}
+
+.x-tag {
+  font-size: 10px;
+  padding: 3px 6px;
+  border-radius: 3px;
+  border: 1px solid #d8a24a;
+  background: #ffe9c7;
+  color: #8a6a16;
+  cursor: default;
+}
+
+.x-primary-btn {
+  background: #1f7fbf;
+  color: #ffffff;
+  border: none;
+  border-radius: 3px;
+  padding: 6px 12px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.x-secondary-btn {
+  background: #ffffff;
+  color: #1f7fbf;
+  border: 1px solid #1f7fbf;
+  border-radius: 3px;
+  padding: 5px 10px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.x-card-row {
+  margin-bottom: 10px;
+}
+
+.x-bank-top {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 10px;
+  gap: 16px;
+}
+
+.x-bank-balances {
+  display: flex;
+  gap: 12px;
+  font-size: 11px;
+}
+
+.x-bank-label {
+  color: #777;
+}
+
+.x-bank-value {
+  font-weight: 600;
+  color: #333;
+}
+
+.x-bank-chart {
+  margin-top: 16px;
+}
+
+.x-bank-line {
+  position: relative;
+  height: 70px;
+  background: #f1f4f8;
+  border-radius: 3px;
+  display: flex;
+  align-items: flex-end;
+  padding: 10px 12px;
+  box-sizing: border-box;
+}
+
+.x-bank-point {
+  flex: 1;
+  position: relative;
+  border-bottom: 2px solid #37a1d6;
+}
+
+.x-bank-point.negative {
+  border-bottom-color: #f76c6c;
+}
+
+.x-bank-dot {
+  position: absolute;
+  right: -2px;
+  bottom: -3px;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #37a1d6;
+}
+
+.x-bank-label-tick {
+  position: absolute;
+  bottom: -18px;
+  font-size: 10px;
+  color: #888;
+}
+
+.x-bars {
+  display: flex;
+  gap: 6px;
+  margin-top: 8px;
+}
+
+.x-bar-item {
+  flex: 1;
+  text-align: center;
+}
+
+.x-bar-stack {
+  height: 90px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  gap: 2px;
+}
+
+.x-bar {
+  width: 100%;
+  border-radius: 2px 2px 0 0;
+}
+
+.x-bar-grey {
+  background: #d3dbe5;
+}
+
+.x-bar-blue {
+  background: #1f7fbf;
+}
+
+.x-bar-blue-light {
+  background: #8cc4ea;
+}
+
+.x-bar-label {
+  margin-top: 4px;
+  font-size: 9px;
+  color: #777;
+}
+
+.x-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+}
+
+.x-table th,
+.x-table td {
+  padding: 4px 4px;
+  border-bottom: 1px solid #e5eaf0;
+}
+
+.x-table th {
+  text-align: left;
+  font-weight: 600;
+  color: #666;
+}
+
+.x-table .x-num {
+  text-align: right;
+}
+
+.x-link {
+  color: #1f7fbf;
+  cursor: pointer;
+}
+
+.x-danger {
+  color: #d7263d;
+}
+
+.x-invoice-links {
+  display: grid;
+  grid-template-columns: 1.5fr 1fr;
+  row-gap: 2px;
+  column-gap: 8px;
+  font-size: 12px;
+  margin-bottom: 8px;
+}
+
+.x-invoice-total {
+  text-align: right;
+}
+
+.x-num {
+  font-family: 'Segoe UI', system-ui, -apple-system, BlinkMacSystemFont,
+    'Roboto', sans-serif;
+}
+
+.x-link-list {
+  list-style: none;
+  padding: 0;
+  margin: 6px 0 0;
+  font-size: 12px;
+}
+
+.x-link-list li {
+  margin-bottom: 4px;
+}
+
+.x-link-list a {
+  color: #1f7fbf;
+}
+
+.x-expense-list {
+  margin-top: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.x-expense-item {
+  display: flex;
+  align-items: center;
+  font-size: 12px;
+}
+
+.x-expense-avatar {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: #dbe7f5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  color: #4a5f88;
+  margin-right: 8px;
+}
+
+.x-expense-main {
+  flex: 1;
+}
+
+.x-expense-name {
+  font-weight: 500;
+}
+
+.x-expense-status {
+  font-size: 11px;
+}
+
+.x-expense-total {
+  font-weight: 600;
+  text-align: right;
+  min-width: 80px;
+}
+
+.x-card-explore {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 12px;
+}
+
+.x-explore-text {
+  color: #555;
+  margin-top: 4px;
+}
+
+.x-link {
+  color: #1f7fbf;
+}

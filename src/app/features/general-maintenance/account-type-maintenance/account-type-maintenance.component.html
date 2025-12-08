@@ -1,166 +1,217 @@
-<div class="page">
-  <div class="titlebar">
-    <h1>Account Type Maintenance</h1>
+<div class="ac-page account-type-page">
+  <div class="ac-card">
+    <!-- HEADER -->
+    <div class="ac-page-header account-type-header">
+      <div>
+        <div class="ac-page-title">Account Type Maintenance</div>
+        <div class="ac-page-subtitle">
+          Maintain account types &amp; reporting categories used in your chart of accounts.
+        </div>
+      </div>
 
-    <div class="toolbar">
-      <input
-        class="search1"
-        type="text"
-        placeholder="Search code / description / category…"
-        [(ngModel)]="q"
-        (input)="page = 1"
-      />
-      <button class="btn primary" (click)="openNew()">New</button>
-      <button class="btn" [disabled]="!selected" (click)="openEdit()">
-        Edit
-      </button>
-      <button class="btn danger" [disabled]="!canDelete()" (click)="onDelete()">
-        Delete
-      </button>
-    </div>
-  </div>
+      <div class="account-type-toolbar">
+        <input
+          class="account-type-search"
+          type="text"
+          placeholder="Search code / description / category…"
+          [(ngModel)]="q"
+          (input)="page = 1"
+        />
 
-  <div class="gridwrap">
-    <table>
-      <thead>
-        <tr>
-          <th style="width: 110px">AccType</th>
-          <th>Description</th>
-          <th>2nd Description</th>
-          <th style="width: 190px">Reporting Category</th>
-          <th style="width: 150px">System/User Defined</th>
-        </tr>
-      </thead>
-
-      <tbody>
-        <tr
-          *ngFor="
-            let r of filtered()
-              | slice : (page - 1) * pageSize : (page - 1) * pageSize + pageSize
-          "
-          (click)="selected = r"
-          [class.is-selected]="selected === r"
+        <button class="ac-btn ac-btn-primary" (click)="openNew()">
+          New
+        </button>
+        <button class="ac-btn" [disabled]="!selected" (click)="openEdit()">
+          Edit
+        </button>
+        <button
+          class="ac-btn ac-btn-danger"
+          [disabled]="!canDelete()"
+          (click)="onDelete()"
         >
-          <td class="mono">{{ r.code }}</td>
-          <td class="clip" [title]="r.description">{{ r.description }}</td>
-          <td class="clip" [title]="r.secondDesc">{{ r.secondDesc || "-" }}</td>
-          <td>{{ r.category }}</td>
-          <td>
-            <span class="pill" [class.ok]="r.system">
-              {{ r.system ? "System" : "User Defined" }}
-            </span>
-          </td>
-        </tr>
+          Delete
+        </button>
+      </div>
+    </div>
 
-        <tr *ngIf="(filtered() || []).length === 0">
-          <td class="empty" colspan="5">No data</td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
+    <!-- GRID -->
+    <div class="account-type-grid">
+      <table class="ac-table">
+        <thead>
+          <tr>
+            <th style="width: 110px">AccType</th>
+            <th>Description</th>
+            <th>2nd Description</th>
+            <th style="width: 190px">Reporting Category</th>
+            <th style="width: 150px">System/User Defined</th>
+          </tr>
+        </thead>
 
-  <div class="panel-foot">
-    <div class="rec">Records: {{ filtered().length }}</div>
-    <div class="pager">
-      <button class="pg" [disabled]="page === 1" (click)="page = 1">
-        &laquo;
-      </button>
-      <button class="pg" [disabled]="page === 1" (click)="page = page - 1">
-        &lsaquo;
-      </button>
-      <span class="pg-label">Page {{ page }} / {{ pageCount() }}</span>
-      <button
-        class="pg"
-        [disabled]="page === pageCount()"
-        (click)="page = page + 1"
-      >
-        &rsaquo;
-      </button>
-      <button
-        class="pg"
-        [disabled]="page === pageCount()"
-        (click)="page = pageCount()"
-      >
-        &raquo;
-      </button>
+        <tbody>
+          <tr
+            *ngFor="
+              let r of filtered()
+                | slice : (page - 1) * pageSize : (page - 1) * pageSize + pageSize
+            "
+            (click)="selected = r"
+            [class.ac-row-selected]="selected === r"
+          >
+            <td class="mono">{{ r.code }}</td>
+            <td class="clip" [title]="r.description">
+              {{ r.description }}
+            </td>
+            <td class="clip" [title]="r.secondDesc">
+              {{ r.secondDesc || '-' }}
+            </td>
+            <td>{{ r.category }}</td>
+            <td>
+              <span
+                [ngClass]="r.system ? 'ac-badge-blue' : 'ac-badge-grey'"
+              >
+                {{ r.system ? 'System' : 'User Defined' }}
+              </span>
+            </td>
+          </tr>
+
+          <tr *ngIf="(filtered() || []).length === 0">
+            <td class="empty" colspan="5">No data</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- FOOTER / PAGER -->
+    <div class="account-type-footer">
+      <div class="account-type-rec">
+        Records: {{ filtered().length }}
+      </div>
+
+      <div class="account-type-pager">
+        <button
+          class="ac-btn ac-btn-ghost account-type-pg-btn"
+          [disabled]="page === 1"
+          (click)="page = 1"
+        >
+          &laquo;
+        </button>
+        <button
+          class="ac-btn ac-btn-ghost account-type-pg-btn"
+          [disabled]="page === 1"
+          (click)="page = page - 1"
+        >
+          &lsaquo;
+        </button>
+
+        <span class="account-type-pg-label">
+          Page {{ page }} / {{ pageCount() }}
+        </span>
+
+        <button
+          class="ac-btn ac-btn-ghost account-type-pg-btn"
+          [disabled]="page === pageCount()"
+          (click)="page = page + 1"
+        >
+          &rsaquo;
+        </button>
+        <button
+          class="ac-btn ac-btn-ghost account-type-pg-btn"
+          [disabled]="page === pageCount()"
+          (click)="page = pageCount()"
+        >
+          &raquo;
+        </button>
+      </div>
     </div>
   </div>
 </div>
 
-<!-- Dialog -->
-<div class="dialog" *ngIf="showDialog">
-  <div class="dialog-panel">
-    <div class="dialog-title">
-      {{ editMode ? "Edit Account Type" : "New Account Type" }}
-      <button class="x" (click)="closeDialog()">✕</button>
+<!-- NEW / EDIT DIALOG -->
+<div class="ac-dialog-backdrop" *ngIf="showDialog">
+  <div class="ac-card ac-dialog-panel-lg">
+    <div class="ac-dialog-header">
+      <span>
+        {{ editMode ? 'Edit Account Type' : 'New Account Type' }}
+      </span>
+      <button type="button" class="ac-dialog-close" (click)="closeDialog()">
+        ×
+      </button>
     </div>
 
-    <div class="dialog-body">
-      <div class="grid2">
-        <label class="lbl"
-          >AccType
+    <div class="ac-dialog-body">
+      <div class="account-type-form-grid">
+        <label class="ac-form-field">
+          <span class="ac-form-label">AccType</span>
           <input
-            class="inp mono"
+            class="mono"
             [(ngModel)]="form.code"
             [readOnly]="editMode"
-            [class.readonly]="editMode"
+            [class.account-type-readonly]="editMode"
             required
             placeholder="e.g. BK"
             #typeCodeModel="ngModel"
           />
-          <div class="err" *ngIf="submitted && typeCodeModel.invalid">
+          <div class="account-type-error" *ngIf="submitted && typeCodeModel.invalid">
             Type Code is required
           </div>
         </label>
-        <label class="lbl"
-          >Description
+
+        <label class="ac-form-field">
+          <span class="ac-form-label">Description</span>
           <input
-            class="inp"
             [(ngModel)]="form.description"
             required
             #descModel="ngModel"
           />
-          <div class="err" *ngIf="submitted && descModel.invalid">
+          <div class="account-type-error" *ngIf="submitted && descModel.invalid">
             Description is required
           </div>
         </label>
-        <label class="lbl"
-          >2nd Description
-          <input class="inp" [(ngModel)]="form.secondDesc" name="secondDesc" />
+
+        <label class="ac-form-field">
+          <span class="ac-form-label">2nd Description</span>
+          <input [(ngModel)]="form.secondDesc" name="secondDesc" />
         </label>
-        <label class="lbl"
-          >Reporting Category
-          <select class="inp" [(ngModel)]="form.category">
+
+        <label class="ac-form-field">
+          <span class="ac-form-label">Reporting Category</span>
+          <select [(ngModel)]="form.category">
             <option>Balance Sheet Type</option>
             <option>Profit and Loss Type</option>
           </select>
         </label>
-        <label class="lbl" *ngIf="false">
-          System/User
-          <select class="inp" [(ngModel)]="form.system" disabled>
+
+        <!-- System/User field ẩn theo logic cũ -->
+        <label class="ac-form-field" *ngIf="false">
+          <span class="ac-form-label">System/User</span>
+          <select [(ngModel)]="form.system" disabled>
             <option [ngValue]="false">User Defined</option>
           </select>
         </label>
       </div>
     </div>
 
-    <div class="dialog-actions">
-      <button class="btn cancel" (click)="closeDialog()">Cancel</button>
+    <div class="ac-dialog-footer">
+      <button class="ac-btn ac-btn-ghost" (click)="closeDialog()">
+        Cancel
+      </button>
       <button
-        class="btn primary"
+        class="ac-btn ac-btn-primary"
         (click)="save(typeCodeModel.invalid || descModel.invalid)"
         [disabled]="typeCodeModel.invalid || descModel.invalid"
       >
-        {{ editMode ? "Save" : "Create" }}
+        {{ editMode ? 'Save' : 'Create' }}
       </button>
     </div>
   </div>
 </div>
-<div class="dialog" *ngIf="showDeleteConfirm">
-  <div class="dialog-panel-small" role="dialog" aria-modal="true">
-    <div class="dialog-title">
-      Delete Debtor Type &nbsp;<button
-        class="x"
+
+<!-- DELETE CONFIRM DIALOG -->
+<div class="ac-dialog-backdrop" *ngIf="showDeleteConfirm">
+  <div class="ac-card ac-dialog-panel-sm" role="dialog" aria-modal="true">
+    <div class="ac-dialog-header">
+      <span>Delete Debtor Type</span>
+      <button
+        class="ac-dialog-close"
         (click)="closeDeleteConfirm()"
         aria-label="Close"
       >
@@ -168,32 +219,52 @@
       </button>
     </div>
 
-    <div class="dialog-body">
+    <div class="ac-dialog-body">
       <p>
         Are you sure you want to delete
-        <b>{{ selected?.code }}</b>
-        ?
+        <b>{{ selected?.code }}</b>?
       </p>
     </div>
 
-    <div class="dialog-actions">
-      <button class="btn" (click)="closeDeleteConfirm()">Cancel</button>
-      <button class="btn danger" (click)="delete()">Delete</button>
-    </div>
-  </div>
-</div>
-<div class="dialog" *ngIf="showSuccess">
-  <div class="dialog-panel-small" role="dialog" aria-modal="true" style="min-width: 360px">
-    <div class="dialog-title" style="background: linear-gradient(180deg,#9be28a 0%, #62c84f 100%);">
-       Success
-      <button class="x" (click)="closeSuccess()" aria-label="Close">×</button>
-    </div>
-    <div class="dialog-body">
-      <p style="margin: 8px 0; font-weight:600; color:#14532d">{{ successMsg }}</p>
-    </div>
-    <div class="dialog-actions">
-      <button class="btn primary" (click)="closeSuccess()">OK</button>
+    <div class="ac-dialog-footer">
+      <button class="ac-btn ac-btn-ghost" (click)="closeDeleteConfirm()">
+        Cancel
+      </button>
+      <button class="ac-btn ac-btn-danger" (click)="delete()">
+        Delete
+      </button>
     </div>
   </div>
 </div>
 
+<!-- SUCCESS DIALOG -->
+<div class="ac-dialog-backdrop" *ngIf="showSuccess">
+  <div
+    class="ac-card ac-dialog-panel-sm account-type-success-dialog"
+    role="dialog"
+    aria-modal="true"
+  >
+    <div class="ac-dialog-header account-type-success-header">
+      <span>Success</span>
+      <button
+        class="ac-dialog-close"
+        (click)="closeSuccess()"
+        aria-label="Close"
+      >
+        ×
+      </button>
+    </div>
+
+    <div class="ac-dialog-body">
+      <p class="account-type-success-text">
+        {{ successMsg }}
+      </p>
+    </div>
+
+    <div class="ac-dialog-footer">
+      <button class="ac-btn ac-btn-primary" (click)="closeSuccess()">
+        OK
+      </button>
+    </div>
+  </div>
+</div>

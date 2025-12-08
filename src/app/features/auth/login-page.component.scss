@@ -1,73 +1,90 @@
-.login-wrapper {
+.xero-login-page {
   min-height: 100vh;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 32px 16px;
-  background: radial-gradient(circle at top left, #e0f2fe, #f5f7fb 40%);
+  background: #f5f7fa;
 }
 
-.login-card {
-  width: 100%;
-  max-width: 420px;
-  border-radius: 18px;
-  box-shadow: 0 18px 45px rgba(15, 23, 42, 0.18);
-  padding: 24px 24px 28px;
+.xero-card {
+  background: #ffffff;
+  width: 360px;
+  padding: 40px 40px 30px;
+  border-radius: 4px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+  text-align: center;
 }
 
-.login-header {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  margin-bottom: 16px;
-}
-
-.login-logo {
-  width: 40px;
-  height: 40px;
-  border-radius: 999px;
-  background: linear-gradient(135deg, #16a34a, #22c55e);
+.xero-logo-circle {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  margin: 0 auto 24px;
+  background: #13b5ea; // xanh kiểu Xero
+  color: #ffffff;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #ffffff;
-  font-weight: 700;
-  font-size: 18px;
+  font-weight: 600;
+  font-size: 26px;
 }
 
-.login-title-group h1 {
+.xero-title {
+  margin: 0 0 24px;
   font-size: 22px;
-  margin: 0 0 2px;
+  font-weight: 600;
+  color: #333333;
 }
 
-.login-title-group p {
-  margin: 0;
-  font-size: 13px;
-  color: #6b7280;
-}
-
-.login-form {
+.xero-form {
   display: flex;
   flex-direction: column;
-  gap: 14px;
-  margin-top: 8px;
+  align-items: stretch;
 }
 
-.login-button {
-  margin-top: 4px;
+.xero-field {
   width: 100%;
-  border-radius: 999px;
-  padding: 8px 0;
+  margin-bottom: 12px;
+  text-align: left;
 }
 
-.error-message {
-  margin-top: 4px;
-  font-size: 13px;
-  color: #b91c1c;
-}
-
-.hint {
+.xero-submit {
   margin-top: 8px;
-  font-size: 12px;
-  color: #6b7280;
+  width: 100%;
+  background-color: #0078d4; // nút xanh
+  color: #ffffff;
+  font-weight: 600;
+  padding: 10px 0;
+  border-radius: 4px;
+}
+
+.xero-submit[disabled] {
+  opacity: 0.6;
+  cursor: default;
+}
+
+.xero-error-message {
+  margin-top: 4px;
+  margin-bottom: 4px;
+  color: #d93025;
+  font-size: 13px;
+}
+
+.xero-footer-links {
+  margin-top: 24px;
+  font-size: 13px;
+  color: #0078d4;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 12px;
+}
+
+.xero-footer-links a {
+  color: #0078d4;
+  text-decoration: none;
+}
+
+.xero-footer-links a:hover {
+  text-decoration: underline;
 }

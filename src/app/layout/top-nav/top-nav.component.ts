@@ -28,9 +28,7 @@ export class TopNavComponent {
             label: 'Account Books',
             icon: 'account_balance',
             children: [
-                { label: 'Journal Entry', path: '/general-ledger/journal-entry' },
-                { label: 'Trial Balance', path: '/general-ledger/trial-balance' },
-                { label: 'Ledger Report', path: '/general-ledger/ledger-report' },
+                { label: 'Manage Account Book', path: '/book/manage-account-book' },
             ],
         },
         {
