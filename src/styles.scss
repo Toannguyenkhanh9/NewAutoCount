@@ -550,11 +550,25 @@ textarea.inp {
 .ac-dialog-panel-lg {
   width: 640px;
   max-width: 95vw;
+  max-height: calc(100vh - 80px); // chừa mép trên dưới
+  display: flex;
+  flex-direction: column;
 }
 
 .ac-dialog-panel-sm {
   width: 420px;
   max-width: 90vw;
+  max-height: calc(100vh - 80px);
+  display: flex;
+  flex-direction: column;
+}
+
+/* Nếu có dùng panel XL cho contra entry */
+.ac-dialog-panel-xl {
+  width: min(1100px, 96vw);
+  max-height: calc(100vh - 80px);
+  display: flex;
+  flex-direction: column;
 }
 
 /* Header / body / footer */
@@ -632,4 +646,331 @@ textarea.inp {
   margin: 8px 0;
   font-weight: 600;
   color: #14532d;
+}
+/* ===== Generic page toolbar & pager (list screens) ===== */
+.ac-page-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.ac-page-search {
+  min-width: 260px;
+}
+
+.ac-page-footer {
+  margin-top: 10px;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  font-size: 12px;
+}
+
+.ac-pager {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.ac-pager-btn {
+  padding: 2px 6px;
+  min-width: auto;
+  font-size: 11px;
+}
+
+.ac-pager-label {
+  margin: 0 4px;
+}
+
+/* text helpers */
+.ac-text-right {
+  text-align: right;
+}
+.ac-text-center {
+  text-align: center;
+}
+.ac-text-muted {
+  color: $ac-text-muted;
+}
+.ac-text-ellipsis {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* selected row (list screens) */
+.ac-row-selected td {
+  background: $ac-primary-light !important;
+}
+
+/* small table variant (detail / subgrid) */
+.ac-table-sm th,
+.ac-table-sm td {
+  padding: 4px 6px;
+  font-size: 11px;
+}
+
+/* detail pane under main list */
+.ac-detail-pane {
+  margin-top: 12px;
+}
+
+.ac-detail-header {
+  font-size: 13px;
+  font-weight: 600;
+  margin-bottom: 6px;
+}
+
+/* XL dialog for complex forms */
+.ac-dialog-panel-xl {
+  width: 1100px;
+  max-width: 96vw;
+}
+
+/* Knock-off panels used in Contra and can reuse elsewhere */
+.ac-knock-panel {
+  border: 1px solid $ac-border;
+  border-radius: $ac-radius-lg;
+  padding: 12px 12px 8px;
+  margin-bottom: 12px;
+  background: #fbfcff;
+}
+
+.ac-knock-totals {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-bottom: 6px;
+  font-size: 12px;
+}
+.ac-knock-totals .label {
+  color: $ac-text-muted;
+}
+.ac-knock-totals .value {
+  font-weight: 600;
+}
+
+.ac-knock-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 8px;
+}
+
+.ac-knock-title {
+  font-weight: 600;
+}
+
+.ac-knock-party {
+  margin-left: 4px;
+  color: $ac-text-muted;
+}
+
+.ac-side-stack {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+}
+
+/* scrollable table in knock-off panels */
+.ac-tablewrap {
+  overflow: auto;
+  max-height: 320px;
+}
+
+/* blue emphasis + overdue */
+.ac-text-blue {
+  color: #1976d2;
+}
+
+.ac-row-overdue td {
+  background: #fff4f4;
+}
+
+/* sum row (tfoot) */
+.ac-row-sum th,
+.ac-row-sum td {
+  font-weight: 600;
+  background: #f3f6fb;
+}
+
+/* inline checkbox in dialog footer */
+.ac-inline-checkbox {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: $ac-text-muted;
+}
+/* Form grid 3 cột trong dialog (contra header, v.v.) */
+.ac-dialog-form-grid-3 {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px 16px;
+  align-items: flex-end; // cho nút / input canh đáy cùng nhau
+}
+
+/* Ô nào cần rộng 2 cột (vd Description) */
+.ac-dialog-form-grid-3-span-2 {
+  grid-column: span 2;
+}
+
+/* đảm bảo input/select trong grid full-width & cùng chiều cao */
+.ac-dialog-form-grid-3 input,
+.ac-dialog-form-grid-3 select {
+  width: 100%;
+  box-sizing: border-box;
+  height: 32px;
+  line-height: 20px;
+  padding: 6px 8px;
+}
+/* Panel chính của popup */
+.dialog-panel,
+.dialog-panel-small {
+  max-height: calc(100vh - 80px);  // không cao hơn màn hình
+  display: flex;
+  flex-direction: column;
+}
+
+/* Phần nội dung bên trong popup – cho phép scroll */
+.dialog-body {
+  flex: 1 1 auto;
+  min-height: 0;           // cần cho flex + overflow
+  overflow-y: auto;        // 👈 thanh cuộn dọc khi nội dung dài
+  padding: 14px 16px;      // nếu muốn giữ padding giống cũ
+  font-size: 13px;
+}
+
+/* Footer luôn dính dưới */
+.dialog-actions {
+  padding: 10px 16px;
+  border-top: 1px solid $ac-border;
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+.dialog-body {
+  scrollbar-width: thin;
+  scrollbar-color: #c3d4e8 #f3f6fb;
+}
+
+.dialog-body::-webkit-scrollbar {
+  width: 6px;
+}
+
+.dialog-body::-webkit-scrollbar-track {
+  background: #f3f6fb;
+}
+
+.dialog-body::-webkit-scrollbar-thumb {
+  background: #c3d4e8;
+  border-radius: 3px;
+}
+/* =============================
+   SCROLL CHO TẤT CẢ POPUP .dialog
+   ============================= */
+
+/* Lớp overlay */
+.dialog {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.35);
+  z-index: 1000;
+}
+
+/* Panel chính và panel small đều có chiều cao tối đa & scroll bên trong */
+.dialog > .dialog-panel,
+.dialog > .dialog-panel-small {
+  max-height: calc(100vh - 80px) !important; // không cao hơn màn hình
+  overflow-y: auto !important;              // 👈 có scrollbar khi dài
+  display: flex;
+  flex-direction: column;
+}
+
+/* Cho scrollbar gọn gàng hơn một chút */
+.dialog > .dialog-panel,
+.dialog > .dialog-panel-small {
+  scrollbar-width: thin;
+  scrollbar-color: #c3d4e8 #f3f6fb;
+}
+
+.dialog > .dialog-panel::-webkit-scrollbar,
+.dialog > .dialog-panel-small::-webkit-scrollbar {
+  width: 6px;
+}
+
+.dialog > .dialog-panel::-webkit-scrollbar-track,
+.dialog > .dialog-panel-small::-webkit-scrollbar-track {
+  background: #f3f6fb;
+}
+
+.dialog > .dialog-panel::-webkit-scrollbar-thumb,
+.dialog > .dialog-panel-small::-webkit-scrollbar-thumb {
+  background: #c3d4e8;
+  border-radius: 3px;
+}
+/* =====================================
+   DIALOG LOẠI LỚN + VÙNG SCROLL BÊN TRONG
+   ===================================== */
+
+/* Panel lớn mặc định cho các form dài (contra, invoice, ...) */
+.ac-dialog-xl {
+  width: min(1100px, 96vw);
+  max-height: calc(100vh - 80px); // không cao hơn màn hình
+  display: flex;
+  flex-direction: column;
+}
+
+/* Vùng nội dung có thể scroll */
+.ac-dialog-scroll {
+  flex: 1 1 auto;
+  min-height: 0;          // rất quan trọng khi dùng flex + overflow
+  overflow-y: auto;
+  padding: 14px 16px;
+  font-size: 13px;
+}
+
+/* Scrollbar gọn gàng */
+.ac-dialog-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: #c3d4e8 #f3f6fb;
+}
+
+.ac-dialog-scroll::-webkit-scrollbar {
+  width: 6px;
+}
+
+.ac-dialog-scroll::-webkit-scrollbar-track {
+  background: #f3f6fb;
+}
+
+.ac-dialog-scroll::-webkit-scrollbar-thumb {
+  background: #c3d4e8;
+  border-radius: 3px;
+}
+.ac-dialog-panel-xl {
+  width: min(1100px, 96vw);
+  max-height: calc(100vh - 80px);
+  display: flex;
+  flex-direction: column;
+}
+
+.ac-dialog-panel-xl > .ac-dialog-body {
+  flex: 1 1 auto;
+  min-height: 0;
+  padding: 0; // padding chuyển cho scroll + footer
+  display: flex;
+  flex-direction: column;
+}
+
+.ac-dialog-scroll {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 14px 16px;
+  font-size: 13px;
 }

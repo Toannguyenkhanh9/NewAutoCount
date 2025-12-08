@@ -1,97 +1,128 @@
-<div class="page">
-  <!-- ===== Title + Toolbar ===== -->
-  <div class="titlebar">
-    <h1>A/R and A/P Contra Entry</h1>
-    <div class="toolbar">
-      <input
-        class="search1"
-        [(ngModel)]="q"
-        placeholder="Search contra no, debtor, creditor..."
-      />
-      <button class="btn primary" type="button" (click)="openContraForm()">
-        <span class="ico plus"></span> New
-      </button>
-      <button
-        class="btn"
-        (click)="openView(selected)"
-        type="button"
-        [disabled]="!selected"
-      >
-        <span class="ico eye"></span> View
-      </button>
-    </div>
-  </div>
+<div class="ac-page contra-page">
+  <!-- MAIN LIST CARD -->
+  <div class="ac-card">
+    <!-- ===== HEADER ===== -->
+    <div class="ac-page-header">
+      <div>
+        <div class="ac-page-title">A/R and A/P Contra Entry</div>
+        <div class="ac-page-subtitle">
+          Offset outstanding debtor and creditor balances against each other.
+        </div>
+      </div>
 
-  <!-- ===== LIST ===== -->
-  <div class="gridwrap">
-    <table>
-      <thead>
-        <tr>
-          <th (click)="setSort('contraNo')">Contra No.</th>
-          <th (click)="setSort('date')">Date</th>
-          <th (click)="setSort('debtorName')">Debtor</th>
-          <th (click)="setSort('creditorName')">Creditor</th>
-          <th>Description</th>
-          <th class="r" (click)="setSort('netTotal')">Net Total</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr
-          *ngFor="let r of paged"
-          (click)="toggleDetailFor(r)"
-          [class.selected]="r === selected"
+      <div class="ac-page-toolbar">
+        <input
+          class="ac-form-control ac-page-search"
+          [(ngModel)]="q"
+          placeholder="Search contra no, debtor, creditor..."
+        />
+
+        <button
+          class="ac-btn ac-btn-primary"
+          type="button"
+          (click)="openContraForm()"
         >
-          <td>{{ r.contraNo }}</td>
-          <td>{{ r.date }}</td>
-          <td>{{ r.debtorName }}</td>
-          <td>{{ r.creditorName }}</td>
-          <td class="cut">{{ r.description || "-" }}</td>
-          <td class="r">{{ r.netTotal | number : "1.2-2" }}</td>
-        </tr>
-        <tr *ngIf="!paged.length">
-          <td class="center muted" colspan="8">No data</td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
+          New
+        </button>
 
-  <!-- ===== Pager ===== -->
-  <div class="pager">
-    <div class="nav">
-      <button class="pg" (click)="first()">&laquo;</button>
-      <button class="pg" (click)="prev()">&lsaquo;</button>
-      <span class="pginfo">Page {{ page }} / {{ totalPages }}</span>
-      <button class="pg" (click)="next()">&rsaquo;</button>
-      <button class="pg" (click)="last()">&raquo;</button>
+        <button
+          class="ac-btn ac-btn-ghost"
+          type="button"
+          (click)="openView(selected)"
+          [disabled]="!selected"
+        >
+          View
+        </button>
+      </div>
+    </div>
+
+    <!-- ===== LIST ===== -->
+    <div class="contra-grid">
+      <table class="ac-table">
+        <thead>
+          <tr>
+            <th (click)="setSort('contraNo')">Contra No.</th>
+            <th (click)="setSort('date')">Date</th>
+            <th (click)="setSort('debtorName')">Debtor</th>
+            <th (click)="setSort('creditorName')">Creditor</th>
+            <th>Description</th>
+            <th class="ac-text-right" (click)="setSort('netTotal')">
+              Net Total
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr
+            *ngFor="let r of paged"
+            (click)="toggleDetailFor(r)"
+            [class.ac-row-selected]="r === selected"
+          >
+            <td>{{ r.contraNo }}</td>
+            <td>{{ r.date }}</td>
+            <td>{{ r.debtorName }}</td>
+            <td>{{ r.creditorName }}</td>
+            <td class="ac-text-ellipsis" [title]="r.description || '-'">
+              {{ r.description || '-' }}
+            </td>
+            <td class="ac-num">
+              {{ r.netTotal | number : '1.2-2' }}
+            </td>
+          </tr>
+
+          <tr *ngIf="!paged.length">
+            <td class="ac-text-center ac-text-muted" colspan="6">
+              No data
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- ===== PAGER ===== -->
+    <div class="ac-page-footer">
+      <div class="ac-pager">
+        <button class="ac-btn ac-btn-ghost ac-pager-btn" (click)="first()">
+          &laquo;
+        </button>
+        <button class="ac-btn ac-btn-ghost ac-pager-btn" (click)="prev()">
+          &lsaquo;
+        </button>
+
+        <span class="ac-pager-label">
+          Page {{ page }} / {{ totalPages }}
+        </span>
+
+        <button class="ac-btn ac-btn-ghost ac-pager-btn" (click)="next()">
+          &rsaquo;
+        </button>
+        <button class="ac-btn ac-btn-ghost ac-pager-btn" (click)="last()">
+          &raquo;
+        </button>
+      </div>
     </div>
   </div>
-  <!-- Detail Pane: Invoices/Debit Notes Paid -->
-  <div *ngIf="detailOpen" class="cn-detail-pane">
-    <div class="cn-detail-header">Invoices/Debit Notes Paid</div>
 
-    <table class="table table-sm cn-subgrid">
+  <!-- ===== DETAIL PANE: INVOICES / DEBIT NOTES PAID ===== -->
+  <div *ngIf="detailOpen" class="ac-card ac-detail-pane">
+    <div class="ac-detail-header">Invoices / Debit Notes Paid</div>
+
+    <table class="ac-table ac-table-sm">
       <colgroup>
         <col style="width: 8%" />
-        <!-- Type -->
         <col style="width: 14%" />
-        <!-- Date -->
         <col style="width: 28%" />
-        <!-- No. -->
         <col style="width: 16%" />
-        <!-- Org. Amt. -->
         <col style="width: 16%" />
-        <!-- Outstanding -->
         <col style="width: 18%" />
-        <!-- Paid Amount -->
       </colgroup>
       <thead>
         <tr>
           <th style="width: 70px">Type</th>
           <th style="width: 110px">Date</th>
           <th>No.</th>
-          <th class="text-end" style="width: 140px">Org. Amt.</th>
-          <th class="text-end" style="width: 140px">Outstanding</th>
-          <th class="text-end" style="width: 140px">Paid Amount</th>
+          <th class="ac-text-right" style="width: 140px">Org. Amt.</th>
+          <th class="ac-text-right" style="width: 140px">Outstanding</th>
+          <th class="ac-text-right" style="width: 140px">Paid Amount</th>
         </tr>
       </thead>
       <tbody>
@@ -99,70 +130,93 @@
           <td>{{ d.type }}</td>
           <td>{{ d.date }}</td>
           <td>{{ d.no }}</td>
-          <td class="text-end">{{ fmt(d.orgAmt) }}</td>
-          <td class="text-end">{{ fmt(d.outstanding) }}</td>
-          <td class="text-end">{{ fmt(d.paid) }}</td>
+          <td class="ac-text-right">{{ fmt(d.orgAmt) }}</td>
+          <td class="ac-text-right">{{ fmt(d.outstanding) }}</td>
+          <td class="ac-text-right">{{ fmt(d.paid) }}</td>
         </tr>
         <tr *ngIf="!detailItems.length">
-          <td colspan="6" class="text-center text-muted py-3">
+          <td colspan="6" class="ac-text-center ac-text-muted">
             No invoices/debit notes paid for this credit note.
           </td>
         </tr>
       </tbody>
       <tfoot *ngIf="detailItems.length">
-        <tr>
-          <th colspan="5" class="text-end">Total Paid</th>
-          <th class="text-end">{{ fmt(detailPaidTotal) }}</th>
+        <tr class="ac-row-sum">
+          <th colspan="5" class="ac-text-right">Total Paid</th>
+          <th class="ac-text-right">{{ fmt(detailPaidTotal) }}</th>
         </tr>
       </tfoot>
     </table>
   </div>
-  <!-- =================== MODAL: NEW A/R & A/P CONTRA ENTRY =================== -->
-  <div class="dialog" *ngIf="showContraForm">
-    <div class="dialog-panel" style="width: min(1100px, 96vw)">
-      <div class="dialog-title">
+
+  <!-- ========== MODAL: NEW / VIEW A/R & A/P CONTRA ENTRY ========== -->
+<div class="ac-dialog-backdrop" *ngIf="showContraForm">
+  <div class="ac-card ac-dialog-panel-xl">
+    <!-- HEADER -->
+    <div class="ac-dialog-header">
+      <span>
         {{
           isReadOnly
-            ? "View A/R and A/P Contra Entry"
-            : "New A/R and A/P Contra Entry"
+            ? 'View A/R and A/P Contra Entry'
+            : 'New A/R and A/P Contra Entry'
         }}
-        <button class="x" (click)="closeContraForm()">×</button>
-      </div>
+      </span>
+      <button
+        type="button"
+        class="ac-dialog-close"
+        (click)="closeContraForm()"
+      >
+        ×
+      </button>
+    </div>
 
-      <form class="dialog-body" [formGroup]="contraForm">
+    <!-- FORM + SCROLL -->
+    <form class="ac-dialog-body" [formGroup]="contraForm">
+      <!-- VÙNG CUỘN NỘI DUNG -->
+      <div class="ac-dialog-scroll">
         <!-- ===== HEADER ===== -->
-        <div class="grid3">
-          <label>
-            Debtor
-            <select formControlName="debtor">
+        <div class="ac-dialog-form-grid-3">
+          <label class="ac-form-field">
+            <span class="ac-form-label">Debtor</span>
+            <select class="ac-form-control" formControlName="debtor">
               <option *ngFor="let d of debtorOptions" [value]="d.code">
                 {{ d.code }} — {{ d.name }}
               </option>
             </select>
           </label>
 
-          <label>
-            Creditor
-            <select formControlName="creditor">
+          <label class="ac-form-field">
+            <span class="ac-form-label">Creditor</span>
+            <select class="ac-form-control" formControlName="creditor">
               <option *ngFor="let c of creditorOptions" [value]="c.code">
                 {{ c.code }} — {{ c.name }}
               </option>
             </select>
           </label>
 
-          <label>
-            Journal Type
-            <select formControlName="journalType">
+          <label class="ac-form-field">
+            <span class="ac-form-label">Journal Type</span>
+            <select class="ac-form-control" formControlName="journalType">
               <option *ngFor="let j of journalTypes" [value]="j.typeCode">
                 {{ j.typeCode }}
               </option>
             </select>
           </label>
-          <label>Ref. <input formControlName="ref" /></label>
-          <label>Ref. No.2 <input formControlName="ref2" /></label>
-          <label
-            >Contra No
+
+          <label class="ac-form-field">
+            <span class="ac-form-label">Ref.</span>
+            <input class="ac-form-control" formControlName="ref" />
+          </label>
+
+          <label class="ac-form-field">
+            <span class="ac-form-label">Ref. No. 2</span>
+            <input class="ac-form-control" formControlName="ref2" />
+          </label>
+
+          <label class="ac-form-field">
+            <span class="ac-form-label">Contra No.</span>
             <input
+              class="ac-form-control"
               formControlName="contraNo"
               placeholder="&lt;&lt;new&gt;&gt;"
               (input)="buildOrNoSuggestions()"
@@ -173,13 +227,25 @@
               <option *ngFor="let v of orNoSuggestions" [value]="v"></option>
             </datalist>
           </label>
-          <label>Date <input type="date" formControlName="date" /></label>
-          <label class="wide"
-            >Description <input formControlName="description"
-          /></label>
-          <label>
-            Contra Amt
+
+          <label class="ac-form-field">
+            <span class="ac-form-label">Date</span>
             <input
+              class="ac-form-control"
+              type="date"
+              formControlName="date"
+            />
+          </label>
+
+          <label class="ac-form-field ac-dialog-form-grid-3-span-2">
+            <span class="ac-form-label">Description</span>
+            <input class="ac-form-control" formControlName="description" />
+          </label>
+
+          <label class="ac-form-field">
+            <span class="ac-form-label">Contra Amt</span>
+            <input
+              class="ac-form-control"
               appAmount
               min="0"
               formControlName="contraAmt"
@@ -191,28 +257,23 @@
         <br />
 
         <!-- ===== KNOCK-OFF A/R ===== -->
-        <div class="box">
-          <div class="totals-grid">
+        <div class="ac-knock-panel">
+          <div class="ac-knock-totals">
             <div class="label">Unapplied Amount</div>
-            <div class="value">{{ unappliedAR() | number : "1.2-2" }}</div>
+            <div class="value">
+              {{ unappliedAR() | number : '1.2-2' }}
+            </div>
           </div>
-          <div
-            class="title sm"
-            style="
-              display: flex;
-              justify-content: space-between;
-              align-items: flex-start;
-            "
-          >
-            <div style="font-weight: bold">
+
+          <div class="ac-knock-header">
+            <div class="ac-knock-title">
               Knock-off A/R Invoices / Debit Notes
-              <span class="party">{{ debtorName }}</span>
+              <span class="ac-knock-party">{{ debtorName }}</span>
             </div>
 
-            <!-- Cụm bên phải xếp dọc: Amount ở trên, Auto Allocate ở dưới -->
-            <div class="side-stack">
+            <div class="ac-side-stack">
               <button
-                class="btn primary"
+                class="ac-btn ac-btn-primary"
                 type="button"
                 (click)="autoAllocate('ar')"
                 [disabled]="isReadOnly || !canAllocate"
@@ -222,72 +283,73 @@
             </div>
           </div>
 
-          <div formArrayName="ar" class="tablewrap">
-            <table class="table bordered">
+          <div formArrayName="ar" class="ac-tablewrap">
+            <table class="ac-table ac-table-sm">
               <thead>
                 <tr>
-                  <th class="sortable" (click)="sortKnock('ar', 'type')">
+                  <th (click)="sortKnock('ar', 'type')">
                     Type
-                    <span class="sort" [class.on]="knSort.ar.key === 'type'">{{
-                      knSort.ar.dir === "asc" ? "▲" : "▼"
-                    }}</span>
+                    <span class="sort" [class.on]="knSort.ar.key === 'type'">
+                      {{ knSort.ar.dir === 'asc' ? '▲' : '▼' }}
+                    </span>
                   </th>
-                  <th class="sortable" (click)="sortKnock('ar', 'date')">
+                  <th (click)="sortKnock('ar', 'date')">
                     Date
-                    <span class="sort" [class.on]="knSort.ar.key === 'date'">{{
-                      knSort.ar.dir === "asc" ? "▲" : "▼"
-                    }}</span>
+                    <span class="sort" [class.on]="knSort.ar.key === 'date'">
+                      {{ knSort.ar.dir === 'asc' ? '▲' : '▼' }}
+                    </span>
                   </th>
-                  <th class="sortable" (click)="sortKnock('ar', 'no')">
+                  <th (click)="sortKnock('ar', 'no')">
                     No.
-                    <span class="sort" [class.on]="knSort.ar.key === 'no'">{{
-                      knSort.ar.dir === "asc" ? "▲" : "▼"
-                    }}</span>
+                    <span class="sort" [class.on]="knSort.ar.key === 'no'">
+                      {{ knSort.ar.dir === 'asc' ? '▲' : '▼' }}
+                    </span>
                   </th>
-                  <th class="r sortable" (click)="sortKnock('ar', 'orgAmt')">
+                  <th class="ac-text-right" (click)="sortKnock('ar', 'orgAmt')">
                     Org. Amt.
                     <span
                       class="sort"
                       [class.on]="knSort.ar.key === 'orgAmt'"
-                      >{{ knSort.ar.dir === "asc" ? "▲" : "▼" }}</span
                     >
+                      {{ knSort.ar.dir === 'asc' ? '▲' : '▼' }}
+                    </span>
                   </th>
-                  <th class="r">Outstanding</th>
-                  <th class="r">Pay</th>
-                  <!-- bỏ (click) ở header -->
-                  <th class="c"></th>
+                  <th class="ac-text-right">Outstanding</th>
+                  <th class="ac-text-right">Pay</th>
+                  <th class="ac-text-center"></th>
                 </tr>
               </thead>
               <tbody>
                 <tr
                   *ngFor="let fg of arFA.controls; let i = index"
                   [formGroupName]="i"
-                  [class.overdue-row]="isOverdue(fg.get('date')?.value)"
+                  [class.ac-row-overdue]="isOverdue(fg.get('date')?.value)"
                 >
-                  <td>{{ fg.get("type")!.value }}</td>
-                  <td>{{ fg.get("date")!.value }}</td>
-                  <td>{{ fg.get("no")!.value }}</td>
-                  <td class="r">
-                    {{ fg.get("orgAmt")!.value | number : "1.2-2" }}
+                  <td>{{ fg.get('type')!.value }}</td>
+                  <td>{{ fg.get('date')!.value }}</td>
+                  <td>{{ fg.get('no')!.value }}</td>
+                  <td class="ac-text-right">
+                    {{ fg.get('orgAmt')!.value | number : '1.2-2' }}
                   </td>
-                  <td class="r">
+                  <td class="ac-text-right">
                     <span
-                      [class.blue]="(fg.get('outstanding')?.value || 0) > 0"
+                      [class.ac-text-blue]="(fg.get('outstanding')?.value || 0) > 0"
                     >
-                      {{ fg.get("outstanding")?.value | number : "1.2-2" }}
+                      {{
+                        fg.get('outstanding')?.value | number : '1.2-2'
+                      }}
                     </span>
                   </td>
-                  <td class="r">
+                  <td class="ac-text-right">
                     <input
-                      style="width: 100%"
+                      class="ac-form-control"
                       appAmount
                       formControlName="pay"
                       (input)="clampPay(arFA.at(i), 'ar')"
                       [disabled]="isReadOnly"
                     />
                   </td>
-                  <!-- Alloc -->
-                  <td class="c">
+                  <td class="ac-text-center">
                     <input
                       type="checkbox"
                       formControlName="alloc"
@@ -298,12 +360,14 @@
                 </tr>
               </tbody>
               <tfoot>
-                <tr class="sum">
+                <tr class="ac-row-sum">
                   <td colspan="3">Total</td>
-                  <td class="r">{{ sumOrg("ar") | number : "1.2-2" }}</td>
-                  <td class="r">
-                    <span [class.blue]="sumOutstanding('ar') > 0">
-                      {{ sumOutstanding("ar") | number : "1.2-2" }}
+                  <td class="ac-text-right">
+                    {{ sumOrg('ar') | number : '1.2-2' }}
+                  </td>
+                  <td class="ac-text-right">
+                    <span [class.ac-text-blue]="sumOutstanding('ar') > 0">
+                      {{ sumOutstanding('ar') | number : '1.2-2' }}
                     </span>
                   </td>
                   <td colspan="2"></td>
@@ -316,26 +380,23 @@
         <br />
 
         <!-- ===== KNOCK-OFF A/P ===== -->
-        <div class="box">
-          <div class="totals-grid">
+        <div class="ac-knock-panel">
+          <div class="ac-knock-totals">
             <div class="label">Unapplied Amount</div>
-            <div class="value">{{ unappliedAP() | number : "1.2-2" }}</div>
-          </div>
-          <div
-            class="title sm"
-            style="
-              display: flex;
-              justify-content: space-between;
-              align-items: flex-start;
-            "
-          >
-            <div style="font-weight: bold">
-              Knock-off A/P Invoices / Debit Notes
-              <span class="party">{{ creditorName }}</span>
+            <div class="value">
+              {{ unappliedAP() | number : '1.2-2' }}
             </div>
-            <div class="side-stack">
+          </div>
+
+          <div class="ac-knock-header">
+            <div class="ac-knock-title">
+              Knock-off A/P Invoices / Debit Notes
+              <span class="ac-knock-party">{{ creditorName }}</span>
+            </div>
+
+            <div class="ac-side-stack">
               <button
-                class="btn primary"
+                class="ac-btn ac-btn-primary"
                 type="button"
                 (click)="autoAllocate('ap')"
                 [disabled]="!canAllocate"
@@ -345,70 +406,73 @@
             </div>
           </div>
 
-          <div formArrayName="ap" class="tablewrap">
-            <table class="table bordered">
+          <div formArrayName="ap" class="ac-tablewrap">
+            <table class="ac-table ac-table-sm">
               <thead>
                 <tr>
-                  <th class="sortable" (click)="sortKnock('ap', 'type')">
+                  <th (click)="sortKnock('ap', 'type')">
                     Type
-                    <span class="sort" [class.on]="knSort.ap.key === 'type'">{{
-                      knSort.ap.dir === "asc" ? "▲" : "▼"
-                    }}</span>
+                    <span class="sort" [class.on]="knSort.ap.key === 'type'">
+                      {{ knSort.ap.dir === 'asc' ? '▲' : '▼' }}
+                    </span>
                   </th>
-                  <th class="sortable" (click)="sortKnock('ap', 'date')">
+                  <th (click)="sortKnock('ap', 'date')">
                     Date
-                    <span class="sort" [class.on]="knSort.ap.key === 'date'">{{
-                      knSort.ap.dir === "asc" ? "▲" : "▼"
-                    }}</span>
+                    <span class="sort" [class.on]="knSort.ap.key === 'date'">
+                      {{ knSort.ap.dir === 'asc' ? '▲' : '▼' }}
+                    </span>
                   </th>
-                  <th class="sortable" (click)="sortKnock('ap', 'no')">
+                  <th (click)="sortKnock('ap', 'no')">
                     No.
-                    <span class="sort" [class.on]="knSort.ap.key === 'no'">{{
-                      knSort.ap.dir === "asc" ? "▲" : "▼"
-                    }}</span>
+                    <span class="sort" [class.on]="knSort.ap.key === 'no'">
+                      {{ knSort.ap.dir === 'asc' ? '▲' : '▼' }}
+                    </span>
                   </th>
-                  <th class="r sortable" (click)="sortKnock('ap', 'orgAmt')">
+                  <th class="ac-text-right" (click)="sortKnock('ap', 'orgAmt')">
                     Org. Amt.
                     <span
                       class="sort"
                       [class.on]="knSort.ap.key === 'orgAmt'"
-                      >{{ knSort.ap.dir === "asc" ? "▲" : "▼" }}</span
                     >
+                      {{ knSort.ap.dir === 'asc' ? '▲' : '▼' }}
+                    </span>
                   </th>
-                  <th class="r">Outstanding</th>
-                  <th class="r">Pay</th>
-                  <th class="c"></th>
+                  <th class="ac-text-right">Outstanding</th>
+                  <th class="ac-text-right">Pay</th>
+                  <th class="ac-text-center"></th>
                 </tr>
               </thead>
               <tbody>
                 <tr
                   *ngFor="let fg of apFA.controls; let i = index"
                   [formGroupName]="i"
-                  [class.overdue-row]="isOverdue(fg.get('date')?.value)"
+                  [class.ac-row-overdue]="isOverdue(fg.get('date')?.value)"
                 >
-                  <td>{{ fg.get("type")!.value }}</td>
-                  <td>{{ fg.get("date")!.value }}</td>
-                  <td>{{ fg.get("no")!.value }}</td>
-                  <td class="r">
-                    {{ fg.get("orgAmt")!.value | number : "1.2-2" }}
+                  <td>{{ fg.get('type')!.value }}</td>
+                  <td>{{ fg.get('date')!.value }}</td>
+                  <td>{{ fg.get('no')!.value }}</td>
+                  <td class="ac-text-right">
+                    {{ fg.get('orgAmt')!.value | number : '1.2-2' }}
                   </td>
-                  <td class="r">
+                  <td class="ac-text-right">
                     <span
-                      [class.blue]="(fg.get('outstanding')?.value || 0) > 0"
+                      [class.ac-text-blue]="(fg.get('outstanding')?.value || 0) > 0"
                     >
-                      {{ fg.get("outstanding")?.value | number : "1.2-2" }}
+                      {{
+                        fg.get('outstanding')?.value | number : '1.2-2'
+                      }}
                     </span>
                   </td>
-                  <td class="r">
+                  <td class="ac-text-right">
                     <input
-                      style="width: 100%"
+                      class="ac-form-control"
                       appAmount
                       formControlName="pay"
                       (input)="clampPay(apFA.at(i), 'ap')"
                       [disabled]="isReadOnly"
                     />
                   </td>
-                  <td class="c">
+                  <td class="ac-text-center">
                     <input
                       type="checkbox"
                       formControlName="alloc"
@@ -419,12 +483,14 @@
                 </tr>
               </tbody>
               <tfoot>
-                <tr class="sum">
+                <tr class="ac-row-sum">
                   <td colspan="3">Total</td>
-                  <td class="r">{{ sumOrg("ap") | number : "1.2-2" }}</td>
-                  <td class="r">
-                    <span [class.blue]="sumOutstanding('ap') > 0">
-                      {{ sumOutstanding("ap") | number : "1.2-2" }}
+                  <td class="ac-text-right">
+                    {{ sumOrg('ap') | number : '1.2-2' }}
+                  </td>
+                  <td class="ac-text-right">
+                    <span [class.ac-text-blue]="sumOutstanding('ap') > 0">
+                      {{ sumOutstanding('ap') | number : '1.2-2' }}
                     </span>
                   </td>
                   <td colspan="2"></td>
@@ -433,86 +499,143 @@
             </table>
           </div>
         </div>
+      </div> <!-- /ac-dialog-scroll -->
 
-        <div class="dialog-actions">
-          <label class="chk">
-            <input type="checkbox" />
-            <span>After save, proceed with new debit note entry</span>
-          </label>
-          <span class="spacer"></span>
-          <button class="btn cancel" (click)="closeContraForm()">Cancel</button>
-          <button
-            *ngIf="!isReadOnly"
-            class="btn primary"
-            type="button"
-            (click)="saveContra()"
-            [disabled]="
-              contraForm.invalid ||
-              unappliedAR() !== 0 ||
-              unappliedAP() !== 0 ||
-              !meetsOutstandingRule
-            "
-          >
-            Save
-          </button>
-        </div>
-      </form>
+      <!-- FOOTER: CHECKBOX + BUTTONS (KHÔNG CUỘN) -->
+      <div class="ac-dialog-footer">
+        <label class="ac-inline-checkbox" style="margin-right: auto">
+          <input type="checkbox" />
+          <span>After save, proceed with new debit note entry</span>
+        </label>
+
+        <button
+          class="ac-btn ac-btn-ghost"
+          type="button"
+          (click)="closeContraForm()"
+        >
+          Cancel
+        </button>
+        <button
+          *ngIf="!isReadOnly"
+          class="ac-btn ac-btn-primary"
+          type="button"
+          (click)="saveContra()"
+          [disabled]="
+            contraForm.invalid ||
+            unappliedAR() !== 0 ||
+            unappliedAP() !== 0 ||
+            !meetsOutstandingRule
+          "
+        >
+          Save
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+
+  <!-- ===== DELETE CONFIRM ===== -->
+  <div class="ac-dialog-backdrop" *ngIf="showDeleteConfirm">
+    <div class="ac-card ac-dialog-panel-sm" role="dialog" aria-modal="true">
+      <div class="ac-dialog-header">
+        <span>Delete Receive Payment</span>
+        <button
+          class="ac-dialog-close"
+          (click)="showDeleteConfirm = false"
+          aria-label="Close"
+        >
+          ×
+        </button>
+      </div>
+      <div class="ac-dialog-body">
+        Are you sure you want to delete
+        <b>{{ selected?.contraNo }}</b>?
+      </div>
+      <div class="ac-dialog-footer">
+        <button
+          class="ac-btn ac-btn-ghost"
+          type="button"
+          (click)="showDeleteConfirm = false"
+        >
+          Cancel
+        </button>
+        <button
+          class="ac-btn ac-btn-danger"
+          type="button"
+          (click)="doDelete()"
+        >
+          Delete
+        </button>
+      </div>
     </div>
   </div>
 
-  <!-- ===== Delete confirm ===== -->
-  <div class="dialog" *ngIf="showDeleteConfirm">
-    <div class="dialog-panel-small">
-      <div class="dialog-title">
-        Delete Receive Payment
-        <button class="x" (click)="showDeleteConfirm = false">×</button>
-      </div>
-      <div class="dialog-body">
-        Are you sure you want to delete <b>{{ selected?.contraNo }}</b
-        >?
-      </div>
-      <div class="dialog-actions">
-        <button class="btn" (click)="showDeleteConfirm = false">Cancel</button>
-        <button class="btn danger" (click)="doDelete()">Delete</button>
-      </div>
-    </div>
-  </div>
-  <div class="dialog" *ngIf="showSuccess">
+  <!-- ===== SUCCESS ===== -->
+  <div class="ac-dialog-backdrop" *ngIf="showSuccess">
     <div
-      class="dialog-panel-small"
+      class="ac-card ac-dialog-panel-sm ac-dialog-success"
       role="dialog"
       aria-modal="true"
-      style="min-width: 360px"
     >
-      <div
-        class="dialog-title"
-        style="background: linear-gradient(180deg, #9be28a 0%, #62c84f 100%)"
-      >
-        Success
-        <button class="x" (click)="closeSuccess()" aria-label="Close">×</button>
+      <div class="ac-dialog-header ac-dialog-success-header">
+        <span>Success</span>
+        <button
+          class="ac-dialog-close"
+          (click)="closeSuccess()"
+          aria-label="Close"
+        >
+          ×
+        </button>
       </div>
-      <div class="dialog-body">
-        <p style="margin: 8px 0; font-weight: 600; color: #14532d">
+      <div class="ac-dialog-body">
+        <p class="ac-dialog-success-text">
           {{ successMsg }}
         </p>
       </div>
-      <div class="dialog-actions">
-        <button class="btn primary" (click)="closeSuccess()">OK</button>
+      <div class="ac-dialog-footer">
+        <button
+          class="ac-btn ac-btn-primary"
+          type="button"
+          (click)="closeSuccess()"
+        >
+          OK
+        </button>
       </div>
     </div>
   </div>
-  <div class="dialog" *ngIf="showSaveConfirm">
-    <div class="dialog-panel-small">
-      <div class="dialog-title">
-        Confirm
-        <button class="x" (click)="cancelConfirmSave()">×</button>
+
+  <!-- ===== SAVE CONFIRM ===== -->
+  <div class="ac-dialog-backdrop" *ngIf="showSaveConfirm">
+    <div class="ac-card ac-dialog-panel-sm" role="dialog" aria-modal="true">
+      <div class="ac-dialog-header">
+        <span>Confirm</span>
+        <button
+          class="ac-dialog-close"
+          (click)="cancelConfirmSave()"
+          aria-label="Close"
+        >
+          ×
+        </button>
       </div>
-      <div class="dialog-body">
+      <div class="ac-dialog-body">
         {{ confirmMsg }}
       </div>
-      <div class="dialog-actions">
-        <button class="btn cancel" (click)="cancelConfirmSave()">Cancel</button>
-        <button class="btn primary" (click)="doConfirmSave()">OK</button>
+      <div class="ac-dialog-footer">
+        <button
+          class="ac-btn ac-btn-ghost"
+          type="button"
+          (click)="cancelConfirmSave()"
+        >
+          Cancel
+        </button>
+        <button
+          class="ac-btn ac-btn-primary"
+          type="button"
+          (click)="doConfirmSave()"
+        >
+          OK
+        </button>
       </div>
     </div>
   </div>
