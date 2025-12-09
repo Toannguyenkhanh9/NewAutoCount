@@ -1,46 +1,177 @@
-.top-nav {
+/* src/app/layout/top-nav/top-nav.component.scss */
+$ac-primary: #0078d4;
+$ac-primary-dark: #005a9e;
+$ac-header-height: 48px;
+
+/* Thanh top-nav chính */
+.top-nav-bar {
+  display: flex;
+  align-items: center;
+  height: $ac-header-height;
+  padding: 0 16px;
+  background: $ac-primary;
+  color: #fff;
+  box-sizing: border-box;
+}
+
+/* MENU NGANG (DESKTOP) */
+.top-nav-desktop {
   display: flex;
   align-items: center;
   gap: 4px;
-  height: 100%;
 }
 
 .nav-item {
-  height: 44px;
-  border-radius: 999px;
-  padding: 0 14px;
-  font-size: 15px;
+  color: #e6f3ff;
+  font-size: 13px;
   text-transform: none;
-  letter-spacing: 0;
-
-  /* chữ trắng trên nền xanh */
-  color: #ffffff;
-  background: transparent;
 }
 
 .nav-item .nav-icon {
   font-size: 18px;
-  margin-right: 6px;
+  margin-right: 4px;
 }
 
 .nav-item-has-children .nav-chevron {
   font-size: 18px;
-  margin-left: 4px;
+  margin-left: 2px;
 }
 
-/* hover: hơi sáng hơn bằng overlay trắng mờ */
+.nav-item-active,
 .nav-item:hover {
-  background: rgba(255, 255, 255, 0.16);
-  color: #ffffff;
+  background: rgba(255, 255, 255, 0.12);
 }
 
-/* active: viên trắng giống pill, chữ xanh */
-.nav-item-active {
-  background: #ffffff !important;
-  color: #005c9d !important;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25);
+/* Nút hamburger – ở đầu bên trái */
+.top-nav-menu-btn {
+  border: none;
+  background: transparent;
+  color: #fff;
+  cursor: pointer;
+  display: none; // ẩn trên desktop
+  margin-right: 8px;
+
+  mat-icon {
+    font-size: 24px;
+  }
 }
 
-.mat-mdc-menu-item {
+/* ==================== MOBILE SIDEBAR ==================== */
+
+.mobile-nav-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 1000;
+}
+
+.mobile-nav {
+  position: fixed;
+  inset: 0 auto 0 0;
+  width: 280px;
+  max-width: 80vw;
+  background: #ffffff;
+  box-shadow: 2px 0 6px rgba(0, 0, 0, 0.2);
+  z-index: 1001;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Header của sidebar */
+.mobile-nav-header {
+  display: flex;
+  align-items: center;
+  height: 52px;
+  padding: 0 12px 0 8px;
+  border-bottom: 1px solid #e3e7ee;
+}
+
+.mobile-nav-back-btn,
+.mobile-nav-close-btn {
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.mobile-nav-back-btn mat-icon,
+.mobile-nav-close-btn mat-icon {
+  font-size: 22px;
+}
+
+.mobile-nav-title {
+  flex: 1;
+  text-align: left;
+  font-size: 14px;
+  font-weight: 600;
+  padding: 0 8px;
+}
+
+/* Danh sách items trong sidebar */
+.mobile-nav-list {
+  flex: 1 1 auto;
+  overflow-y: auto;
+}
+
+.mobile-nav-item {
+  width: 100%;
+  border: none;
+  background: #ffffff;
+  padding: 10px 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
   font-size: 13px;
+}
+
+.mobile-nav-item:hover {
+  background: #f3f6fb;
+}
+
+.mobile-nav-item-main {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.mobile-nav-icon {
+  font-size: 20px;
+  color: $ac-primary-dark;
+}
+
+.mobile-nav-label {
+  text-align: left;
+}
+
+.mobile-nav-chevron {
+  font-size: 20px;
+  color: #999;
+}
+
+/* ================= RESPONSIVE BREAKPOINTS ================= */
+
+/* Màn hình nhỏ: ẩn menu ngang, hiện hamburger bên trái */
+@media (max-width: 1024px) {
+  .top-nav-desktop {
+    display: none;
+  }
+
+  .top-nav-menu-btn {
+    display: inline-flex;
+  }
+}
+
+/* Màn rộng: chỉ dùng menu ngang */
+@media (min-width: 1025px) {
+  .mobile-nav,
+  .mobile-nav-backdrop {
+    display: none !important;
+  }
+
+  .top-nav-menu-btn {
+    display: none;
+  }
 }

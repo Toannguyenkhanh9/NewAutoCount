@@ -1,39 +1,130 @@
 <!-- src/app/layout/top-nav/top-nav.component.html -->
-<nav class="top-nav">
-  <ng-container *ngFor="let item of navItems">
-    <!-- Item không có submenu -->
+
+<!-- Thanh top-nav: nút menu + menu ngang (desktop) -->
+<div class="top-nav-bar">
+  <!-- Nút hamburger: nằm đầu bên trái -->
+  <button
+    type="button"
+    class="top-nav-menu-btn"
+    (click)="openMobileMenu()"
+    aria-label="Open menu"
+  >
+    <mat-icon>menu</mat-icon>
+  </button>
+
+  <!-- Menu ngang (desktop) - không còn logo ở đây nữa -->
+  <nav class="top-nav top-nav-desktop">
+    <ng-container *ngFor="let item of navItems">
+
+      <!-- Item không có submenu -->
+      <button
+        *ngIf="!item.children"
+        mat-button
+        class="nav-item"
+        [routerLink]="item.path"
+        routerLinkActive="nav-item-active"
+        [routerLinkActiveOptions]="{ exact: true }"
+      >
+        <mat-icon class="nav-icon" *ngIf="item.icon">{{ item.icon }}</mat-icon>
+        <span>{{ item.label }}</span>
+      </button>
+
+      <!-- Item có submenu -->
+      <ng-container *ngIf="item.children">
+        <button
+          mat-button
+          class="nav-item nav-item-has-children"
+          [matMenuTriggerFor]="menu"
+        >
+          <mat-icon class="nav-icon" *ngIf="item.icon">{{ item.icon }}</mat-icon>
+          <span>{{ item.label }}</span>
+          <mat-icon class="nav-chevron">expand_more</mat-icon>
+        </button>
+
+        <mat-menu #menu="matMenu">
+          <button
+            mat-menu-item
+            *ngFor="let child of item.children"
+            (click)="navigate(child.path)"
+          >
+            <span>{{ child.label }}</span>
+          </button>
+        </mat-menu>
+      </ng-container>
+    </ng-container>
+  </nav>
+</div>
+
+<!-- ================= MOBILE SIDEBAR MENU ================= -->
+
+<!-- Overlay mờ -->
+<div
+  class="mobile-nav-backdrop"
+  *ngIf="mobileMenuOpen"
+  (click)="closeMobileMenu()"
+></div>
+
+<!-- Sidebar trái -->
+<div class="mobile-nav" *ngIf="mobileMenuOpen" (click)="$event.stopPropagation()">
+  <!-- Header của sidebar -->
+  <div class="mobile-nav-header">
     <button
-      *ngIf="!item.children"
-      mat-button
-      class="nav-item"
-      [routerLink]="item.path"
-      routerLinkActive="nav-item-active"
-      [routerLinkActiveOptions]="{ exact: true }"
+      *ngIf="mobileActiveParent"
+      type="button"
+      class="mobile-nav-back-btn"
+      (click)="backToRoot()"
+      aria-label="Back"
     >
-      <mat-icon class="nav-icon" *ngIf="item.icon">{{ item.icon }}</mat-icon>
-      <span>{{ item.label }}</span>
+      <mat-icon>arrow_back</mat-icon>
     </button>
 
-    <!-- Item có submenu -->
+    <div class="mobile-nav-title">
+      {{ mobileActiveParent?.label || 'Menu' }}
+    </div>
+
     <button
-      *ngIf="item.children"
-      mat-button
-      class="nav-item nav-item-has-children"
-      [matMenuTriggerFor]="menu"
+      type="button"
+      class="mobile-nav-close-btn"
+      (click)="closeMobileMenu()"
+      aria-label="Close"
     >
-      <mat-icon class="nav-icon" *ngIf="item.icon">{{ item.icon }}</mat-icon>
-      <span>{{ item.label }}</span>
-      <mat-icon class="nav-chevron">expand_more</mat-icon>
+      <mat-icon>close</mat-icon>
     </button>
-    <mat-menu #menu="matMenu">
-      <button
-        *ngFor="let child of item.children"
-        mat-menu-item
-        (click)="navigate(child.path)"
-        routerLinkActive="menu-item-active"
+  </div>
+
+  <!-- Level 1: menu chính -->
+  <div class="mobile-nav-list" *ngIf="!mobileActiveParent">
+    <button
+      class="mobile-nav-item"
+      *ngFor="let item of navItems"
+      type="button"
+      (click)="onMobileRootClick(item)"
+    >
+      <div class="mobile-nav-item-main">
+        <mat-icon class="mobile-nav-icon" *ngIf="item.icon">
+          {{ item.icon }}
+        </mat-icon>
+        <span class="mobile-nav-label">{{ item.label }}</span>
+      </div>
+
+      <mat-icon
+        class="mobile-nav-chevron"
+        *ngIf="item.children && item.children.length"
       >
-        <span>{{ child.label }}</span>
-      </button>
-    </mat-menu>
-  </ng-container>
-</nav>
+        chevron_right
+      </mat-icon>
+    </button>
+  </div>
+
+  <!-- Level 2: submenu -->
+  <div class="mobile-nav-list" *ngIf="mobileActiveParent as parent">
+    <button
+      class="mobile-nav-item"
+      type="button"
+      *ngFor="let child of parent.children || []"
+      (click)="navigate(child.path); closeMobileMenu()"
+    >
+      <span class="mobile-nav-label">{{ child.label }}</span>
+    </button>
+  </div>
+</div>

@@ -365,7 +365,7 @@ input[type='radio'] {
   background: #f3f6fb;
   font-weight: 600;
   text-align: left;
-  color: #444;
+  color: #0077c8;
 }
 
 .ac-table tr:nth-child(even) td {
@@ -974,4 +974,237 @@ textarea.inp {
   overflow-y: auto;
   padding: 14px 16px;
   font-size: 13px;
+}
+/* ======================================
+   RESPONSIVE LAYOUT CHO CÁC PAGE .ac-page
+   ====================================== */
+
+/* Desktop >= 1366px: canh giữa với max-width */
+@media (min-width: 1366px) {
+  .ac-page {
+    max-width: 1200px;
+    margin: 16px auto;
+    padding: 16px 24px;
+  }
+
+  .ac-card {
+    width: 100%;
+    max-width: 100%;
+    margin: 0;
+  }
+}
+
+/* Laptop / tablet ngang < 1366px */
+@media (max-width: 1365.98px) {
+  .ac-page {
+    padding: 12px 12px;
+  }
+
+  .ac-card {
+    width: 100%;
+    max-width: 100%;
+    margin: 8px 0;
+  }
+}
+
+/* Tablet / màn hình vừa: header + toolbar xếp dọc, search full width */
+@media (max-width: 992px) {
+  .ac-page-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+
+  .ac-page-toolbar {
+    margin-top: 8px;
+    flex-wrap: wrap;
+    width: 100%;
+  }
+
+  .ac-page-search {
+    flex: 1 1 100%;
+    min-width: 0;
+  }
+
+  /* Nút trong toolbar không bị dính sát nhau */
+  .ac-page-toolbar .ac-btn {
+    white-space: nowrap;
+  }
+}
+
+/* Mobile / màn hình nhỏ < 768px */
+@media (max-width: 768px) {
+  .ac-page {
+    padding: 8px;
+  }
+
+  .ac-card {
+    padding: 12px;
+  }
+
+  /* Cho table có thể scroll ngang nếu nhiều cột */
+  .ac-card {
+    overflow-x: auto;
+  }
+
+  table.ac-table {
+    min-width: 640px;              /* giữ cột dễ đọc, phần dư scroll ngang */
+  }
+}
+/* =========================================
+   RESPONSIVE LAYOUT CHO CÁC TRANG .ac-page
+   ========================================= */
+
+/* Desktop lớn: canh giữa, giới hạn bề rộng nội dung */
+@media (min-width: 1400px) {
+  .ac-page {
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+}
+
+/* <= 1200px: giảm padding một chút */
+@media (max-width: 1200px) {
+  .ac-page {
+    padding: 16px 20px;
+  }
+}
+
+/* <= 992px: tablet / small desktop  */
+@media (max-width: 992px) {
+  .ac-page {
+    padding: 12px 12px 20px;
+  }
+
+  .ac-card {
+    padding: 12px;
+    margin: 0;            // card full-width so với .ac-page
+  }
+
+  /* Header & toolbar xếp dọc */
+  .ac-page-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+
+  .ac-page-toolbar {
+    width: 100%;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  .ac-page-search {
+    flex: 1 1 100%;
+    min-width: 0;        // search box kéo full-width hàng đầu
+  }
+}
+
+/* <= 768px: mobile */
+@media (max-width: 768px) {
+  .ac-page {
+    padding: 8px;
+  }
+
+  .ac-card {
+    padding: 10px;
+    border-radius: 0;     // cảm giác “full-screen card”
+    box-shadow: none;     // bớt cảm giác có lớp phủ
+  }
+
+  .ac-page-toolbar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .ac-page-toolbar .ac-btn {
+    width: 100%;
+    justify-content: center;
+  }
+
+  /* Bảng: cho phép scroll ngang riêng, tránh zoom nhỏ toàn bộ */
+  .ac-tablewrap,
+  .ac-table-wrapper {      // dùng class nào thì giữ class đó
+    overflow-x: auto;
+  }
+
+  .ac-table {
+    min-width: 640px;     // giữ cấu trúc cột, không bị bóp chữ
+  }
+}
+
+/* <= 576px: mobile rất nhỏ */
+@media (max-width: 576px) {
+  .ac-page {
+    padding: 6px;
+  }
+
+  .ac-card {
+    padding: 8px;
+  }
+
+  .ac-page-title {
+    font-size: 16px;
+  }
+
+  .ac-table {
+    font-size: 11px;
+  }
+}
+html,
+body {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden; // 👈 tắt thanh scroll ngang
+}
+/* ===== SIZING CHO CÁC POPUP DÙNG .ac-dialog-panel-XX ===== */
+
+/* Large dialog – Account Type, v.v. */
+.ac-card.ac-dialog-panel-lg {
+  width: 900px;          // rộng hơn 640 một chút
+  max-width: 95vw;       // màn nhỏ thì co lại theo viewport
+  max-height: calc(100vh - 80px);
+  display: flex;
+  flex-direction: column;
+}
+
+/* Small dialog */
+.ac-card.ac-dialog-panel-sm {
+  width: 420px;
+  max-width: 90vw;
+  max-height: calc(100vh - 80px);
+  display: flex;
+  flex-direction: column;
+}
+
+/* XL dialog (contra, form dài) */
+.ac-card.ac-dialog-panel-xl {
+  width: min(1100px, 96vw);
+  max-height: calc(100vh - 80px);
+  display: flex;
+  flex-direction: column;
+}
+/* ===== HEADER POPUP GIỐNG MÀU THANH MENU ===== */
+
+.ac-dialog-header {
+  padding: 10px 14px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-weight: 600;
+  font-size: 14px;
+
+  background: $ac-primary;                 // xanh giống top menu
+  color: #ffffff;
+  border-bottom: 1px solid darken($ac-primary, 5%);
+}
+
+.ac-dialog-close {
+  border: none;
+  background: transparent;
+  font-size: 18px;
+  line-height: 1;
+  cursor: pointer;
+  padding: 0 2px;
+  color: #ffffff;                          // icon X màu trắng
 }
