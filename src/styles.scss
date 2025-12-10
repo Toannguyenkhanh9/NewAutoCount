@@ -131,7 +131,13 @@ h5 {
   padding: 16px;
   box-sizing: border-box;
 }
-
+.ac-card-no-padding {
+  background: #ffffff;
+  border-radius: $ac-radius-lg;
+  border: 1px solid $ac-border;
+  box-shadow: $ac-shadow-card;
+  box-sizing: border-box;
+}
 /* Section title trong card */
 .ac-section-title {
   font-size: 14px;

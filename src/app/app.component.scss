@@ -83,3 +83,43 @@
   max-width: 1360px;
   margin: 0 auto;
 }
+/* ============================
+   ALIGN BREADCRUMB VỚI .ac-page
+   ============================ */
+
+/* Bỏ padding/margin thừa của container chính */
+.app-content {
+  padding: 0;
+  margin: 0;
+}
+
+.page-wrapper {
+  padding: 0;
+  margin: 0;
+}
+
+/* Khung bao breadcrumb – canh lề giống .ac-page */
+.page-breadcrumb-wrapper {
+  max-width: 1100px;        // cùng max-width với .ac-page trên desktop
+  margin: 0 auto;           // canh giữa
+  padding: 4px 24px 0;      // 4px dưới header, lề trái/phải 24px như .ac-page
+  box-sizing: border-box;
+}
+
+/* Cho breadcrumb dính sát nội dung, không có khoảng trắng thừa */
+.page-breadcrumb-wrapper .breadcrumb {
+  margin: 0 0 4px;          // bỏ margin-top, chỉ giữ chút khoảng dưới
+}
+
+/* Responsive giống .ac-page */
+@media (max-width: 1200px) {
+  .page-breadcrumb-wrapper {
+    padding: 4px 20px 0;
+  }
+}
+
+@media (max-width: 768px) {
+  .page-breadcrumb-wrapper {
+    padding: 4px 8px 0;
+  }
+}

@@ -1,0 +1,58 @@
+// src/app/layout/breadcrumb/breadcrumb.component.scss
+
+// Khai báo cục bộ cho chắc, không phụ thuộc styles.scss
+$ac-primary: #0078d4;
+$ac-text-muted: #666666;
+
+/* Vùng bao breadcrumb – căn lề giống .ac-page */
+.ac-breadcrumb-wrapper {
+  padding: 8px 24px 0;
+}
+
+/* Desktop lớn: canh giữa, max-width giống .ac-page (1100px) */
+@media (min-width: 1400px) {
+  .ac-breadcrumb-wrapper {
+    max-width: 1100px;
+    margin: 8px auto 0;
+  }
+}
+
+/* Màn hình nhỏ hơn: chỉ thêm khoảng cách trên một chút */
+@media (max-width: 1399.98px) {
+  .ac-breadcrumb-wrapper {
+    margin-top: 8px;
+  }
+}
+
+/* Dòng breadcrumb */
+.ac-breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  color: $ac-text-muted;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Link các cấp trước */
+.ac-breadcrumb-link {
+  color: $ac-primary;
+  cursor: pointer;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+/* Dấu phân cách */
+.ac-breadcrumb-separator {
+  color: $ac-text-muted;
+}
+
+/* Cấp hiện tại */
+.ac-breadcrumb-current {
+  font-weight: 600;
+  color: #222;
+}

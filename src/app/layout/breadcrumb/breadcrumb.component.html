@@ -1,0 +1,23 @@
+<!-- src/app/layout/breadcrumb/breadcrumb.component.html -->
+<div class="ac-breadcrumb-wrapper" *ngIf="items.length">
+  <nav class="ac-breadcrumb">
+    <ng-container *ngFor="let item of items; let last = last">
+      <!-- Link cho các cấp trước -->
+      <a
+        *ngIf="!last"
+        class="ac-breadcrumb-link"
+        [routerLink]="item.url"
+      >
+        {{ item.label }}
+      </a>
+
+      <!-- Cấp hiện tại -->
+      <span *ngIf="last" class="ac-breadcrumb-current">
+        {{ item.label }}
+      </span>
+
+      <!-- Dấu > -->
+      <span *ngIf="!last" class="ac-breadcrumb-separator">›</span>
+    </ng-container>
+  </nav>
+</div>

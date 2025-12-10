@@ -2,13 +2,12 @@
   <div class="ac-card">
     <!-- HEADER -->
     <div class="ac-page-header account-type-header">
-      <div>
+            <div>
         <div class="ac-page-title">Account Type Maintenance</div>
         <div class="ac-page-subtitle">
           Maintain account types &amp; reporting categories used in your chart of accounts.
         </div>
       </div>
-
       <div class="account-type-toolbar">
         <input
           class="account-type-search"
@@ -127,7 +126,7 @@
 
 <!-- NEW / EDIT DIALOG -->
 <div class="ac-dialog-backdrop" *ngIf="showDialog">
-  <div class="ac-card ac-dialog-panel-lg">
+  <div class="ac-card-no-padding ac-dialog-panel-lg">
     <div class="ac-dialog-header">
       <span>
         {{ editMode ? 'Edit Account Type' : 'New Account Type' }}
@@ -207,7 +206,7 @@
 
 <!-- DELETE CONFIRM DIALOG -->
 <div class="ac-dialog-backdrop" *ngIf="showDeleteConfirm">
-  <div class="ac-card ac-dialog-panel-sm" role="dialog" aria-modal="true">
+  <div class="ac-card-no-padding ac-dialog-panel-sm" role="dialog" aria-modal="true">
     <div class="ac-dialog-header">
       <span>Delete Debtor Type</span>
       <button
@@ -240,7 +239,7 @@
 <!-- SUCCESS DIALOG -->
 <div class="ac-dialog-backdrop" *ngIf="showSuccess">
   <div
-    class="ac-card ac-dialog-panel-sm account-type-success-dialog"
+    class="ac-card-no-padding ac-dialog-panel-sm account-type-success-dialog"
     role="dialog"
     aria-modal="true"
   >

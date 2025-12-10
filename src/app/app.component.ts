@@ -9,7 +9,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { TopNavComponent } from './layout/top-nav/top-nav.component';
 import { AuthService } from './core/services/auth.service';
 import { filter } from 'rxjs';
-
+import { BreadcrumbComponent } from './layout/breadcrumb/breadcrumb.component';
 @Component({
   selector: 'app-root',
   standalone: true,
@@ -22,6 +22,7 @@ import { filter } from 'rxjs';
     MatMenuModule,
     MatButtonModule,
     TopNavComponent,
+    BreadcrumbComponent
   ],
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss'],

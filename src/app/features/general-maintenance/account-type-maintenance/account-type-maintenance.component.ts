@@ -9,7 +9,6 @@ import {
   Validators,
 } from '@angular/forms';
 import { FormsModule } from '@angular/forms';
-
 type ReportingCat = 'Balance Sheet Type' | 'Profit and Loss Type';
 
 export interface AccTypeRow {
