@@ -39,11 +39,6 @@ $ac-text-muted: #666666;
 /* Link các cấp trước */
 .ac-breadcrumb-link {
   color: $ac-primary;
-  cursor: pointer;
-
-  &:hover {
-    text-decoration: underline;
-  }
 }
 
 /* Dấu phân cách */

@@ -3,18 +3,18 @@
   <nav class="ac-breadcrumb">
     <ng-container *ngFor="let item of items; let last = last">
       <!-- Link cho các cấp trước -->
-      <a
+      <span
         *ngIf="!last"
         class="ac-breadcrumb-link"
-        [routerLink]="item.url"
+
       >
         {{ item.label }}
-      </a>
+      </span>
 
       <!-- Cấp hiện tại -->
-      <span *ngIf="last" class="ac-breadcrumb-current">
+      <!-- <span *ngIf="last" class="ac-breadcrumb-current">
         {{ item.label }}
-      </span>
+      </span> -->
 
       <!-- Dấu > -->
       <span *ngIf="!last" class="ac-breadcrumb-separator">›</span>
