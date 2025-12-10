@@ -1,5 +1,5 @@
 <div class="app-shell">
-  <!-- Header -->
+  <!-- Header chỉ hiện khi đã login & không ở trang login -->
   <mat-toolbar
     class="app-toolbar"
     *ngIf="(isAuthenticated$ | async) && !isLoginRoute"
@@ -31,20 +31,14 @@
     </div>
   </mat-toolbar>
 
-  <!-- Nội dung chính -->
-<main class="app-content">
-  <div class="page-wrapper">
+  <main class="app-content">
+    <div class="page-wrapper">
+      <!-- Breadcrumb nằm trong page-wrapper nên sẽ thẳng hàng với nội dung -->
+      <app-breadcrumb
+        *ngIf="(isAuthenticated$ | async) && !isLoginRoute"
+      ></app-breadcrumb>
 
-    <!-- Khung breadcrumb dùng chung, canh lề giống .ac-page -->
-    <div
-      class="page-breadcrumb-wrapper"
-      *ngIf="(isAuthenticated$ | async) && !isLoginRoute"
-    >
-      <app-breadcrumb></app-breadcrumb>
+      <router-outlet></router-outlet>
     </div>
-
-    <!-- Nội dung từng page -->
-    <router-outlet></router-outlet>
-  </div>
-</main>
+  </main>
 </div>
