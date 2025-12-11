@@ -1,0 +1,20 @@
+<div class="ac-page">
+  <div class="ac-page-header">
+    <div>
+      <div class="ac-page-title">Create Account Book</div>
+      <div class="ac-page-subtitle">
+        Set up a new company database and connection.
+      </div>
+    </div>
+
+    <div class="ac-page-toolbar">
+      <button class="ac-btn ac-btn-ghost" type="button" (click)="backToList()">
+        Cancel
+      </button>
+    </div>
+  </div>
+
+  <div class="ac-card">
+    <app-config-new-db (cancel)="backToList()"></app-config-new-db>
+  </div>
+</div>

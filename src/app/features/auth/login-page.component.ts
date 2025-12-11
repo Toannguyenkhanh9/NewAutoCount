@@ -97,11 +97,8 @@ export class LoginPageComponent implements OnInit {
     const companyValue = this.form.value.company as CompanyDto | null;
 
     // Tham số thứ 3 tuỳ bạn: Database / ConnectionString / gì backend yêu cầu
-    const loginCompany =
-      companyValue?.ConnectionString ??
-      companyValue?.Database ??
-      companyValue?.Company ??
-      '';
+    const loginCompany = companyValue?.Company ?? "";
+
 
     const ok = this.auth.login(username, password, loginCompany);
 

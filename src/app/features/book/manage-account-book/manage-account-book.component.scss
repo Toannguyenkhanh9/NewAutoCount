@@ -1,10 +1,42 @@
-
-.col-flag { width: 34px; text-align: center; }
-.flag-dot{
-  display:inline-block; width:12px; height:12px; border-radius:50%;
-  background:#22c55e; box-shadow:0 0 0 3px rgba(34,197,94,.18);
+.company-table tr {
+  cursor: pointer;
 }
 
-/* tuỳ chọn: nhấn nhẹ dòng đang login */
-tr.current td { background: #f0fff4; }
+.company-table th.col-flag,
+.company-table td.col-flag {
+  width: 32px;
+  text-align: center;
+}
 
+/* Chấm tròn chỉ company đang login */
+.flag-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+  display: inline-block;
+  background: #0078d4; /* cùng màu primary */
+}
+
+/* Hàng current: xám, không hover, không click */
+.company-table tr.row-current {
+  cursor: default;
+}
+
+.company-table tr.row-current td {
+  background: #f3f6fb;
+  color: #9ca3af;
+}
+
+.company-table tr.row-current:hover td {
+  background: #f3f6fb;
+}
+
+/* Hàng đang chọn (không phải current) */
+.company-table tr.row-selected td {
+  background: #e5f2ff;
+}
+
+/* Hover bình thường cho các hàng khác */
+.company-table tr:not(.row-current):hover td {
+  background: #f0f7ff;
+}

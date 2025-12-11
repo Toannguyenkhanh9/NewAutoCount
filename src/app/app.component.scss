@@ -144,3 +144,31 @@
   text-overflow: ellipsis;
   white-space: nowrap;
 }
+.company-menu-header {
+  font-weight: 600;
+  background: #f3f6fb;
+  color: #6b7280;
+  cursor: default;
+}
+
+.company-menu-item-other {
+  // company khác: chữ đậm + icon xanh
+  .mat-icon {
+    color: var(--ac-primary);
+  }
+  span {
+    font-weight: 500;
+  }
+}
+
+.company-menu-item-create {
+  border-top: 1px solid var(--ac-border);
+  margin-top: 4px;
+
+  .mat-icon {
+    color: var(--ac-primary);
+  }
+  span {
+    font-weight: 600;
+  }
+}

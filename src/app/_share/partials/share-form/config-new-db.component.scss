@@ -1,0 +1,145 @@
+/* Chỉ thêm phần chưa có trong global */
+
+/* thanh bước */
+.stepper{
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin: 8px 0 4px 0;
+}
+.step{
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 10px;
+  border-radius: 999px;
+  border: 1px solid #dfe8db;
+  background: #fff;
+  font-weight: 700;
+  cursor: pointer;
+  transition: .15s ease;
+}
+.step .dot{
+  width: 22px; height: 22px; border-radius: 50%;
+  display: grid; place-items: center;
+  background: #eef6ea; color: #205a28; font-weight: 800; font-size: 12px;
+}
+.step.active{ background: #eef6ea; border-color: #cfe4c9; }
+.step.active .dot{ background: #66c54a; color: #fff; }
+.step .label{ color: #284a30; }
+
+/* khối nhóm tóm tắt */
+.summary-card{
+  background: #fff;
+  border: 1px solid #e6efe1;
+  border-radius: 10px;
+  padding: 10px 12px;
+}
+.summary-card h4{ margin: 0 0 8px 0; color: #0f4d1f; }
+
+/* hàng chiếm đủ 2 cột trong grid2 */
+.span-2{ grid-column: 1 / -1; }
+
+/* cảnh báo */
+.warn{ color: #c84a44; font-weight: 700; margin-top: 6px; }
+
+/* mono */
+.mono{ font-family: ui-monospace,SFMono-Regular,Menlo,Consolas,"Liberation Mono","Courier New",monospace; }
+
+/* nút ở cuối trang review */
+.actions{ display:flex; gap:8px; justify-content:flex-end; margin-top: 8px; }
+.row select,
+.row input {
+  width: 100%;
+  padding: 6px 8px;
+  border: 1px solid #cfcfcf;
+  border-radius: 4px;
+}
+/* Chỉ grid này cần căn giữa theo trục dọc */
+.grid2.align-center {
+  align-items: center; /* canh các item ở giữa chiều dọc của hàng */
+}
+
+/* Checkbox + text hiển thị ngang hàng, căng giữa với select bên trái */
+.check-inline {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  line-height: 1.2;
+  /* chiều cao gần bằng control input/select mặc định để nhìn cân */
+  min-height: 38px;
+}
+
+.check-inline input[type="checkbox"] {
+  margin: 0;          /* bỏ margin mặc định gây lệch */
+  transform: translateY(0); /* đảm bảo không lệch baseline */
+}
+/* 2 cột luôn thẳng hàng: nhãn nằm trên, input dưới */
+.grid2.equal-label > label {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+/* Nhãn giả: ẩn chữ nhưng vẫn giữ chỗ đúng bằng nhãn thật */
+.ghost-label {
+  visibility: hidden;    /* ẩn chữ */
+  display: block;
+  min-height: 1em;       /* chiều cao dòng nhãn */
+  margin-bottom: 0;      /* đã có gap ở trên */
+}
+/* Bố cục 2 cột giống hình */
+.account-format {
+  align-items: start;
+}
+/* Bảng giải thích bên phải */
+.meaning-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: #fff;
+  border: 1px solid #dcdfe4;
+}
+
+.meaning-table th,
+.meaning-table td {
+  border: 1px solid #dcdfe4;
+  padding: 8px 10px;
+  vertical-align: top;
+  font-size: 14px;
+}
+
+.meaning-table thead th {
+  background: #f3f4f6;
+  font-weight: 600;
+}
+
+.note {
+  display: block;
+  margin-top: 4px;
+  color: #2563eb;
+  font-size: 10px;
+  line-height: 1.4;
+  font-weight: 400;     /* không tô đậm */
+  text-transform: none; /* giữ chữ thường (không uppercase) */
+  font-style: normal;   /* phòng trường hợp bị italic */
+}
+@media (max-width: 880px){
+  .stepper{ gap: 6px; }
+  .step{ padding: 6px 8px; }
+}
+/* viền đỏ khi invalid */
+.config-form input.invalid,
+.config-form select.invalid {
+  border-color: #ef4444 !important;
+  box-shadow: 0 0 0 2px rgba(239,68,68,.12);
+}
+
+/* dòng lỗi */
+.config-form .err {
+  display:block;
+  margin-top:4px;
+  color:#ef4444;
+  font-size:12px;
+  line-height:1.2;
+}
+

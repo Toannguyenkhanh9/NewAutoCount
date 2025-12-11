@@ -1,450 +1,507 @@
-<!-- Titlebar + Toolbar -->
-<div class="titlebar">
-  <h1>Manage Account Book</h1>
+<div class="ac-page">
+  <!-- Header -->
+  <div class="ac-page-header">
+    <div>
+      <div class="ac-page-title">Manage Account Book</div>
+      <div class="ac-page-subtitle">
+        Manage your company account books and database connections.
+      </div>
+    </div>
 
-  <div class="toolbar">
-    <button class="btn" (click)="openCreate()">Create</button>
-    <!-- Chỉ hiện khi đã chọn 1 dòng -->
-    <ng-container *ngIf="selectedIndex !== null">
-      <button class="btn" (click)="attach()">Attach</button>
-      <button class="btn" (click)="openEdit()">Edit</button>
-      <button class="btn danger" (click)="openDeleteConfirm()">Delete</button>
-      <button class="btn danger" (click)="detach()">Detach</button>
-    </ng-container>
-    <button class="btn" (click)="refresh()">Refresh</button>
-  </div>
-</div>
-
-<!-- Grid -->
-<div class="gridwrap">
-  <table class="company-table">
-    <thead>
-      <tr>
-        <th class="col-flag"></th>
-        <th>Company Name</th>
-        <th>Remark</th>
-        <th>Version</th>
-        <th>Server</th>
-        <th>Database Name</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr
-        *ngFor="let c of listserver; let i = index"
-        (click)="select(i)"
-        [class.selected]="i === selectedIndex"
-      >
-        <td class="col-flag">
-          <span *ngIf="isCurrent(c)" class="flag-dot" title="Current login"></span>
-        </td>
-        <td>{{ c.Company }}</td>
-        <td>{{ c.Remark }}</td>
-        <td>{{ c.Version }}</td>
-        <td>{{ c.Server }}</td>
-        <td>{{ c.Database }}</td>
-      </tr>
-    </tbody>
-  </table>
-</div>
-
-<!-- Create dialog (giữ nguyên) -->
-<div class="dialog" *ngIf="showCreate">
-  <div class="dialog-panel" style="min-height: 880px; overflow: auto">
-    <div class="dialog-title">
-       Create Account Book
+    <div class="ac-page-toolbar">
+      <!-- Nút mở trang Create Account Book -->
       <button
-        class="x"
-        (click)="closeCodeDialogSetupNewDb()"
-        aria-label="Close"
+        class="ac-btn ac-btn-primary"
+        type="button"
+        (click)="goToCreate()"
       >
-        &times;
+        Create Account Book
       </button>
-    </div>
-    <div class="dialog-body">
-      <app-config-new-db
-        (cancel)="closeCodeDialogSetupNewDb()"
-      ></app-config-new-db>
+      <!-- Các action chỉ dùng khi đã chọn 1 dòng (không phải company đang login) -->
+      <ng-container *ngIf="selectedItem">
+        <button class="ac-btn" type="button" (click)="attach()">Attach</button>
+        <button class="ac-btn" type="button" (click)="openEdit()">Edit</button>
+        <button
+          class="ac-btn ac-btn-danger"
+          type="button"
+          (click)="openDeleteConfirm()"
+        >
+          Delete
+        </button>
+        <button
+          class="ac-btn ac-btn-danger"
+          type="button"
+          (click)="detach()"
+        >
+          Detach
+        </button>
+      </ng-container>
     </div>
   </div>
-</div>
 
-<!-- DELETE CONFIRM dialog -->
-<div class="dialog" *ngIf="showDeleteConfirm">
-  <div class="dialog-panel-small">
-    <div class="dialog-title">
-      Delete Account Book
-      <button class="x" (click)="closeDeleteConfirm()" aria-label="Close">
-        &times;
-      </button>
+  <!-- Card + tab Companies -->
+  <div class="ac-card ac-card-no-padding">
+    <div class="ac-tabs">
+      <div class="ac-tab ac-tab--active">Companies</div>
     </div>
-    <div class="dialog-body">
-      <p>
-        Are you sure you want to delete <b>{{ selectedItem?.Company }}</b> (DB:
-        {{ selectedItem?.Database }})?
-      </p>
-    </div>
-    <div class="dialog-actions">
-      <button class="btn cancel" (click)="closeDeleteConfirm()">Cancel</button>
-      <button class="btn danger" (click)="confirmDelete()">Delete</button>
+
+    <div class="ac-tablewrap">
+      <table class="ac-table company-table">
+        <thead>
+          <tr>
+            <th class="col-flag"></th>
+            <th>Company Name</th>
+            <th>Remark</th>
+            <th>Version</th>
+            <th>Server</th>
+            <th>Database Name</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          <!-- sortedList: company đang login luôn đứng đầu -->
+          <tr
+            *ngFor="let c of sortedList"
+            (click)="onRowClick(c)"
+            [class.row-current]="isCurrent(c)"
+            [class.ac-row-selected]="isSelected(c) && !isCurrent(c)"
+          >
+            <td class="col-flag">
+              <span
+                *ngIf="isCurrent(c)"
+                class="flag-dot"
+                title="Current company"
+              ></span>
+            </td>
+            <td>{{ c.Company }}</td>
+            <td>{{ c.Remark }}</td>
+            <td>{{ c.Version }}</td>
+            <td>{{ c.Server }}</td>
+            <td>{{ c.Database }}</td>
+          </tr>
+        </tbody>
+      </table>
     </div>
   </div>
-</div>
 
-<!-- EDIT dialog -->
-<div class="dialog" *ngIf="showEdit">
-  <div class="dialog-panel">
-    <div class="dialog-title">
-      Edit Account Book
-      <button class="x" (click)="closeEdit()" aria-label="Close">
-        &times;
-      </button>
-    </div>
+  <!-- ========== DIALOGS ========== -->
 
-    <form class="dialog-body" [formGroup]="editForm" (ngSubmit)="saveEdit()"  autocomplete="off">
-      <div class="grid2">
-        <label
-          >Company Name
-          <input type="text" formControlName="Company" />
-        </label>
-        <label
-          >Remark
-          <input type="text" formControlName="Remark" />
-        </label>
-      </div>
-      <br />
-      <div class="grid2">
-        <label
-          >Version
-          <input type="text" formControlName="Version"  name="version_display"
-             autocomplete="off"
-             inputmode="text"
-             spellcheck="false" />
-        </label>
-          <div class="col-span-1" style="align-self:end"></div>
-      </div>
-       <br />
-      <p class="edit-hint">
-  If you want to reset the password, please type in a new password.
-</p>
-
-<div class="grid2">
-  <label>SA Password
-    <input type="password" formControlName="SaPassword"  autocomplete="new-password" />
-  </label>
-</div>
-<br />
-      <div class="dialog-actions">
-        <button type="button" class="btn cancel" (click)="closeEdit()">Cancel</button>
-        <button type="submit" class="btn primary" [disabled]="editForm.invalid">
-          Save
+  <!-- DELETE CONFIRM dialog -->
+  <div class="dialog" *ngIf="showDeleteConfirm">
+    <div class="dialog-panel-small ac-card-no-padding">
+      <div class="ac-dialog-header">
+        <span>Delete Account Book</span>
+        <button
+          type="button"
+          class="ac-dialog-close"
+          (click)="closeDeleteConfirm()"
+          aria-label="Close"
+        >
+          &times;
         </button>
       </div>
-    </form>
+      <div class="ac-dialog-body">
+        <p>
+          Are you sure you want to delete
+          <b>{{ selectedItem?.Company }}</b>
+          (DB: {{ selectedItem?.Database }})?
+        </p>
+      </div>
+      <div class="ac-dialog-footer">
+        <button
+          type="button"
+          class="ac-btn ac-btn-ghost"
+          (click)="closeDeleteConfirm()"
+        >
+          Cancel
+        </button>
+        <button
+          type="button"
+          class="ac-btn ac-btn-danger"
+          (click)="confirmDelete()"
+        >
+          Delete
+        </button>
+      </div>
+    </div>
   </div>
-</div>
-<div class="dialog" *ngIf="showEditDone">
-  <div class="dialog-panel-small">
-    <div class="dialog-title">
-      Edit Account Book
-      <button class="x" (click)="closeEditDone()" aria-label="Close">
-        &times;
-      </button>
-    </div>
-    <div class="dialog-body">
-      <p>The account book was successfully edited.</p>
-    </div>
-    <div class="dialog-actions">
-      <button class="btn primary" (click)="closeEditDone()">OK</button>
-    </div>
-  </div>
-</div>
-<!-- ATTACH dialog -->
-<div class="dialog" *ngIf="showAttach">
-  <div class="dialog-panel">
-    <div class="dialog-title">
-      Attach Account Book
-      <button class="x" (click)="closeAttach()" aria-label="Close">
-        &times;
-      </button>
-    </div>
 
-    <form
-      class="dialog-body attach-form"
-      [formGroup]="attachForm"
-      (ngSubmit)="confirmAttach()"
-    >
-      <!-- Server + Database -->
-      <div class="grid2">
-        <label
-          >Server Name
-          <select
-            formControlName="serverName"
-            (change)="onServerChangeAttach()"
+  <!-- EDIT dialog -->
+  <div class="dialog" *ngIf="showEdit">
+    <div class="dialog-panel ac-card-no-padding ac-dialog-panel-lg">
+      <div class="ac-dialog-header">
+        <span>Edit Account Book</span>
+        <button
+          type="button"
+          class="ac-dialog-close"
+          (click)="closeEdit()"
+          aria-label="Close"
+        >
+          &times;
+        </button>
+      </div>
+
+      <form
+        class="ac-dialog-body"
+        [formGroup]="editForm"
+        (ngSubmit)="saveEdit()"
+        autocomplete="off"
+      >
+        <div class="ac-dialog-form-grid-2">
+          <label class="ac-form-field">
+            <span class="ac-form-label">Company Name</span>
+            <input
+              type="text"
+              class="ac-form-control"
+              formControlName="Company"
+            />
+          </label>
+
+          <label class="ac-form-field">
+            <span class="ac-form-label">Remark</span>
+            <input
+              type="text"
+              class="ac-form-control"
+              formControlName="Remark"
+            />
+          </label>
+        </div>
+
+        <div class="ac-dialog-form-grid-2" style="margin-top: 12px">
+          <label class="ac-form-field">
+            <span class="ac-form-label">Version</span>
+            <input
+              type="text"
+              class="ac-form-control"
+              formControlName="Version"
+              name="version_display"
+              autocomplete="off"
+              inputmode="text"
+              spellcheck="false"
+            />
+          </label>
+
+          <div class="ac-form-field"></div>
+        </div>
+
+        <p class="ac-form-hint" style="margin-top: 12px">
+          If you want to reset the password, please type in a new password.
+        </p>
+
+        <div class="ac-dialog-form-grid-2" style="margin-top: 8px">
+          <label class="ac-form-field">
+            <span class="ac-form-label">SA Password</span>
+            <input
+              type="password"
+              class="ac-form-control"
+              formControlName="SaPassword"
+              autocomplete="new-password"
+            />
+          </label>
+        </div>
+
+        <div class="ac-dialog-footer">
+          <button
+            type="button"
+            class="ac-btn ac-btn-ghost"
+            (click)="closeEdit()"
           >
-            <option *ngFor="let s of serverList" [ngValue]="s">{{ s }}</option>
-          </select>
-        </label>
+            Cancel
+          </button>
+          <button
+            type="submit"
+            class="ac-btn ac-btn-primary"
+            [disabled]="editForm.invalid"
+          >
+            Save
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
 
-        <label
-          >Database Name
-          <select formControlName="databaseName">
-            <option *ngFor="let d of databaseList" [ngValue]="d">
-              {{ d }}
-            </option>
-          </select>
-        </label>
+  <!-- EDIT done -->
+  <div class="dialog" *ngIf="showEditDone">
+    <div class="dialog-panel-small ac-card-no-padding">
+      <div class="ac-dialog-header">
+        <span>Edit Account Book</span>
+        <button
+          type="button"
+          class="ac-dialog-close"
+          (click)="closeEditDone()"
+          aria-label="Close"
+        >
+          &times;
+        </button>
       </div>
-      <div class="attach-radios">
-        <label class="radio-inline">
-          <input type="radio" value="sa" formControlName="loginMode" />
-          <span>Use Default SA Account and Password</span>
-        </label>
+      <div class="ac-dialog-body">
+        <p>The account book was successfully edited.</p>
+      </div>
+      <div class="ac-dialog-footer">
+        <button
+          type="button"
+          class="ac-btn ac-btn-primary"
+          (click)="closeEditDone()"
+        >
+          OK
+        </button>
+      </div>
+    </div>
+  </div>
 
-        <label class="radio-inline">
-          <input type="radio" value="custom" formControlName="loginMode" />
-          <span>Use the following User Name and Password</span>
-        </label>
+  <!-- ATTACH dialog -->
+  <div class="dialog" *ngIf="showAttach">
+    <div class="dialog-panel ac-card-no-padding ac-dialog-panel-lg">
+      <div class="ac-dialog-header">
+        <span>Attach Account Book</span>
+        <button
+          type="button"
+          class="ac-dialog-close"
+          (click)="closeAttach()"
+          aria-label="Close"
+        >
+          &times;
+        </button>
       </div>
 
-      <!-- User & Password -->
-      <div class="grid2">
-        <label
-          >User Name:
+      <form
+        class="ac-dialog-body attach-form"
+        [formGroup]="attachForm"
+        (ngSubmit)="confirmAttach()"
+      >
+        <!-- Server + Database -->
+        <div class="ac-dialog-form-grid-2">
+          <label class="ac-form-field">
+            <span class="ac-form-label">Server Name</span>
+            <select
+              class="ac-form-control"
+              formControlName="serverName"
+              (change)="onServerChangeAttach()"
+            >
+              <option *ngFor="let s of serverList" [ngValue]="s">
+                {{ s }}
+              </option>
+            </select>
+          </label>
+
+          <label class="ac-form-field">
+            <span class="ac-form-label">Database Name</span>
+            <select
+              class="ac-form-control"
+              formControlName="databaseName"
+            >
+              <option *ngFor="let d of databaseList" [ngValue]="d">
+                {{ d }}
+              </option>
+            </select>
+          </label>
+        </div>
+
+        <div class="attach-radios" style="margin-top: 12px">
+          <label class="radio-inline">
+            <input type="radio" value="sa" formControlName="loginMode" />
+            <span>Use Default SA Account and Password</span>
+          </label>
+
+          <label class="radio-inline">
+            <input type="radio" value="custom" formControlName="loginMode" />
+            <span>Use the following User Name and Password</span>
+          </label>
+        </div>
+
+        <!-- User & Password -->
+        <div class="ac-dialog-form-grid-2" style="margin-top: 10px">
+          <label class="ac-form-field">
+            <span class="ac-form-label">User Name</span>
+            <input
+              type="text"
+              class="ac-form-control"
+              formControlName="userName"
+              [readonly]="loginMode !== 'custom'"
+              [class.input-readonly]="loginMode !== 'custom'"
+              autocomplete="off"
+            />
+          </label>
+
+          <label class="ac-form-field">
+            <span class="ac-form-label">Password</span>
+            <input
+              type="password"
+              class="ac-form-control"
+              formControlName="password"
+              [readonly]="loginMode !== 'custom'"
+              [class.input-readonly]="loginMode !== 'custom'"
+              autocomplete="off"
+            />
+          </label>
+        </div>
+
+        <div class="ac-dialog-footer">
+          <button
+            class="ac-btn ac-btn-ghost"
+            type="button"
+            (click)="closeAttach()"
+          >
+            Cancel
+          </button>
+          <button
+            class="ac-btn ac-btn-primary"
+            type="submit"
+            [disabled]="attachForm.invalid"
+            (click)="attachSubmit()"
+          >
+            OK
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ATTACH done -->
+  <div class="dialog" *ngIf="showAttachDone">
+<div class="ac-card-no-padding ac-dialog-panel-lg">
+      <div class="ac-dialog-header">
+        <span>Attach Account Book</span>
+      </div>
+      <div class="ac-dialog-body">
+        <p>The account book was successfully attached.</p>
+      </div>
+      <div class="ac-dialog-footer">
+        <button
+          type="button"
+          class="ac-btn ac-btn-primary"
+          (click)="closeAttachDone()"
+        >
+          OK
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- DETACH confirm -->
+  <div class="ac-dialog-backdrop" *ngIf="showDetachConfirm">
+    <div class="ac-card-no-padding ac-dialog-panel-lg">
+      <div class="ac-dialog-header">
+        <span>Detach Account Book</span>
+        <button
+          type="button"
+          class="ac-dialog-close"
+          (click)="closeDetachFlow()"
+          aria-label="Close"
+        >
+          &times;
+        </button>
+      </div>
+      <div class="ac-dialog-body">
+        <p>
+          Do you really want to detach this account book
+          <b>{{ selectedItem?.Company }}</b>?
+        </p>
+      </div>
+      <div class="ac-dialog-footer">
+        <button
+          type="button"
+          class="ac-btn ac-btn-ghost"
+          (click)="closeDetachFlow()"
+        >
+          No
+        </button>
+        <button
+          type="button"
+          class="ac-btn ac-btn-primary"
+          (click)="proceedDetach()"
+        >
+          Yes
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- DETACH auth -->
+  <div class="ac-dialog-backdrop" *ngIf="showDetachAuth">
+    <div class="ac-card-no-padding ac-dialog-panel-lg">
+      <div class="ac-dialog-header">
+        <span>ADMIN password required</span>
+        <button
+          type="button"
+          class="ac-dialog-close"
+          (click)="closeDetachFlow()"
+          aria-label="Close"
+        >
+          &times;
+        </button>
+      </div>
+
+      <form
+        class="ac-dialog-body"
+        [formGroup]="detachAdminForm"
+        (ngSubmit)="submitDetach()"
+      >
+        <p class="ac-form-hint">
+          Please enter the ADMIN password in order to perform this operation.
+        </p>
+
+        <label class="ac-form-field" style="margin-top: 8px">
+          <span class="ac-form-label">User ID</span>
           <input
-            type="text"
-            formControlName="userName"
-            [readonly]="loginMode !== 'custom'"
-            [class.input-readonly]="loginMode !== 'custom'"
-            autocomplete="off"
+            class="ac-form-control"
+            formControlName="userId"
+            readonly
           />
         </label>
 
-        <label
-          >Password:
+        <label class="ac-form-field" style="margin-top: 8px">
+          <span class="ac-form-label">SA Password</span>
           <input
             type="password"
+            class="ac-form-control"
             formControlName="password"
-            [readonly]="loginMode !== 'custom'"
-            [class.input-readonly]="loginMode !== 'custom'"
             autocomplete="off"
           />
         </label>
+
+        <div class="ac-dialog-footer">
+          <button
+            type="button"
+            class="ac-btn ac-btn-ghost"
+            (click)="closeDetachFlow()"
+          >
+            Cancel
+          </button>
+          <button
+            (click)="detachSubmit()"
+            type="submit"
+            class="ac-btn ac-btn-primary"
+            [disabled]="detachAdminForm.invalid || detaching"
+          >
+            OK
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- DETACH done -->
+  <div class="dialog" *ngIf="showDetachDone">
+    <div class="dialog-panel-small ac-card-no-padding">
+      <div class="ac-dialog-header">
+        <span>Detach Account Book</span>
       </div>
-      <br />
-      <div class="dialog-actions">
-        <button class="btn cancel" type="button" (click)="closeAttach()">
-          Cancel
-        </button>
+      <div class="ac-dialog-body">
+        <p>The account book was successfully detached.</p>
+      </div>
+      <div class="ac-dialog-footer">
         <button
-          class="btn primary"
-          type="submit"
-          [disabled]="attachForm.invalid"
-           (click)="attachSubmit()"
+          type="button"
+          class="ac-btn ac-btn-primary"
+          (click)="closeDetachDone()"
         >
           OK
         </button>
       </div>
-    </form>
-  </div>
-</div>
-<!-- DELETE: Done -->
-<div class="dialog" *ngIf="showAttachDone">
-  <div class="dialog-panel-small">
-    <div class="dialog-title">
-      Attach Account Book
-    </div>
-    <div class="dialog-body">
-      <p>The account book was successfully attached.</p>
-    </div>
-    <div class="dialog-actions">
-      <button class="btn primary" (click)="closeAttachDone()">OK</button>
     </div>
   </div>
+
+  <!-- DELETE flow step 1/2 + auth + done: bạn giữ nguyên hoặc chuyển sang
+       ac-dialog-header/body/footer giống các dialog trên là ổn. -->
 </div>
-
-<div class="dialog" *ngIf="showDetachConfirm">
-  <div class="dialog-panel-small">
-    <div class="dialog-title">
-      Detach Account Book
-      <button class="x" (click)="closeDetachFlow()" aria-label="Close">
-        &times;
-      </button>
-    </div>
-    <div class="dialog-body">
-      <p>
-        Do you really want to detach this account book
-        <b>{{ selectedItem?.Company }}</b
-        >?
-      </p>
-    </div>
-    <div class="dialog-actions">
-      <button class="btn cancel" (click)="closeDetachFlow()">No</button>
-      <button class="btn primary" (click)="proceedDetach()">Yes</button>
-    </div>
-  </div>
-</div>
-
-<div class="dialog" *ngIf="showDetachAuth">
-  <div class="dialog-panel-small">
-    <div class="dialog-title">
-      ADMIN password required
-      <button class="x" (click)="closeDetachFlow()" aria-label="Close">
-        &times;
-      </button>
-    </div>
-
-    <form
-      class="dialog-body"
-      [formGroup]="detachAdminForm"
-      (ngSubmit)="submitDetach()"
-    >
-      <!-- dòng hướng dẫn -->
-      <p class="dialog-hint">
-        Please enter the ADMIN password in order to perform this operation
-      </p>
-
-      <label
-        >User ID:
-        <input formControlName="userId" readonly />
-      </label>
-      <br>
-      <label
-        >SA Password:
-        <input type="password" formControlName="password" autocomplete="off" />
-      </label>
-
-      <div class="dialog-actions">
-        <button type="button" class="btn cancel" (click)="closeDetachFlow()">
-          Cancel
-        </button>
-        <button
-        (click)="detachSubmit()"
-          type="submit"
-          class="btn primary"
-          [disabled]="detachAdminForm.invalid || detaching"
-        >
-          OK
-        </button>
-      </div>
-    </form>
-  </div>
-</div>
-
-<!-- DETACH: Done -->
-<div class="dialog" *ngIf="showDetachDone">
-  <div class="dialog-panel-small">
-    <div class="dialog-title">Detach Account Book</div>
-    <div class="dialog-body">
-      <p>The account book was successfully detached.</p>
-    </div>
-    <div class="dialog-actions">
-      <button class="btn primary" (click)="closeDetachDone()">OK</button>
-    </div>
-  </div>
-</div>
-<div class="dialog" *ngIf="showDeleteConfirm1">
-  <div class="dialog-panel-small">
-    <div class="dialog-title">
-      Delete Account Book
-      <button class="x" (click)="closeDeleteFlow()" aria-label="Close">
-        &times;
-      </button>
-    </div>
-    <div class="dialog-body">
-      <p>
-        Do you really want to delete this account book
-        <b>{{ selectedItem?.Company }}</b
-        >?
-      </p>
-    </div>
-    <div class="dialog-actions">
-      <button class="btn cancel" (click)="closeDeleteFlow()">No</button>
-      <button class="btn primary" (click)="goDeleteStep2()">Yes</button>
-    </div>
-  </div>
-</div>
-
-<!-- DELETE: Confirm #2 (cảnh báo) -->
-<div class="dialog" *ngIf="showDeleteConfirm2">
-  <div class="dialog-panel-small">
-    <div class="dialog-title">
-      Delete Account Book
-      <button class="x" (click)="closeDeleteFlow()" aria-label="Close">
-        &times;
-      </button>
-    </div>
-    <div class="dialog-body">
-      <p>
-        Are you sure you want to delete this account book
-        <b>{{ selectedItem?.Company }}</b
-        >?
-      </p>
-      <p style="margin-top: 6px; color: #6b7280">
-        (Note: Once deleted, you can't get back the data, unless you have backup
-        copy)
-      </p>
-    </div>
-    <div class="dialog-actions">
-      <button class="btn cancel" (click)="closeDeleteFlow()">No</button>
-      <button class="btn primary" (click)="proceedDeleteAuth()">Yes</button>
-    </div>
-  </div>
-</div>
-
-<!-- DELETE: ADMIN password -->
-<div class="dialog" *ngIf="showDeleteAuth">
-  <div class="dialog-panel-small">
-    <div class="dialog-title">
-      ADMIN password required
-      <button class="x" (click)="closeDeleteFlow()" aria-label="Close">
-        &times;
-      </button>
-    </div>
-    <form
-      class="dialog-body"
-      [formGroup]="deleteAdminForm"
-      (ngSubmit)="confirmDelete()"
-    >
-      <p class="dialog-hint">
-        Please enter the ADMIN password in order to perform this operation
-      </p>
-      <label
-        >User ID:
-        <input formControlName="userId" readonly />
-      </label>
-      <br>
-      <label
-        >SA Password:
-        <input type="password" formControlName="password" autocomplete="off" />
-      </label>
-      <div class="dialog-actions">
-        <button type="button" class="btn cancel" (click)="closeDeleteFlow()">
-          Cancel
-        </button>
-        <button
-          type="submit"
-          class="btn primary"
-          [disabled]="deleteAdminForm.invalid || deleting"
-        >
-          OK
-        </button>
-      </div>
-    </form>
-  </div>
-</div>
-
-<!-- DELETE: Done -->
-<div class="dialog" *ngIf="showDeleteDone">
-  <div class="dialog-panel-small">
-    <div class="dialog-title">
-      Delete Account Book
-    </div>
-    <div class="dialog-body">
-      <p>The account book was successfully deleted.</p>
-    </div>
-    <div class="dialog-actions">
-      <button class="btn primary" (click)="closeDeleteDone()">OK</button>
-    </div>
-  </div>
-</div>
-

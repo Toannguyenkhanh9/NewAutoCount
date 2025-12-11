@@ -26,27 +26,51 @@
       <mat-icon>expand_more</mat-icon>
     </button>
 
-    <mat-menu #companyMenu="matMenu">
-      <!-- Header trong menu (chỉ hiển thị tên, không click) -->
-      <button mat-menu-item disabled class="company-menu-header">
-        <mat-icon>business</mat-icon>
-        <span>{{ (companyName$ | async) || 'Select company' }}</span>
-      </button>
+<mat-menu #companyMenu="matMenu">
+  <!-- Header: company đang chọn, disable -->
+  <button mat-menu-item disabled class="company-menu-header">
+    <mat-icon>business</mat-icon>
+    <span>{{ (companyName$ | async) || 'Select company' }}</span>
+  </button>
 
-      <mat-divider></mat-divider>
+  <!-- Các company khác (màu khác, có thể click) -->
+  <button
+    mat-menu-item
+    *ngFor="let c of otherCompanies"
+    class="company-menu-item-other"
+    (click)="selectCompanyFromMenu(c)"
+  >
+    <mat-icon>business</mat-icon>
+    <span>{{ c.Company }}</span>
+  </button>
 
-      <!-- Settings -->
-      <button mat-menu-item [routerLink]="['/settings']">
-        <mat-icon>settings</mat-icon>
-        <span>Settings</span>
-      </button>
+  <mat-divider></mat-divider>
 
-      <!-- Manage Account Book -->
-      <button mat-menu-item [routerLink]="['/book/manage-account-book']">
-        <mat-icon>menu_book</mat-icon>
-        <span>Manage Account Book</span>
-      </button>
-    </mat-menu>
+  <!-- Settings -->
+  <button mat-menu-item [routerLink]="['/settings']">
+    <mat-icon>settings</mat-icon>
+    <span>Settings</span>
+  </button>
+
+  <!-- Manage Account Book -->
+  <button mat-menu-item [routerLink]="['/book/manage-account-book']">
+    <mat-icon>menu_book</mat-icon>
+    <span>Manage Account Book</span>
+  </button>
+
+  <mat-divider></mat-divider>
+
+  <!-- Create Account Book (ở cuối list) -->
+  <button
+    mat-menu-item
+    class="company-menu-item-create"
+    [routerLink]="['/book/create-account-book']"
+  >
+    <mat-icon>add_business</mat-icon>
+    <span>Create Account Book</span>
+  </button>
+</mat-menu>
+
 
     <!-- NAV CHÍNH: Dashboard, Account Books, ... -->
     <app-top-nav class="flex-fill"></app-top-nav>

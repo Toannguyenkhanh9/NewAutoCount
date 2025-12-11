@@ -1,11 +1,4 @@
-import {
-  Component,
-  signal,
-  inject,
-  ChangeDetectorRef,
-  OnInit,
-  OnDestroy,
-} from '@angular/core';
+import { Component, signal, inject, ChangeDetectorRef, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {
   FormBuilder,
@@ -16,10 +9,10 @@ import {
 } from '@angular/forms';
 import { Subscription, finalize } from 'rxjs';
 import { ListServerRes } from '../../../_share/models/account';
-import { ConfigNewDbComponent } from '../../../_share/partials/share-form/config-new-db.component';
 import { ApiHttpService } from '../../../core/services/api-http.service';
 import { ServerSessionService } from '../../../core/services/server-session.service';
 import { AuthService } from '../../../core/services/auth.service';
+import { Router } from '@angular/router';
 type AccountBook = {
   company: string;
   remark: string;
@@ -38,12 +31,7 @@ type CreateForm = {
 @Component({
   selector: 'app-manage-account-book',
   standalone: true, // <-- Standalone
-  imports: [
-    CommonModule,
-    ConfigNewDbComponent,
-    ReactiveFormsModule,
-    FormsModule,
-  ], // <-- Tự import cho template
+  imports: [CommonModule, ReactiveFormsModule, FormsModule], // <-- Tự import cho template
   templateUrl: './manage-account-book.component.html',
   styleUrls: ['./manage-account-book.component.scss'],
 })
@@ -54,9 +42,7 @@ export class ManageAccountBookComponent implements OnInit, OnDestroy {
   private subscriptions$: Subscription[] = [];
   selectedIndex: number | null = null;
   get selectedItem(): ListServerRes | null {
-    return this.selectedIndex !== null
-      ? this.listserver[this.selectedIndex]
-      : null;
+    return this.selectedIndex !== null ? this.listserver[this.selectedIndex] : null;
   }
   isLoading = signal(false);
   listserver: ListServerRes[] = [];
@@ -116,7 +102,11 @@ export class ManageAccountBookComponent implements OnInit, OnDestroy {
   attachForm: FormGroup;
   detachAdminForm: FormGroup;
   deleteAdminForm: FormGroup;
-  constructor(private fb: FormBuilder, private session: ServerSessionService) {
+  constructor(
+    private router: Router,
+    private fb: FormBuilder,
+    private session: ServerSessionService
+  ) {
     this.editForm = this.fb.group({
       Id: [''],
       Company: ['', [Validators.required, Validators.minLength(2)]],
@@ -165,20 +155,18 @@ export class ManageAccountBookComponent implements OnInit, OnDestroy {
 
   // ----- DELETE -----
   openDeleteConfirm() {
-    if (this.selectedItem) this.showDeleteConfirm1 = true;
+    if (this.selectedItem) this.showDeleteConfirm = true;
   }
   closeDeleteConfirm() {
     this.showDeleteConfirm = false;
   }
-confirmDelete() {
-  if (!this.selectedItem) return;
+  confirmDelete() {
+    if (!this.selectedItem) return;
 
-  const target = this.selectedItem;
-  const id = this.selectedItem.Id;
+    const target = this.selectedItem;
+    const id = this.selectedItem.Id;
 
-  this.api
-    .delete<void>(`/books/${id}`)
-    .subscribe({
+    this.api.delete<void>(`/api/books/${id}`).subscribe({
       next: () => {
         // đóng popup, báo done
         this.showDeleteAuth = false;
@@ -200,8 +188,7 @@ confirmDelete() {
         alert(err?.message || 'Delete failed');
       },
     });
-}
-
+  }
 
   // ----- EDIT -----
   openEdit() {
@@ -228,11 +215,7 @@ confirmDelete() {
   onServerChangeAttach() {
     const s = String(this.attachForm.get('serverName')!.value || '');
     this.databaseList = this.sampleDbByServer[s] ?? [];
-    if (
-      !this.databaseList.includes(
-        String(this.attachForm.get('databaseName')!.value || '')
-      )
-    ) {
+    if (!this.databaseList.includes(String(this.attachForm.get('databaseName')!.value || ''))) {
       this.attachForm.get('databaseName')!.setValue(this.databaseList[0] ?? '');
     }
   }
@@ -243,20 +226,18 @@ confirmDelete() {
     this.showEditDone = false;
   }
 
-saveEdit() {
-  if (this.editForm.invalid || this.selectedIndex === null) return;
-  if (!this.selectedItem) return;
+  saveEdit() {
+    if (this.editForm.invalid || this.selectedIndex === null) return;
+    if (!this.selectedItem) return;
 
-  const id = this.selectedItem.Id;
+    const id = this.selectedItem.Id;
 
-  const updated: ListServerRes = {
-    ...this.listserver[this.selectedIndex],
-    ...this.editForm.value,
-  };
+    const updated: ListServerRes = {
+      ...this.listserver[this.selectedIndex],
+      ...this.editForm.value,
+    };
 
-  this.api
-    .put<any>(`/api/books/${id}`, updated)
-    .subscribe({
+    this.api.put<any>(`/api/books/${id}`, updated).subscribe({
       next: (res) => {
         this.showEditDone = true;
         // load lại danh sách từ server để sync
@@ -268,7 +249,7 @@ saveEdit() {
         alert(err?.message || 'Edit failed');
       },
     });
-}
+  }
   attach() {
     this.openAttach();
   }
@@ -300,11 +281,11 @@ saveEdit() {
   closeAttach() {
     this.showAttach = false;
   }
-  attachSubmit(){
-     this.showAttach = false;
-     this.showAttachDone = true;
+  attachSubmit() {
+    this.showAttach = false;
+    this.showAttachDone = true;
   }
-  closeAttachDone(){
+  closeAttachDone() {
     this.showAttachDone = false;
   }
 
@@ -335,10 +316,7 @@ saveEdit() {
     this.attachForm.get('serverName')!.setValue(s);
     this.availableDatabases = this.sampleDbByServer[s] ?? [];
     // nếu có DB đầu tiên, gợi ý luôn
-    if (
-      this.availableDatabases.length &&
-      !this.attachForm.get('databaseName')!.value
-    ) {
+    if (this.availableDatabases.length && !this.attachForm.get('databaseName')!.value) {
       this.attachForm.get('databaseName')!.setValue(this.availableDatabases[0]);
     }
   }
@@ -401,33 +379,31 @@ saveEdit() {
     this.onLoginModeChange();
 
     // theo dõi thay đổi radio
-    this.attachForm
-      .get('loginMode')!
-      .valueChanges.subscribe(() => this.onLoginModeChange());
+    this.attachForm.get('loginMode')!.valueChanges.subscribe(() => this.onLoginModeChange());
   }
   ngOnDestroy() {
     this.subscriptions$.forEach((sb) => sb.unsubscribe());
   }
-getListServer(): void {
-  this.isLoading.set(true);
+  getListServer(): void {
+    this.isLoading.set(true);
 
-  this.subscriptions$.push(
-    this.api
-      .get<any[]>('/api/books/get-list-server')
-      .pipe(finalize(() => this.isLoading.set(false)))
-      .subscribe({
-        next: (res) => {
-          this.listserver = Array.isArray(res) ? res : res ? [res] : [];
-          this.cdr.markForCheck();
-        },
-        error: (err) => {
-          console.error(err);
-          this.listserver = [];
-          this.cdr.markForCheck();
-        },
-      })
-  );
-}
+    this.subscriptions$.push(
+      this.api
+        .get<any[]>('/api/books/get-list-server')
+        .pipe(finalize(() => this.isLoading.set(false)))
+        .subscribe({
+          next: (res) => {
+            this.listserver = Array.isArray(res) ? res : res ? [res] : [];
+            this.cdr.markForCheck();
+          },
+          error: (err) => {
+            console.error(err);
+            this.listserver = [];
+            this.cdr.markForCheck();
+          },
+        })
+    );
+  }
   closeCodeDialogSetupNewDb() {
     this.showCreate = false;
     this.getListServer();
@@ -517,5 +493,44 @@ getListServer(): void {
   }
   closeDeleteDone() {
     this.showDeleteDone = false;
+  }
+  // listserver hiện có rồi – dùng để sort
+  get sortedList(): any[] {
+    if (!this.listserver) {
+      return [];
+    }
+    const copy = [...this.listserver];
+    copy.sort((a, b) => {
+      const aCur = this.isCurrent(a);
+      const bCur = this.isCurrent(b);
+      if (aCur === bCur) return 0;
+      return aCur ? -1 : 1; // current lên đầu
+    });
+    return copy;
+  }
+
+  /** Row click trong grid: company current thì bỏ qua, các company khác gọi select() */
+  onRowClick(row: any): void {
+    if (this.isCurrent(row)) {
+      return; // không cho click company đang login
+    }
+    const idx = this.listserver.findIndex(
+      (x: any) => x.Database === row.Database && x.Server === row.Server
+    );
+    if (idx >= 0) {
+      this.select(idx); // dùng hàm select(index) cũ để set selectedItem, selectedIndex...
+    }
+  }
+
+  /** Kiểm tra row đang được chọn (dùng cho CSS row-selected) */
+  isSelected(row: any): boolean {
+    return (
+      !!this.selectedItem &&
+      this.selectedItem.Database === row.Database &&
+      this.selectedItem.Server === row.Server
+    );
+  }
+  goToCreate(): void {
+    this.router.navigate(['/book/create-account-book']);
   }
 }

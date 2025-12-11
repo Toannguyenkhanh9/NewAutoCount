@@ -46,6 +46,7 @@ import { ArOutstandingReportComponent } from './features/ar/outstanding-ar-invoi
 import { ArReceivePaymentPageComponent } from './features/ar/receive-payment/ar-receive-payment-page.component';
 import { ManageAccountBookComponent } from './features/book/manage-account-book/manage-account-book.component';
 import { SettingsPageComponent } from './features/settings/settings-page/settings-page.component';
+import { CreateAccountBookPageComponent } from './features/book/create-account-book/create-account-book-page.component';
 export const routes: Routes = [
   { path: 'login', component: LoginPageComponent, title: 'Login' },
 
@@ -60,19 +61,24 @@ export const routes: Routes = [
   },
 
   // ===== Account Books =====
-  {
-    path: 'book',
-    canActivate: [authGuard],
-    data: { breadcrumb: 'Account Books' },
-    children: [
-      {
-        path: 'manage-account-book',
-        component: ManageAccountBookComponent,
-        title: 'Manage Account Book',
-        data: { breadcrumb: 'Manage Account Book' },
-      },
-    ],
-  },
+{
+  path: 'book',
+  canActivate: [authGuard],
+  children: [
+    {
+      path: 'manage-account-book',
+      component: ManageAccountBookComponent,
+      title: 'Manage Account Book',
+      data: { breadcrumb: 'Manage Account Book' },
+    },
+    {
+      path: 'create-account-book',
+      component: CreateAccountBookPageComponent,
+      title: 'Create Account Book',
+      data: { breadcrumb: 'Create Account Book' },
+    },
+  ],
+},
 
   // ===== General Maintenance =====
   {

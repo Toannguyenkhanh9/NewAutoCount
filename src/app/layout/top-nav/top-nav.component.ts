@@ -30,7 +30,7 @@ interface NavItem {
 })
 export class TopNavComponent {
   navItems: NavItem[] = [
-    { label: 'Dashboard', icon: 'dashboard', path: '/dashboard' },
+    { label: 'Home', icon: 'dashboard', path: '/dashboard' },
     {
       label: 'Accounts Receivable (A/R)',
       icon: 'assignment_ind',

@@ -1,0 +1,289 @@
+<form [formGroup]="form" novalidate>
+  <!-- BASIC INFORMATION -->
+  <div class="ac-section-title">Basic Information</div>
+  <div class="ac-dialog-form-grid-2">
+    <label class="ac-form-field">
+      <span class="ac-form-label">New Company Name</span>
+      <input
+        class="ac-form-control mono"
+        [ngModelOptions]="{ standalone: true }"
+        [(ngModel)]="form.get('company.code')!.value"
+        (ngModelChange)="form.get('company.code')!.setValue($event)"
+        (blur)="form.get('company.code')!.markAsTouched()"
+        [class.invalid]="
+          form.get('company.code')!.invalid &&
+          form.get('company.code')!.touched
+        "
+      />
+      <div
+        class="ac-dialog-field-error"
+        *ngIf="
+          form.get('company.code')!.hasError('required') &&
+          form.get('company.code')!.touched
+        "
+      >
+        New Company Name is required
+      </div>
+    </label>
+  </div>
+
+  <!-- START DATE -->
+  <div class="ac-section-title">Start Date</div>
+  <div class="ac-dialog-form-grid-2">
+    <label class="ac-form-field">
+      <span class="ac-form-label">Fiscal Year Start</span>
+      <input
+        type="date"
+        class="ac-form-control"
+        [ngModelOptions]="{ standalone: true }"
+        [(ngModel)]="form.get('period.fiscalYearStartMonth')!.value"
+        (ngModelChange)="
+          form.get('period.fiscalYearStartMonth')!.setValue($event)
+        "
+        (blur)="form.get('period.fiscalYearStartMonth')!.markAsTouched()"
+        [class.invalid]="
+          form.get('period.fiscalYearStartMonth')!.invalid &&
+          form.get('period.fiscalYearStartMonth')!.touched
+        "
+      />
+      <div
+        class="ac-dialog-field-error"
+        *ngIf="
+          form.get('period.fiscalYearStartMonth')!.hasError('required') &&
+          form.get('period.fiscalYearStartMonth')!.touched
+        "
+      >
+        Start date is required
+      </div>
+      <div class="ac-form-hint">
+        Specify the start date of this account book.
+      </div>
+    </label>
+
+    <label class="ac-form-field">
+      <span class="ac-form-label">Actual Data Start Date</span>
+      <input
+        type="date"
+        class="ac-form-control"
+        [ngModelOptions]="{ standalone: true }"
+        [(ngModel)]="form.get('period.openingDate')!.value"
+        (ngModelChange)="form.get('period.openingDate')!.setValue($event)"
+        (blur)="form.get('period.openingDate')!.markAsTouched()"
+        [class.invalid]="
+          form.get('period.openingDate')!.invalid &&
+          form.get('period.openingDate')!.touched
+        "
+      />
+      <div
+        class="ac-dialog-field-error"
+        *ngIf="
+          form.get('period.openingDate')!.hasError('required') &&
+          form.get('period.openingDate')!.touched
+        "
+      >
+        Actual data start date is required
+      </div>
+      <div class="ac-form-hint">
+        Specify the start date of the actual data to be entered in this account
+        book. If Actual Data Start Date is greater than Fiscal Year Start Date,
+        then you can maintain current year account balance in Year To Date
+        Maintenance.
+      </div>
+    </label>
+  </div>
+
+  <!-- LOCAL CURRENCY SETTING -->
+  <div class="ac-section-title">Local Currency Setting</div>
+  <div class="ac-dialog-form-grid-2">
+    <label class="ac-form-field">
+      <span class="ac-form-label">Country</span>
+      <select
+        class="ac-form-control"
+        formControlName="country"
+        (blur)="form.get('country')!.markAsTouched()"
+        [class.invalid]="
+          form.get('country')!.invalid && form.get('country')!.touched
+        "
+      >
+        <option [ngValue]="null" disabled>Select a country</option>
+        <option *ngFor="let c of countries" [ngValue]="c">
+          {{ c }}
+        </option>
+      </select>
+      <div
+        class="ac-dialog-field-error"
+        *ngIf="
+          form.get('country')!.hasError('required') &&
+          form.get('country')!.touched
+        "
+      >
+        Country is required
+      </div>
+    </label>
+
+    <label class="ac-form-field">
+      <span class="ac-form-label">Local Currency Code</span>
+      <input
+        type="text"
+        class="ac-form-control"
+        formControlName="localCurrencyCode"
+      />
+    </label>
+  </div>
+
+  <div class="ac-dialog-form-grid-2">
+    <label class="ac-form-field">
+      <span class="ac-form-label">Symbol</span>
+      <input
+        type="text"
+        class="ac-form-control"
+        formControlName="symbol"
+      />
+    </label>
+  </div>
+
+  <div class="ac-dialog-form-grid-2">
+    <label class="ac-form-field">
+      <span class="ac-form-label">Local Currency Word</span>
+      <input
+        type="text"
+        class="ac-form-control"
+        formControlName="wordEn"
+      />
+    </label>
+
+    <label class="ac-form-field">
+      <span class="ac-form-label">Local Currency Word (Local)</span>
+      <input
+        type="text"
+        class="ac-form-control"
+        formControlName="wordLocal"
+      />
+    </label>
+  </div>
+
+  <!-- ACCOUNT CODE FORMAT -->
+  <div class="ac-section-title">Account Code Format</div>
+  <div class="ac-dialog-form-grid-2">
+    <!-- Left: input + note -->
+    <label class="ac-form-field">
+      <span class="ac-form-label">Account Code Format</span>
+      <input
+        type="text"
+        class="ac-form-control"
+        [ngModelOptions]="{ standalone: true }"
+        [(ngModel)]="form.get('number.qtyDecimals')!.value"
+        (ngModelChange)="form.get('number.qtyDecimals')!.setValue($event)"
+        placeholder="AAA-AAAA"
+      />
+      <div class="ac-form-hint">
+        (Note: To use free format, leave the Account Code Format field empty.)
+      </div>
+    </label>
+
+    <!-- Right: meaning table -->
+    <div class="ac-form-field">
+      <span class="ac-form-label">Character meaning</span>
+      <table class="ac-table ac-table-sm">
+        <thead>
+          <tr>
+            <th style="width: 80px">Character</th>
+            <th>Meaning</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>L</td>
+            <td>
+              An <b>L</b> character requires an uppercase alphabetic character
+              only in this position (A–Z).
+            </td>
+          </tr>
+          <tr>
+            <td>A</td>
+            <td>
+              An <b>A</b> character requires an alphanumeric character only in
+              this position (A–Z, 0–9).
+            </td>
+          </tr>
+          <tr>
+            <td>0</td>
+            <td>
+              A <b>0</b> character requires a numeric character only in this
+              position.
+            </td>
+          </tr>
+          <tr>
+            <td>/ - ( ) &#123; &#125;</td>
+            <td>Literal.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- SAMPLE CHART OF ACCOUNT -->
+  <div class="ac-section-title">Sample Chart of Account</div>
+  <div class="ac-dialog-form-grid-2">
+    <label class="ac-form-field">
+      <span class="ac-form-label">Create sample Chart of Accounts</span>
+      <select
+        class="ac-form-control"
+        [ngModelOptions]="{ standalone: true }"
+        [(ngModel)]="form.get('coa.template')!.value"
+        (ngModelChange)="form.get('coa.template')!.setValue($event)"
+      >
+        <option *ngFor="let t of coaTemplates" [ngValue]="t.value">
+          {{ t.label }}
+        </option>
+      </select>
+    </label>
+  </div>
+  <br>
+  <!-- ACTIONS -->
+  <div class="ac-dialog-footer">
+    <button
+      type="button"
+      class="ac-btn ac-btn-ghost"
+      (click)="onCancel()"
+    >
+      Cancel
+    </button>
+    <button
+      type="button"
+      class="ac-btn ac-btn-primary"
+      (click)="createNow()"
+      [disabled]="form.invalid"
+    >
+      Create
+    </button>
+  </div>
+
+  <!-- DONE DIALOG -->
+  <div class="dialog" *ngIf="showDone()">
+    <div class="dialog-panel-small ac-card-no-padding">
+      <div class="ac-dialog-header">
+        <span>Setup Complete</span>
+        <button
+          type="button"
+          class="ac-dialog-close"
+          (click)="closeDone()"
+        >
+          &times;
+        </button>
+      </div>
+      <div class="ac-dialog-body">
+        <p>Your account book has been created successfully.</p>
+      </div>
+      <div class="ac-dialog-footer">
+        <button
+          type="button"
+          class="ac-btn ac-btn-primary"
+          (click)="closeDone()"
+        >
+          OK
+        </button>
+      </div>
+    </div>
+  </div>
+</form>
