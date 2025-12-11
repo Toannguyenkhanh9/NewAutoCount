@@ -4,6 +4,7 @@
     class="app-toolbar"
     *ngIf="(isAuthenticated$ | async) && !isLoginRoute"
   >
+    <!-- Logo AutoCount -->
     <div class="brand">
       <div class="brand-logo">AC</div>
       <div class="brand-text">
@@ -12,8 +13,45 @@
       </div>
     </div>
 
+    <!-- 👇 NÚT COMPANY – nằm NGAY SAU LOGO, TRƯỚC DASHBOARD -->
+    <button
+      mat-button
+      [matMenuTriggerFor]="companyMenu"
+      class="company-menu-trigger"
+    >
+      <mat-icon>business</mat-icon>
+      <span class="company-menu-label">
+        {{ (companyName$ | async) || 'Select company' }}
+      </span>
+      <mat-icon>expand_more</mat-icon>
+    </button>
+
+    <mat-menu #companyMenu="matMenu">
+      <!-- Header trong menu (chỉ hiển thị tên, không click) -->
+      <button mat-menu-item disabled class="company-menu-header">
+        <mat-icon>business</mat-icon>
+        <span>{{ (companyName$ | async) || 'Select company' }}</span>
+      </button>
+
+      <mat-divider></mat-divider>
+
+      <!-- Settings -->
+      <button mat-menu-item [routerLink]="['/settings']">
+        <mat-icon>settings</mat-icon>
+        <span>Settings</span>
+      </button>
+
+      <!-- Manage Account Book -->
+      <button mat-menu-item [routerLink]="['/book/manage-account-book']">
+        <mat-icon>menu_book</mat-icon>
+        <span>Manage Account Book</span>
+      </button>
+    </mat-menu>
+
+    <!-- NAV CHÍNH: Dashboard, Account Books, ... -->
     <app-top-nav class="flex-fill"></app-top-nav>
 
+    <!-- User menu bên phải -->
     <div class="user-area">
       <button mat-icon-button [matMenuTriggerFor]="userMenu">
         <mat-icon>account_circle</mat-icon>
@@ -32,12 +70,11 @@
   </mat-toolbar>
 
   <main class="app-content">
-    <div class="page-wrapper">
-      <!-- Breadcrumb nằm trong page-wrapper nên sẽ thẳng hàng với nội dung -->
-      <app-breadcrumb
-        *ngIf="(isAuthenticated$ | async) && !isLoginRoute"
-      ></app-breadcrumb>
+    <app-breadcrumb
+      *ngIf="(isAuthenticated$ | async) && !isLoginRoute"
+    ></app-breadcrumb>
 
+    <div class="page-wrapper">
       <router-outlet></router-outlet>
     </div>
   </main>

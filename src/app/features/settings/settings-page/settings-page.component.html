@@ -1,0 +1,28 @@
+<div class="ac-page">
+  <div class="ac-card settings-card">
+    <h1 class="settings-title">Settings</h1>
+
+    <div
+      class="settings-section"
+      *ngFor="let section of sections"
+    >
+      <h2 class="settings-section-title">{{ section.title }}</h2>
+
+      <div class="settings-list">
+        <a
+          class="settings-item"
+          *ngFor="let link of section.links"
+          [routerLink]="link.path"
+        >
+          <div class="settings-item-main">
+            <div class="settings-item-label">{{ link.label }}</div>
+            <div class="settings-item-desc">
+              {{ link.description }}
+            </div>
+          </div>
+          <mat-icon class="settings-item-arrow">chevron_right</mat-icon>
+        </a>
+      </div>
+    </div>
+  </div>
+</div>

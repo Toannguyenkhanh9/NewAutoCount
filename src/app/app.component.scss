@@ -14,13 +14,11 @@
 /* Header / Toolbar */
 .app-toolbar {
   display: flex;
-  gap: 24px;
+  align-items: center;
+  gap: 16px;
   padding: 0 24px;
-
-  /* nền xanh kiểu Xero */
   background: #0077c8;
   color: #ffffff;
-
   border-bottom: none;
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
   height: 64px;
@@ -30,9 +28,9 @@
   display: flex;
   align-items: center;
   gap: 12px;
+  margin-right: 8px;
 }
 
-/* logo trắng, chữ xanh hoặc ngược lại tùy bạn */
 .brand-logo {
   width: 32px;
   height: 32px;
@@ -72,15 +70,77 @@
   align-items: center;
 }
 
+/* ========= NÚT COMPANY ========== */
+
+.company-switcher {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  color: #fff;                 // chữ trắng
+  text-transform: none;
+  font-weight: 500;
+  padding: 0 10px;
+  min-width: 0;
+}
+
+.company-switcher mat-icon {
+  color: #fff;
+  font-size: 18px;
+}
+
+.company-switcher-label {
+  max-width: 180px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* menu header trong dropdown */
+.company-menu-header {
+  font-weight: 600;
+}
+
 /* Content */
 .app-content {
   flex: 1 1 auto;
   overflow: auto;
 }
 
-/* 👇 chỉ sửa dòng này */
 .page-wrapper {
-  padding: 8px 24px 32px; /* top 8px thay vì 24px */
   max-width: 1360px;
   margin: 0 auto;
+}
+.app-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  padding: 0 24px;
+  background: #0077c8;
+  color: #ffffff;
+  border-bottom: none;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
+  height: 64px;
+}
+
+/* Nút company – nằm trong header, text màu trắng */
+.company-menu-trigger {
+  color: #ffffff !important;
+  text-transform: none;
+  font-weight: 500;
+  font-size: 14px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 0 8px;
+}
+
+.company-menu-trigger .mat-icon {
+  color: #ffffff;
+}
+
+.company-menu-label {
+  max-width: 220px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }

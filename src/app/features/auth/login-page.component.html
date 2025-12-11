@@ -84,29 +84,30 @@
       </mat-form-field>
 
       <!-- Company -->
-      <mat-form-field appearance="outline" class="xero-field">
-        <mat-label>Company</mat-label>
-        <mat-select formControlName="company">
-          <mat-option *ngIf="companiesLoading" disabled>
-            Loading...
-          </mat-option>
-          <mat-option
-            *ngFor="let c of companies"
-            [value]="c.Database"
-          >
-            {{ c.Company }}
-          </mat-option>
-        </mat-select>
+<!-- Company -->
+<mat-form-field appearance="outline" class="xero-field">
+  <mat-label>Company</mat-label>
+  <mat-select formControlName="company">
+    <mat-option *ngIf="companiesLoading" disabled>
+      Loading...
+    </mat-option>
 
-        <mat-error
-          *ngIf="
-            form.controls['company'].hasError('required') &&
-            form.controls['company'].touched
-          "
-        >
-          Company is required
-        </mat-error>
-      </mat-form-field>
+    <!-- 👇 GIỮ CẢ OBJECT CompanyDto -->
+    <mat-option *ngFor="let c of companies" [value]="c">
+      {{ c.Company }}
+    </mat-option>
+  </mat-select>
+
+  <mat-error
+    *ngIf="
+      form.controls['company'].hasError('required') &&
+      form.controls['company'].touched
+    "
+  >
+    Company is required
+  </mat-error>
+</mat-form-field>
+
 
       <!-- Thông báo lỗi chung -->
       <div class="xero-error-message" *ngIf="errorMessage">

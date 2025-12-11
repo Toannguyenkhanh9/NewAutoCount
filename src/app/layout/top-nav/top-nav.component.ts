@@ -32,27 +32,6 @@ export class TopNavComponent {
   navItems: NavItem[] = [
     { label: 'Dashboard', icon: 'dashboard', path: '/dashboard' },
     {
-      label: 'Account Books',
-      icon: 'account_balance',
-      children: [
-        { label: 'Manage Account Book', path: '/book/manage-account-book' },
-      ],
-    },
-    {
-      label: 'General Maintenance',
-      icon: 'miscellaneous_services',
-      children: [
-        { label: 'Company Profile', path: '/general-maintenance/company-profile' },
-        { label: 'Account Type Maintenance', path: '/general-maintenance/account-type-maintenance' },
-        { label: 'Creditor Type Maintenance', path: '/general-maintenance/creditor-type-maintenance' },
-        { label: 'Currency Maintenance', path: '/general-maintenance/currency-maintenance' },
-        { label: 'Debtor Type Maintenance', path: '/general-maintenance/debtor-type-maintenance' },
-        { label: 'Document Numbering Format Maintenance', path: '/general-maintenance/document-numbering-format-maintenance' },
-        { label: 'Journal Type Maintenance', path: '/general-maintenance/journal-type-maintenance' },
-        { label: 'Last Year Balance Maintenance', path: '/general-maintenance/last-year-balance-maintenance' },
-      ],
-    },
-    {
       label: 'Accounts Receivable (A/R)',
       icon: 'assignment_ind',
       children: [

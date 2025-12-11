@@ -1,15 +1,19 @@
 import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterOutlet, Router, NavigationEnd } from '@angular/router';
+import { RouterOutlet, Router, NavigationEnd,  RouterLink} from '@angular/router';
 import { HttpClientModule } from '@angular/common/http';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatIconModule } from '@angular/material/icon';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatButtonModule } from '@angular/material/button';
+import { MatDividerModule } from '@angular/material/divider';
+
 import { TopNavComponent } from './layout/top-nav/top-nav.component';
-import { AuthService } from './core/services/auth.service';
-import { filter } from 'rxjs';
 import { BreadcrumbComponent } from './layout/breadcrumb/breadcrumb.component';
+import { AuthService } from './core/services/auth.service';
+import { CompanyContextService } from './core/services/company-context.service';
+import { filter } from 'rxjs';
+
 @Component({
   selector: 'app-root',
   standalone: true,
@@ -21,8 +25,10 @@ import { BreadcrumbComponent } from './layout/breadcrumb/breadcrumb.component';
     MatIconModule,
     MatMenuModule,
     MatButtonModule,
+    MatDividerModule,
     TopNavComponent,
-    BreadcrumbComponent
+    BreadcrumbComponent,
+    RouterLink,
   ],
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss'],
@@ -30,9 +36,13 @@ import { BreadcrumbComponent } from './layout/breadcrumb/breadcrumb.component';
 export class AppComponent {
   private authService = inject(AuthService);
   private router = inject(Router);
+  private companyContext = inject(CompanyContextService); // 👈 inject service
 
   isAuthenticated$ = this.authService.isAuthenticated$;
   isLoginRoute = false;
+
+  // 👇 dùng tên company đã chọn ở login
+  companyName$ = this.companyContext.companyName$;
 
   constructor() {
     this.router.events

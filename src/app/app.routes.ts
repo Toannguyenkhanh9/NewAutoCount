@@ -45,7 +45,7 @@ import { ArInvoicePageComponent } from './features/ar/invoice-entry/ar-invoice-p
 import { ArOutstandingReportComponent } from './features/ar/outstanding-ar-invoice-report/ar-outstanding-report.component';
 import { ArReceivePaymentPageComponent } from './features/ar/receive-payment/ar-receive-payment-page.component';
 import { ManageAccountBookComponent } from './features/book/manage-account-book/manage-account-book.component';
-
+import { SettingsPageComponent } from './features/settings/settings-page/settings-page.component';
 export const routes: Routes = [
   { path: 'login', component: LoginPageComponent, title: 'Login' },
 
@@ -76,10 +76,16 @@ export const routes: Routes = [
 
   // ===== General Maintenance =====
   {
-    path: 'general-maintenance',
+    path: 'settings',
     canActivate: [authGuard],
-    data: { breadcrumb: 'General Maintenance' },
+    data: { breadcrumb: 'Settings' },
     children: [
+      {
+        path: '',
+        pathMatch: 'full',
+        component: SettingsPageComponent,
+        title: 'Settings',
+      },
       {
         path: 'account-type-maintenance',
         component: AccountTypeMaintenanceComponent,
@@ -141,7 +147,7 @@ export const routes: Routes = [
         path: 'account-maintenance',
         component: AccountMaintenanceComponent,
         title: 'Account Maintenance',
-        data: { breadcrumb: 'Account Maintenance' },
+        data: { breadcrumb: '' },
       },
       {
         path: 'balance-sheet-statement',
@@ -279,7 +285,7 @@ export const routes: Routes = [
         path: 'contra-entry',
         component: ArApContraPageComponent,
         title: 'A/R and A/P Contra Entry',
-        data: { breadcrumb: 'A/R and A/P Contra Entry' },
+        data: { breadcrumb: '' },
       },
       {
         path: 'credit-note-entry',
@@ -337,6 +343,5 @@ export const routes: Routes = [
       },
     ],
   },
-
   { path: '**', redirectTo: 'dashboard' },
 ];
