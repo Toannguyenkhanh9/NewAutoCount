@@ -129,38 +129,6 @@ companyInitials(name: string | null | undefined): string {
 
   return lastIsNumber ? letters + last : letters;
 }
-companyAcronym(name: string | null | undefined): string {
-  if (!name) return '';
-
-  const parts = name.trim().split(/\s+/).filter(Boolean);
-  if (!parts.length) return '';
-
-  const last = parts[parts.length - 1];
-  const lastIsNumber = /^[0-9]+$/.test(last);
-
-  const letters = parts
-    .slice(0, lastIsNumber ? parts.length - 1 : parts.length)
-    .map(p => p[0]?.toUpperCase() || '')
-    .join('');
-
-  return lastIsNumber ? letters + last : letters;
-}
-
-companyLogoChar(name: string | null | undefined): string {
-  const ac = this.companyAcronym(name);
-  return ac ? ac[0] : '';
-}
-
-companyColorClass(name: string | null | undefined): string {
-  if (!name) return 'company-logo--c1';
-  const str = name.trim().toUpperCase();
-  let hash = 0;
-  for (let i = 0; i < str.length; i++) {
-    hash = (hash * 31 + str.charCodeAt(i)) | 0; // int32
-  }
-  const idx = Math.abs(hash) % 6; // 6 màu
-  return `company-logo--c${idx + 1}`;
-}
 
   logout() {
     this.authService.logout();

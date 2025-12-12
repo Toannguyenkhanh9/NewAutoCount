@@ -13,74 +13,62 @@
       </div>
     </div>
 
-<!-- 👇 NÚT COMPANY – ngay sau logo -->
+<!-- 👇 NÚT COMPANY – nằm NGAY SAU LOGO, TRƯỚC DASHBOARD -->
 <button
   mat-button
   [matMenuTriggerFor]="companyMenu"
   class="company-menu-trigger"
 >
-  <!-- Logo: 1 ký tự đầu, nhiều màu -->
-  <span
-    class="company-logo"
-    [ngClass]="companyColorClass((companyName$ | async) || '')"
-  >
-    {{ companyLogoChar((companyName$ | async) || '') }}
+  <!-- Avatar chữ viết tắt công ty -->
+  <span class="company-initials">
+    {{ companyInitials((companyName$ | async) || '') }}
   </span>
 
-  <!-- Tên: viết tắt (NC1) -->
   <span class="company-menu-label">
-    {{ companyAcronym((companyName$ | async) || '') || 'Select company' }}
+    {{ (companyName$ | async) || 'Select company' }}
   </span>
 
   <mat-icon>expand_more</mat-icon>
 </button>
 
 <mat-menu #companyMenu="matMenu">
-  <!-- 1️⃣ Company đang login -->
+  <!-- 1️⃣ Dòng đầu: company đang login (disable) -->
   <button mat-menu-item disabled class="company-menu-header">
-    <span
-      class="company-logo company-logo--lg"
-      [ngClass]="companyColorClass((companyName$ | async) || '')"
-    >
-      {{ companyLogoChar((companyName$ | async) || '') }}
+    <span class="company-initials company-initials--lg">
+      {{ companyInitials((companyName$ | async) || '') }}
     </span>
-    <span>
-      {{ companyAcronym((companyName$ | async) || '') || 'Select company' }}
-    </span>
+    <span>{{ (companyName$ | async) || 'Select company' }}</span>
   </button>
 
-  <!-- 2️⃣ Settings -->
+  <!-- 2️⃣ Button Settings -->
   <button mat-menu-item [routerLink]="['/settings']">
     <mat-icon>settings</mat-icon>
     <span>Settings</span>
   </button>
 
-  <!-- 3️⃣ Divider -->
+  <!-- 3️⃣ Line phân hàng -->
   <mat-divider></mat-divider>
 
-  <!-- 4️⃣ ORGANIZATION label -->
+  <!-- 4️⃣ Label ORGANIZATION -->
   <div class="company-menu-section-label">ORGANIZATION</div>
 
-  <!-- 5️⃣ Các công ty khác -->
+  <!-- 5️⃣ Các company khác (đã loại company đang login) -->
   <button
     mat-menu-item
     *ngFor="let c of otherCompanies"
     class="company-menu-item-other"
     (click)="selectCompanyFromMenu(c)"
   >
-    <span
-      class="company-logo company-logo--sm"
-      [ngClass]="companyColorClass(c.Company)"
-    >
-      {{ companyLogoChar(c.Company) }}
+    <span class="company-initials company-initials--sm">
+      {{ companyInitials(c.Company) }}
     </span>
-    <span>{{ companyAcronym(c.Company) }}</span>
+    <span>{{ c.Company }}</span>
   </button>
 
-  <!-- 6️⃣ Divider -->
+  <!-- 6️⃣ Line phân hàng -->
   <mat-divider></mat-divider>
 
-  <!-- 7️⃣ Create New Account Book -->
+  <!-- 7️⃣ Button Create New Account Book -->
   <button
     mat-menu-item
     class="company-menu-item-create"
@@ -90,7 +78,6 @@
     <span>Create New Account Book</span>
   </button>
 </mat-menu>
-
 
 
 
