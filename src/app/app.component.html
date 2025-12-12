@@ -94,28 +94,28 @@
     </span>
   </button>
 
-  <mat-menu #userMenu="matMenu">
+  <mat-menu #userMenu="matMenu" class="user-menu">
     <!-- Header: tên đầy đủ, in đậm -->
-    <div class="user-menu-header">
-      {{ (userDisplayName$ | async) || 'Current user' }}
+    <div class="user-menu-header" *ngIf="(userDisplayName$ | async) as u">
+      {{ u | uppercase }}
     </div>
 
     <!-- Profile -->
     <button mat-menu-item>
       <mat-icon>person</mat-icon>
-      <span  class="user-menu-header">Profile</span>
+      <span>Profile</span>
     </button>
 
     <!-- Account -->
     <button mat-menu-item>
       <mat-icon>account_box</mat-icon>
-      <span  class="user-menu-header">Account</span>
+      <span>Account</span>
     </button>
 <mat-divider class="company-menu-divider"></mat-divider>
     <!-- Log out -->
     <button mat-menu-item (click)="logout()">
       <mat-icon>logout</mat-icon>
-      <span  class="user-menu-header">Log out</span>
+      <span>Log out</span>
     </button>
   </mat-menu>
 </div>

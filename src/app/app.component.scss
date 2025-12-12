@@ -299,7 +299,7 @@
 /* dòng đầu trong menu: tên đầy đủ, in đậm */
 .user-menu-header {
   padding: 10px 16px 6px;
-  font-weight: 400;
+  font-weight: 700;
   font-size: 13px;
   color: #111827;
 }
@@ -307,4 +307,36 @@
 /* tạo một chút khoảng cách giữa header và item đầu tiên */
 .user-menu-header + .mat-menu-item {
   margin-top: 4px;
+}
+/* Avatar nút user */
+.user-avatar-btn {
+  padding: 0;
+}
+
+.user-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 999px;
+  background: #0f766e;
+  color: #fff;
+  font-weight: 700;
+  font-size: 13px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Dòng tên user trong menu: in đậm + IN HOA */
+.user-menu-header {
+  padding: 8px 16px 6px;
+  font-size: 13px;
+  font-weight: 700;
+  text-transform: uppercase;  /* luôn IN HOA */
+  color: #111827;
+}
+
+/* Đảm bảo các label nút còn lại KHÔNG bị in hoa theo */
+.user-menu .mat-menu-item span {
+  text-transform: none;
+  font-weight: 400;
 }
