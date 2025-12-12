@@ -83,21 +83,42 @@
     <app-top-nav class="flex-fill"></app-top-nav>
 
     <!-- User menu bên phải -->
-    <div class="user-area">
-      <button mat-icon-button [matMenuTriggerFor]="userMenu">
-        <mat-icon>account_circle</mat-icon>
-      </button>
-      <mat-menu #userMenu="matMenu">
-        <button mat-menu-item>
-          <mat-icon>person</mat-icon>
-          <span>My Profile</span>
-        </button>
-        <button mat-menu-item (click)="logout()">
-          <mat-icon>logout</mat-icon>
-          <span>Sign out</span>
-        </button>
-      </mat-menu>
+<div class="user-area">
+  <button
+    mat-icon-button
+    [matMenuTriggerFor]="userMenu"
+    class="user-avatar-btn"
+  >
+    <span class="user-avatar-badge">
+      {{ userInitials((userDisplayName$ | async) || '') }}
+    </span>
+  </button>
+
+  <mat-menu #userMenu="matMenu">
+    <!-- Header: tên đầy đủ, in đậm -->
+    <div class="user-menu-header">
+      {{ (userDisplayName$ | async) || 'Current user' }}
     </div>
+
+    <!-- Profile -->
+    <button mat-menu-item>
+      <mat-icon>person</mat-icon>
+      <span  class="user-menu-header">Profile</span>
+    </button>
+
+    <!-- Account -->
+    <button mat-menu-item>
+      <mat-icon>account_box</mat-icon>
+      <span  class="user-menu-header">Account</span>
+    </button>
+<mat-divider class="company-menu-divider"></mat-divider>
+    <!-- Log out -->
+    <button mat-menu-item (click)="logout()">
+      <mat-icon>logout</mat-icon>
+      <span  class="user-menu-header">Log out</span>
+    </button>
+  </mat-menu>
+</div>
   </mat-toolbar>
 
   <main class="app-content">

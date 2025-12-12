@@ -86,37 +86,37 @@ export class LoginPageComponent implements OnInit {
     });
   }
 
-  submit() {
-    if (this.form.invalid) {
-      this.form.markAllAsTouched();
-      return;
-    }
-
-    const username = (this.form.value.username ?? '').trim();
-    const password = (this.form.value.password ?? '').trim();
-    const companyValue = this.form.value.company as CompanyDto | null;
-
-    // Tham số thứ 3 tuỳ bạn: Database / ConnectionString / gì backend yêu cầu
-    const loginCompany = companyValue?.Company ?? "";
-
-
-    const ok = this.auth.login(username, password, loginCompany);
-
-    if (!ok) {
-      this.errorMessage = 'Invalid username or password';
-
-      this.form.get('username')?.setErrors({ invalid: true });
-      this.form.get('password')?.setErrors({ invalid: true });
-      return;
-    }
-
-    // ✅ Lưu tên company để header hiển thị
-    if (companyValue?.Company) {
-      this.companyContext.setCompanyName(companyValue.Company);
-    }
-
-    // login ok thì xoá lỗi
-    this.errorMessage = '';
-    this.router.navigateByUrl('/dashboard');
+submit() {
+  if (this.form.invalid) {
+    this.form.markAllAsTouched();
+    return;
   }
+
+  const username = (this.form.value.username ?? '').trim();
+  const password = (this.form.value.password ?? '').trim();
+  const companyValue = this.form.value.company as CompanyDto | null;
+
+  const loginCompany = companyValue?.Company ?? '';
+
+  const ok = this.auth.login(username, password, loginCompany);
+
+  if (!ok) {
+    this.errorMessage = 'Invalid username or password';
+    this.form.get('username')?.setErrors({ invalid: true });
+    this.form.get('password')?.setErrors({ invalid: true });
+    return;
+  }
+
+  // ✅ Lưu username cho header/user-menu
+  this.auth.setUserDisplayName(username);
+
+  // ✅ Lưu tên company để header hiển thị
+  if (companyValue?.Company) {
+    this.companyContext.setCompanyName(companyValue.Company);
+  }
+
+  this.errorMessage = '';
+  this.router.navigateByUrl('/dashboard');
+}
+
 }

@@ -268,3 +268,43 @@
   border-top-color: #cbd5e1;  /* slate-300 */
   border-top-width: 2px;
 }
+.user-area {
+  display: flex;
+  align-items: center;
+}
+
+/* nút tròn chứa avatar */
+.user-avatar-btn {
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  border-radius: 999px;
+}
+
+/* badge 2 chữ cái */
+.user-avatar-badge {
+  width: 32px;
+  height: 32px;
+  border-radius: 999px;
+  background: #0f766e;       /* teal */
+  color: #ffffff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  font-size: 13px;
+  text-transform: uppercase;
+}
+
+/* dòng đầu trong menu: tên đầy đủ, in đậm */
+.user-menu-header {
+  padding: 10px 16px 6px;
+  font-weight: 400;
+  font-size: 13px;
+  color: #111827;
+}
+
+/* tạo một chút khoảng cách giữa header và item đầu tiên */
+.user-menu-header + .mat-menu-item {
+  margin-top: 4px;
+}

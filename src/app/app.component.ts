@@ -129,6 +129,14 @@ companyColorClass(index: number): string {
   ];
   return palette[index % palette.length];
 }
+   userDisplayName$ = this.authService.userDisplayName$;
+ userInitials(name: string | null | undefined): string {
+    if (!name) return '';
+    const clean = name.trim();
+    if (!clean) return '';
+    // bỏ khoảng trắng, lấy 2 ký tự
+    return clean.replace(/\s+/g, '').slice(0, 2).toUpperCase();
+  }
   logout() {
     this.authService.logout();
     this.router.navigateByUrl('/login');
