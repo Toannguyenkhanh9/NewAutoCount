@@ -122,8 +122,7 @@
   width: 24px;
   height: 24px;
   margin-right: 8px;
-  background: #eff6ff;
-  color: #1d4ed8;
+  /* màu sẽ lấy từ class company-badge-x */
 }
 
 /* label tên company trong nút */
@@ -232,4 +231,40 @@
 .company-menu-item-other .company-name {
   font-weight: 400 !important;   /* bỏ in đậm */
   text-transform: none !important; /* không ALL CAPS nếu đâu đó có set */
+}
+/* Palette màu cho logo company trong ORGANIZATION */
+.company-badge-1 {
+  background: #eef2ff;  /* indigo nhạt */
+  color: #4338ca;
+}
+
+.company-badge-2 {
+  background: #ecfdf3;  /* green nhạt */
+  color: #166534;
+}
+
+.company-badge-3 {
+  background: #fffbeb;  /* amber nhạt */
+  color: #92400e;
+}
+
+.company-badge-4 {
+  background: #fef2f2;  /* red nhạt */
+  color: #b91c1c;
+}
+
+.company-badge-5 {
+  background: #f5f3ff;  /* purple nhạt */
+  color: #6d28d9;
+}
+
+.company-badge-6 {
+  background: #e0f2fe;  /* sky nhạt */
+  color: #0369a1;
+}
+/* Divider trong company menu – đậm hơn */
+.company-menu-divider {
+  margin: 4px 0;
+  border-top-color: #cbd5e1;  /* slate-300 */
+  border-top-width: 2px;
 }

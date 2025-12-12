@@ -43,25 +43,27 @@
     <span>Settings</span>
   </button>
 
-  <mat-divider></mat-divider>
+<mat-divider class="company-menu-divider"></mat-divider>
 
-  <!-- 3️⃣ ORGANIZATION label -->
-  <div class="company-menu-section-label">ORGANIZATION</div>
+<div class="company-menu-section-label">ORGANIZATION</div>
 
-  <!-- 4️⃣ Các company khác (tên thường, không bold) -->
-  <button
-    mat-menu-item
-    *ngFor="let c of otherCompanies"
-    class="company-menu-item-other"
-    (click)="selectCompanyFromMenu(c)"
+<!-- 5️⃣ Các company khác (đã loại company đang login) -->
+<button
+  mat-menu-item
+  *ngFor="let c of otherCompanies; let i = index"
+  class="company-menu-item-other"
+  (click)="selectCompanyFromMenu(c)"
+>
+  <span
+    class="company-initials company-initials--sm"
+    [ngClass]="companyColorClass(i)"
   >
-    <span class="company-initials company-initials--sm">
-      {{ companyInitials(c.Company) }}
-    </span>
-    <span class="company-name">{{ c.Company }}</span>
-  </button>
+    {{ companyInitials(c.Company) }}
+  </span>
+  <span class="company-name">{{ c.Company }}</span>
+</button>
 
-  <mat-divider></mat-divider>
+<mat-divider class="company-menu-divider"></mat-divider>
 
   <!-- 5️⃣ Create New Account Book -->
   <button
@@ -70,7 +72,7 @@
     [routerLink]="['/book/create-account-book']"
   >
     <mat-icon>add_business</mat-icon>
-    <span>Create New Account Book</span>
+    <span>Create New Account Book &nbsp; &nbsp; &nbsp;</span>
   </button>
 </mat-menu>
 

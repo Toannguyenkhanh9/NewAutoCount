@@ -118,7 +118,17 @@ export class AppComponent implements OnInit {
     // chỉ lấy đúng 1 ký tự đầu tiên
     return trimmed[0].toUpperCase();
   }
-
+companyColorClass(index: number): string {
+  const palette = [
+    'company-badge-1',
+    'company-badge-2',
+    'company-badge-3',
+    'company-badge-4',
+    'company-badge-5',
+    'company-badge-6',
+  ];
+  return palette[index % palette.length];
+}
   logout() {
     this.authService.logout();
     this.router.navigateByUrl('/login');

@@ -17,7 +17,7 @@
     <ng-container *ngFor="let item of navItems">
 
       <!-- Item không có submenu -->
-      <!-- <button
+      <button
         *ngIf="!item.children"
         mat-button
         class="nav-item"
@@ -27,7 +27,7 @@
       >
         <mat-icon class="nav-icon" *ngIf="item.icon">{{ item.icon }}</mat-icon>
         <span>{{ item.label }}</span>
-      </button> -->
+      </button>
 
       <!-- Item có submenu -->
       <ng-container *ngIf="item.children">
