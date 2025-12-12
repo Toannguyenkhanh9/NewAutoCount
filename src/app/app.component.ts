@@ -60,7 +60,7 @@ export class AppComponent implements OnInit {
       .subscribe((e: NavigationEnd) => {
         this.isLoginRoute = e.urlAfterRedirects.startsWith('/login');
       });
-          this.companyName$.subscribe((name) => {
+    this.companyName$.subscribe((name) => {
       this.currentCompanyName = name || null;
     });
   }
@@ -85,19 +85,17 @@ export class AppComponent implements OnInit {
   }
 
   // các company khác, exclude company hiện tại
-get otherCompanies(): ListServerRes[] {
-  if (!this.companies?.length) return [];
-  const ctx = this.session.get();
-  const currentId = ctx?.companyId ?? null;
+  get otherCompanies(): ListServerRes[] {
+    if (!this.companies?.length) return [];
+    const ctx = this.session.get();
+    const currentId = ctx?.companyId ?? null;
 
-  return this.companies.filter((c) => {
-    const differentId = currentId == null || c.Id !== currentId;
-    const differentName =
-      !this.currentCompanyName || c.Company !== this.currentCompanyName;
-    return differentId && differentName;
-  });
-}
-
+    return this.companies.filter((c) => {
+      const differentId = currentId == null || c.Id !== currentId;
+      const differentName = !this.currentCompanyName || c.Company !== this.currentCompanyName;
+      return differentId && differentName;
+    });
+  }
 
   // click chọn company từ menu (tạm thời chỉ log, bạn có thể thêm logic switch DB ở đây)
   selectCompanyFromMenu(c: ListServerRes): void {
@@ -113,22 +111,13 @@ get otherCompanies(): ListServerRes[] {
     // this.companyContext.setCompanyName(c.Company ?? '');
     // this.router.navigateByUrl('/dashboard');
   }
-companyInitials(name: string | null | undefined): string {
-  if (!name) return '';
-
-  const parts = name.trim().split(/\s+/).filter(Boolean);
-  if (!parts.length) return '';
-
-  const last = parts[parts.length - 1];
-  const lastIsNumber = /^[0-9]+$/.test(last);
-
-  const letters = parts
-    .slice(0, lastIsNumber ? parts.length - 1 : parts.length)
-    .map(p => p[0]?.toUpperCase() || '')
-    .join('');
-
-  return lastIsNumber ? letters + last : letters;
-}
+  companyInitials(name: string | null | undefined): string {
+    if (!name) return '';
+    const trimmed = name.trim();
+    if (!trimmed) return '';
+    // chỉ lấy đúng 1 ký tự đầu tiên
+    return trimmed[0].toUpperCase();
+  }
 
   logout() {
     this.authService.logout();

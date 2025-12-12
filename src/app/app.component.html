@@ -13,26 +13,23 @@
       </div>
     </div>
 
-<!-- 👇 NÚT COMPANY – nằm NGAY SAU LOGO, TRƯỚC DASHBOARD -->
+<!-- NÚT COMPANY TRÊN TOOLBAR -->
 <button
   mat-button
   [matMenuTriggerFor]="companyMenu"
   class="company-menu-trigger"
 >
-  <!-- Avatar chữ viết tắt công ty -->
-  <span class="company-initials">
-    {{ companyInitials((companyName$ | async) || '') }}
-  </span>
-
   <span class="company-menu-label">
-    {{ (companyName$ | async) || 'Select company' }}
+    <span class="company-menu-text">
+      {{ (companyName$ | async) || 'Select company' }}
+    </span>
+    <mat-icon class="company-menu-chevron">expand_more</mat-icon>
   </span>
-
-  <mat-icon>expand_more</mat-icon>
 </button>
 
+
 <mat-menu #companyMenu="matMenu">
-  <!-- 1️⃣ Dòng đầu: company đang login (disable) -->
+  <!-- 1️⃣ Company đang login -->
   <button mat-menu-item disabled class="company-menu-header">
     <span class="company-initials company-initials--lg">
       {{ companyInitials((companyName$ | async) || '') }}
@@ -40,19 +37,18 @@
     <span>{{ (companyName$ | async) || 'Select company' }}</span>
   </button>
 
-  <!-- 2️⃣ Button Settings -->
+  <!-- 2️⃣ Settings -->
   <button mat-menu-item [routerLink]="['/settings']">
     <mat-icon>settings</mat-icon>
     <span>Settings</span>
   </button>
 
-  <!-- 3️⃣ Line phân hàng -->
   <mat-divider></mat-divider>
 
-  <!-- 4️⃣ Label ORGANIZATION -->
+  <!-- 3️⃣ ORGANIZATION label -->
   <div class="company-menu-section-label">ORGANIZATION</div>
 
-  <!-- 5️⃣ Các company khác (đã loại company đang login) -->
+  <!-- 4️⃣ Các company khác (tên thường, không bold) -->
   <button
     mat-menu-item
     *ngFor="let c of otherCompanies"
@@ -62,13 +58,12 @@
     <span class="company-initials company-initials--sm">
       {{ companyInitials(c.Company) }}
     </span>
-    <span>{{ c.Company }}</span>
+    <span class="company-name">{{ c.Company }}</span>
   </button>
 
-  <!-- 6️⃣ Line phân hàng -->
   <mat-divider></mat-divider>
 
-  <!-- 7️⃣ Button Create New Account Book -->
+  <!-- 5️⃣ Create New Account Book -->
   <button
     mat-menu-item
     class="company-menu-item-create"
@@ -78,6 +73,7 @@
     <span>Create New Account Book</span>
   </button>
 </mat-menu>
+
 
 
 

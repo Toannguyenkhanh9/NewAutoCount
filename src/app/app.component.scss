@@ -11,11 +11,11 @@
   color: #1f2933;
 }
 
-/* Header / Toolbar */
+/* ===== Toolbar / Header ===== */
 .app-toolbar {
   display: flex;
   align-items: center;
-  gap: 16px;
+  gap: 24px;
   padding: 0 24px;
   background: #0077c8;
   color: #ffffff;
@@ -70,121 +70,34 @@
   align-items: center;
 }
 
-/* ========= NÚT COMPANY ========== */
+/* ===== NÚT COMPANY TRÊN TOOLBAR ===== */
 
-.company-switcher {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  color: #fff;                 // chữ trắng
-  text-transform: none;
-  font-weight: 500;
-  padding: 0 10px;
-  min-width: 0;
-}
-
-.company-switcher mat-icon {
-  color: #fff;
-  font-size: 18px;
-}
-
-.company-switcher-label {
-  max-width: 180px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-/* menu header trong dropdown */
-.company-menu-header {
-  font-weight: 600;
-}
-
-/* Content */
-.app-content {
-  flex: 1 1 auto;
-  overflow: auto;
-}
-
-.page-wrapper {
-  max-width: 1360px;
-  margin: 0 auto;
-}
-.app-toolbar {
-  display: flex;
-  align-items: center;
-  gap: 24px;
-  padding: 0 24px;
-  background: #0077c8;
-  color: #ffffff;
-  border-bottom: none;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
-  height: 64px;
-}
-
-/* Nút company – nằm trong header, text màu trắng */
-.company-menu-trigger {
-  color: #ffffff !important;
-  text-transform: none;
-  font-weight: 500;
-  font-size: 14px;
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  padding: 0 8px;
-}
-
-.company-menu-trigger .mat-icon {
-  color: #ffffff;
-}
-
-.company-menu-label {
-  max-width: 220px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-.company-menu-header {
-  font-weight: 600;
-  background: #f3f6fb;
-  color: #6b7280;
-  cursor: default;
-}
-
-.company-menu-item-other {
-  // company khác: chữ đậm + icon xanh
-  .mat-icon {
-    color: var(--ac-primary);
-  }
-  span {
-    font-weight: 500;
-  }
-}
-
-.company-menu-item-create {
-  border-top: 1px solid var(--ac-border);
-  margin-top: 4px;
-
-  .mat-icon {
-    color: var(--ac-primary);
-  }
-  span {
-    font-weight: 600;
-  }
-}
-/* Nút trigger menu company */
 .company-menu-trigger {
   display: inline-flex;
   align-items: center;
   gap: 6px;
+  color: #ffffff !important;
+  text-transform: none;
+  font-weight: 500;
+  font-size: 14px;
+  padding: 0 8px;
+  min-width: 0;
 }
 
-/* Avatar initials trên toolbar & trong menu */
+/* đảm bảo thứ tự bên trong đúng theo DOM (avatar → tên → chevron) */
+.company-menu-trigger .mat-button-wrapper {
+  display: inline-flex;
+  align-items: center;
+  flex-direction: row;   /* tránh bị row-reverse ở nơi khác */
+  gap: 6px;
+}
+
+/* avatar chữ cái đầu */
 .company-initials {
   width: 26px;
   height: 26px;
   border-radius: 6px;
-  background: #1d4ed8;        /* blue */
+  background: #1d4ed8;
   color: #fff;
   font-size: 12px;
   font-weight: 700;
@@ -192,6 +105,11 @@
   align-items: center;
   justify-content: center;
   box-shadow: 0 1px 0 rgba(0, 0, 0, 0.15);
+}
+
+.company-initials--toolbar {
+  width: 28px;
+  height: 28px;
 }
 
 .company-initials--lg {
@@ -208,13 +126,32 @@
   color: #1d4ed8;
 }
 
-/* Dòng header trong menu */
-.company-menu-header {
-  opacity: 1 !important;
-  font-weight: 600;
+/* label tên company trong nút */
+.company-menu-label {
+  max-width: 220px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
-/* Label ORGANIZATION */
+/* chevron nằm sát tên hơn, bên PHẢI */
+.company-menu-chevron {
+  font-size: 18px;
+  margin-left: 2px;
+  margin-right: 0 !important;
+  color: #ffffff;
+}
+
+/* ===== MENU DROPDOWN ===== */
+
+.company-menu-header {
+  opacity: 1 !important;
+  font-weight: 1000;
+  background: #f3f6fb;
+  color: #060607;
+  cursor: default;
+}
+
 .company-menu-section-label {
   padding: 4px 16px 6px;
   font-size: 11px;
@@ -223,12 +160,76 @@
   color: #9ca3af;
 }
 
-/* Item company thường */
-.company-menu-item-other.mat-menu-item {
+
+
+/* Create New Account Book đậm hơn chút */
+.company-menu-item-create span {
+  font-weight: 600;
+}
+
+/* ===== Content ===== */
+
+.app-content {
+  flex: 1 1 auto;
+  overflow: auto;
+}
+
+.page-wrapper {
+  max-width: 1360px;
+  margin: 0 auto;
+}
+/* Nút trigger menu company trên toolbar */
+.company-menu-trigger {
+  display: inline-flex;
+  align-items: center;
+  padding: 0;                /* giống Home */
+  min-width: 0;
+  color: #ffffff !important;
+  text-transform: none;
+  font-weight: 500;
+  font-size: 14px;
+
+  .mat-button-wrapper {
+    display: inline-flex;
+    align-items: center;
+  }
+}
+
+/* Pill giống nút Home: nền hơi sáng + bo tròn */
+.company-menu-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 12px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.12);
+}
+
+/* Text tên công ty – có ellipsis nếu dài */
+.company-menu-text {
+  max-width: 220px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Chevron ở CHÍNH GIỮA, sát chữ */
+.company-menu-chevron {
+  font-size: 18px;
+  width: 18px;
+  height: 18px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0;                 /* hết lệch trên/dưới */
+  color: #ffffff;
+}
+/* Item company trong ORGANIZATION: chữ thường, không bold */
+.company-menu-item-other {
   height: 36px;
 }
 
-/* Nút Create New Account Book đậm hơn một tí */
-.company-menu-item-create span {
-  font-weight: 600;
+.company-menu-item-other .company-name {
+  font-weight: 400 !important;   /* bỏ in đậm */
+  text-transform: none !important; /* không ALL CAPS nếu đâu đó có set */
 }
