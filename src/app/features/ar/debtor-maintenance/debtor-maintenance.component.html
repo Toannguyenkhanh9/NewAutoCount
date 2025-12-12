@@ -1,97 +1,134 @@
-<div class="page">
-  <!-- Title + Toolbar -->
-  <div class="titlebar">
-    <h1>Debtor Maintenance</h1>
-    <div class="toolbar" role="toolbar" aria-label="Debtor actions">
+<div class="ac-page">
+  <!-- ============ HEADER ============ -->
+  <div class="ac-page-header">
+    <div>
+      <div class="ac-page-title">Debtor Maintenance</div>
+      <div class="ac-page-subtitle">
+        Maintain customer (debtor) master data, addresses and credit settings.
+      </div>
+    </div>
+
+    <div class="ac-page-toolbar" role="toolbar" aria-label="Debtor actions">
       <input
-        class="search1"
+        class="ac-form-control ac-page-search"
         type="text"
-        placeholder="Search code / company Name ..."
+        placeholder="Search code / company name..."
         [(ngModel)]="q"
       />
-      <button class="btn primary" (click)="newDebtor()">
-        <span class="ico plus"></span> New
+
+      <button class="ac-btn ac-btn-primary" type="button" (click)="newDebtor()">
+        <span class="ico plus"></span>
+        New
       </button>
-      <button class="btn" [disabled]="!selected" (click)="editDebtor()">
-        <span class="ico edit"></span> Edit
-      </button>
+
       <button
-        class="btn danger"
+        class="ac-btn"
+        type="button"
+        [disabled]="!selected"
+        (click)="editDebtor()"
+      >
+        <span class="ico edit"></span>
+        Edit
+      </button>
+
+      <button
+        class="ac-btn ac-btn-danger"
+        type="button"
         [disabled]="!selected"
         (click)="onDeleteDebtor()"
       >
-        <span class="ico trash"></span> Delete
+        <span class="ico trash"></span>
+        Delete
       </button>
     </div>
   </div>
 
-  <!-- Grid -->
-  <div class="gridwrap">
-    <table>
-      <thead>
-        <tr>
-          <th (click)="setSort('debtorAccount')">Code</th>
-          <th>Customer Name</th>
-          <th>Company/SSM ID</th>
-          <th>Phone</th>
-          <th>Customer's TIN</th>
-          <th>Active</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr
-          *ngFor="let r of filteredRows(); let i = index"
-          (click)="select(r)"
-          [class.selected]="selected === r"
-        >
-          <td>{{ r.debtorAccount }}</td>
-          <td>{{ r.companyName }}</td>
-          <td>{{ r.type }}</td>
-          <td>
-            {{ r.phone }}
-          </td>
-          <td>
-            {{ r.customerTin }}
-          </td>
-          <td>
-            <input type="checkbox" [checked]="r.active" disabled />
-          </td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
-
-  <!-- Pager -->
-  <div class="pager">
-    <div class="nav">
-      <button class="pg" (click)="first()">&laquo;</button>
-      <button class="pg" (click)="prev()">&lsaquo;</button>
-      <span class="pginfo">Page {{ page }} / {{ totalPages }}</span>
-      <button class="pg" (click)="next()">&rsaquo;</button>
-      <button class="pg" (click)="last()">&raquo;</button>
+  <!-- ============ GRID ============ -->
+  <div class="ac-card ac-card-no-padding">
+    <div class="ac-tablewrap">
+      <table class="ac-table">
+        <thead>
+          <tr>
+            <th (click)="setSort('debtorAccount')">Code</th>
+            <th>Customer Name</th>
+            <th>Company/SSM ID</th>
+            <th>Phone</th>
+            <th>Customer's TIN</th>
+            <th>Active</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr
+            *ngFor="let r of filteredRows(); let i = index"
+            (click)="select(r)"
+            [class.ac-row-selected]="selected === r"
+          >
+            <td>{{ r.debtorAccount }}</td>
+            <td>{{ r.companyName }}</td>
+            <td>{{ r.type }}</td>
+            <td>{{ r.phone }}</td>
+            <td>{{ r.customerTin }}</td>
+            <td>
+              <input type="checkbox" [checked]="r.active" disabled />
+            </td>
+          </tr>
+        </tbody>
+      </table>
     </div>
   </div>
 
-  <!-- PRINT LISTING -->
+  <!-- ============ PAGER ============ -->
+  <div class="ac-page-footer">
+    <div class="ac-pager">
+      <button class="ac-btn ac-pager-btn" type="button" (click)="first()">
+        &laquo;
+      </button>
+      <button class="ac-btn ac-pager-btn" type="button" (click)="prev()">
+        &lsaquo;
+      </button>
+
+      <span class="ac-pager-label">
+        Page {{ page }} / {{ totalPages }}
+      </span>
+
+      <button class="ac-btn ac-pager-btn" type="button" (click)="next()">
+        &rsaquo;
+      </button>
+      <button class="ac-btn ac-pager-btn" type="button" (click)="last()">
+        &raquo;
+      </button>
+    </div>
+  </div>
+
+  <!-- ============ PRINT LISTING ============ -->
   <div class="dialog" *ngIf="showPrint">
-    <div class="dialog-panel">
-      <div class="dialog-title">
-        Debtor Listing
-        <button class="x" (click)="showPrint = false">✕</button>
+    <div class="dialog-panel ac-card-no-padding ac-dialog-panel-lg">
+      <div class="ac-dialog-header">
+        <span>Debtor Listing</span>
+        <button
+          type="button"
+          class="ac-dialog-close"
+          (click)="showPrint = false"
+          aria-label="Close"
+        >
+          &times;
+        </button>
       </div>
-      <div class="dialog-body">
+
+      <div class="ac-dialog-body">
         <form [formGroup]="printForm" class="grid4">
-          <label
-            >Status
-            <select formControlName="active">
+          <label>
+            <span class="ac-form-label">Status</span>
+            <select class="ac-form-control" formControlName="active">
               <option value="all">All</option>
               <option value="active">Active</option>
               <option value="inactive">Inactive</option>
             </select>
           </label>
-          <label
-            >Area
-            <select formControlName="area">
+
+          <label>
+            <span class="ac-form-label">Area</span>
+            <select class="ac-form-control" formControlName="area">
               <option value="">Any</option>
               <option>CENTRAL</option>
               <option>SOUTH</option>
@@ -100,19 +137,25 @@
               <option>WEST</option>
             </select>
           </label>
-          <label>Agent<input formControlName="agent" /></label>
-          <label
-            >Currency
-            <select formControlName="currency">
+
+          <label>
+            <span class="ac-form-label">Agent</span>
+            <input class="ac-form-control" formControlName="agent" />
+          </label>
+
+          <label>
+            <span class="ac-form-label">Currency</span>
+            <select class="ac-form-control" formControlName="currency">
               <option value="">Any</option>
               <option>MYR</option>
               <option>USD</option>
               <option>SGD</option>
             </select>
           </label>
-          <label
-            >Sort by
-            <select formControlName="sort">
+
+          <label>
+            <span class="ac-form-label">Sort by</span>
+            <select class="ac-form-control" formControlName="sort">
               <option value="code">Code</option>
               <option value="name">Name</option>
               <option value="area">Area</option>
@@ -121,12 +164,17 @@
           </label>
         </form>
 
-        <div class="dialog-actions">
-          <button class="btn primary" (click)="showPrintPreview = true">
+        <div class="ac-dialog-footer">
+          <button
+            class="ac-btn ac-btn-primary"
+            type="button"
+            (click)="showPrintPreview = true"
+          >
             Preview
           </button>
           <button
-            class="btn ghost"
+            class="ac-btn ac-btn-ghost"
+            type="button"
             (click)="printNow()"
             *ngIf="showPrintPreview"
           >
@@ -136,38 +184,48 @@
 
         <div class="preview" *ngIf="showPrintPreview">
           <h3>Debtor Listing (Preview)</h3>
-          <table>
-            <thead>
-              <tr>
-                <th>Code</th>
-                <th>Name</th>
-                <th>Agent</th>
-                <th>Currency</th>
-                <th>Active</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr *ngFor="let d of buildListing()">
-                <td>{{ d.debtorAccount }}</td>
-                <td>{{ d.companyName }}</td>
-                <td>{{ d.currency }}</td>
-                <td>{{ d.active ? "Y" : "N" }}</td>
-              </tr>
-            </tbody>
-          </table>
+          <div class="ac-tablewrap">
+            <table class="ac-table ac-table-sm">
+              <thead>
+                <tr>
+                  <th>Code</th>
+                  <th>Name</th>
+                  <th>Agent</th>
+                  <th>Currency</th>
+                  <th>Active</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let d of buildListing()">
+                  <td>{{ d.debtorAccount }}</td>
+                  <td>{{ d.companyName }}</td>
+                  <td>{{ d.currency }}</td>
+                  <td>{{ d.active ? 'Y' : 'N' }}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- DETAIL REPORT -->
+  <!-- ============ DETAIL REPORT ============ -->
   <div class="dialog" *ngIf="showDetail">
-    <div class="dialog-panel">
-      <div class="dialog-title">
-        Debtor Detail Report — {{ selected?.debtorAccount }}
-        <button class="x" (click)="showDetail = false">✕</button>
+    <div class="dialog-panel ac-card-no-padding ac-dialog-panel-lg">
+      <div class="ac-dialog-header">
+        <span>Debtor Detail Report — {{ selected?.debtorAccount }}</span>
+        <button
+          type="button"
+          class="ac-dialog-close"
+          (click)="showDetail = false"
+          aria-label="Close"
+        >
+          &times;
+        </button>
       </div>
-      <div class="dialog-body report">
+
+      <div class="ac-dialog-body report">
         <h2>{{ selected?.companyName }}</h2>
         <div class="kv">
           <div><b>Type:</b> {{ selected?.type }}</div>
@@ -175,40 +233,61 @@
           <div><b>Currency:</b> {{ selected?.currency }}</div>
           <div><b>Credit Term:</b> {{ selected?.creditTerm }}</div>
           <div>
-            <b>Credit Limit:</b> {{ selected?.creditLimit | number : "1.0-0" }}
+            <b>Credit Limit:</b>
+            {{ selected?.creditLimit | number : '1.0-0' }}
           </div>
-          <div><b>Active:</b> {{ selected?.active ? "Yes" : "No" }}</div>
+          <div><b>Active:</b> {{ selected?.active ? 'Yes' : 'No' }}</div>
         </div>
       </div>
-      <div class="dialog-actions">
-        <button class="btn ghost" (click)="printNow()">Print</button>
-        <button class="btn primary" (click)="showDetail = false">Close</button>
+
+      <div class="ac-dialog-footer">
+        <button
+          class="ac-btn ac-btn-ghost"
+          type="button"
+          (click)="printNow()"
+        >
+          Print
+        </button>
+        <button
+          class="ac-btn ac-btn-primary"
+          type="button"
+          (click)="showDetail = false"
+        >
+          Close
+        </button>
       </div>
     </div>
   </div>
 
-  <!-- =============== CREATE / EDIT / VIEW DEBTOR ============== -->
+  <!-- ============ CREATE / EDIT / VIEW DEBTOR ============ -->
   <div class="dialog" *ngIf="showForm">
-    <div class="dialog-panel" style="width: min(1100px, 96vw)">
-      <div class="dialog-title">
-        {{
-          formMode === "new"
-            ? "Create Debtor"
-            : formMode === "edit"
-            ? "Edit Debtor"
-            : "View Debtor"
-        }}
-        <button class="x" (click)="showForm = false">✕</button>
+    <div class="dialog-panel ac-card-no-padding ac-dialog-panel-xl">
+      <div class="ac-dialog-header">
+        <span>
+          {{
+            formMode === 'new'
+              ? 'Create Debtor'
+              : formMode === 'edit'
+              ? 'Edit Debtor'
+              : 'View Debtor'
+          }}
+        </span>
+        <button
+          type="button"
+          class="ac-dialog-close"
+          (click)="showForm = false"
+          aria-label="Close"
+        >
+          &times;
+        </button>
       </div>
 
-      <form [formGroup]="debtorForm" class="dialog-body">
+      <form [formGroup]="debtorForm" class="ac-dialog-body">
+        <!-- Profile -->
         <div class="gbox">
           <div class="gbox-title">Profile</div>
 
-          <!-- Các mục Control Account / Debtor Type / Debtor Account / Group Company / Active đã ẩn khỏi UI -->
-
           <div class="gbox-body grid3">
-            <!-- Customer Name (required) -->
             <label>
               <span class="lbl">Debtor Code <span class="req">*</span></span>
               <input
@@ -223,6 +302,7 @@
                 <option *ngFor="let c of debtorCodeList" [value]="c"></option>
               </datalist>
             </label>
+
             <label>
               <span class="lbl">Customer Name <span class="req">*</span></span>
               <input
@@ -232,7 +312,6 @@
               />
             </label>
 
-            <!-- Company / SSM ID (required) -->
             <label>
               <span class="lbl">Company/SSM ID</span>
               <input
@@ -241,11 +320,10 @@
               />
             </label>
 
-            <!-- Individual ID / Passport No (required) -->
             <label>
-              <span class="lbl"
-                >Individual ID / Passport No <span class="req">*</span></span
-              >
+              <span class="lbl">
+                Individual ID / Passport No <span class="req">*</span>
+              </span>
               <input
                 formControlName="individualId"
                 required
@@ -253,7 +331,6 @@
               />
             </label>
 
-            <!-- Customer's TIN (required) + search -->
             <label>
               <span class="lbl">
                 Customer's TIN <span class="req">*</span>
@@ -273,7 +350,6 @@
               />
             </label>
 
-            <!-- Customer's SST Registration No. -->
             <label>
               <span class="lbl">Customer's SST Registration No.</span>
               <input
@@ -282,7 +358,6 @@
               />
             </label>
 
-            <!-- Currency giữ nguyên -->
             <label>
               <span class="lbl">Currency</span>
               <select
@@ -297,14 +372,14 @@
           </div>
         </div>
 
-        <!-- GENERAL + OTHERS (merged; no tabs) -->
+        <!-- Address & Contact -->
         <div class="gbox">
           <div class="gbox-title">Address & Contact</div>
           <div class="gbox-body grid3">
             <label class="wide">
-              <span class="lbl"
-                >Billing Address <span class="req">*</span></span
-              >
+              <span class="lbl">
+                Billing Address <span class="req">*</span>
+              </span>
               <textarea
                 rows="1"
                 formControlName="billAddress"
@@ -371,7 +446,10 @@
 
             <label>
               <span class="lbl">Email Address</span>
-              <input formControlName="email" [readonly]="formMode === 'view'" />
+              <input
+                formControlName="email"
+                [readonly]="formMode === 'view'"
+              />
             </label>
 
             <label>
@@ -383,15 +461,14 @@
             </label>
           </div>
         </div>
-        <!-- Credit & Others (merged) -->
+
         <!-- Credit & Others -->
         <div class="gbox">
           <div class="gbox-title">Credit & Others</div>
 
           <div class="gbox-body grid3 three-cols">
-            <!-- Hàng Credit Term + nút Credit Control -->
             <div class="col">
-              <label>Credit Term</label>
+              <label class="lbl">Credit Term</label>
               <div class="input-with-btn">
                 <select formControlName="creditTerm">
                   <option *ngFor="let ct of creditTerms" [ngValue]="ct.code">
@@ -399,10 +476,9 @@
                   </option>
                 </select>
 
-                <!-- nút gọn ngay cạnh select -->
                 <button
                   type="button"
-                  class="btn primary"
+                  class="ac-btn ac-btn-primary"
                   (click)="openCreditControl()"
                   title="Open Credit Control"
                 >
@@ -411,9 +487,8 @@
               </div>
             </div>
 
-            <!-- Actual Term: chỉ khi Edit -->
             <label *ngIf="formMode === 'edit'">
-              Actual Term
+              <span class="lbl">Actual Term</span>
               <input
                 type="number"
                 min="0"
@@ -422,18 +497,16 @@
               />
             </label>
 
-            <!-- Sales Tax Exemption No. -->
             <label>
-              Sales Tax Exemption No.
+              <span class="lbl">Sales Tax Exemption No.</span>
               <input
                 formControlName="taxExemptionNo"
                 [readonly]="formMode === 'view'"
               />
             </label>
 
-            <!-- Expired Date -->
             <label>
-              Expired Date
+              <span class="lbl">Expired Date</span>
               <input
                 type="date"
                 formControlName="taxExemptionExpiry"
@@ -443,14 +516,18 @@
           </div>
         </div>
 
-        <div class="dialog-actions">
-          <button type="button" class="btn cancel" (click)="showForm = false">
+        <div class="ac-dialog-footer">
+          <button
+            type="button"
+            class="ac-btn ac-btn-ghost"
+            (click)="showForm = false"
+          >
             Cancel
           </button>
           <button
             *ngIf="formMode !== 'view'"
             type="button"
-            class="btn primary"
+            class="ac-btn ac-btn-primary"
             (click)="saveDebtor()"
           >
             Save
@@ -460,25 +537,25 @@
     </div>
   </div>
 
-  <!-- =================== CREDIT CONTROL POPUP =================== -->
+  <!-- ============ CREDIT CONTROL POPUP ============ -->
   <div class="dialog" *ngIf="showCredit">
-    <div
-      class="dialog-panel-small"
-      role="dialog"
-      aria-modal="true"
-      style="width: min(720px, 96vw)"
-    >
-      <div class="dialog-title">
-        Debtor Credit Control
-        <button class="x" (click)="showCredit = false" aria-label="Close">
+    <div class="dialog-panel-small ac-card-no-padding" style="width: min(720px, 96vw)">
+      <div class="ac-dialog-header">
+        <span>Debtor Credit Control</span>
+        <button
+          class="ac-dialog-close"
+          type="button"
+          (click)="showCredit = false"
+          aria-label="Close"
+        >
           ×
         </button>
       </div>
 
-      <div class="dialog-body">
+      <div class="ac-dialog-body">
         <form [formGroup]="creditForm" class="cc-grid">
           <label class="cell">
-            Credit Limit
+            <span class="ac-form-label">Credit Limit</span>
             <input
               type="text"
               appAmount
@@ -488,7 +565,7 @@
           </label>
 
           <label class="cell">
-            Credit Term's Overdue Limit
+            <span class="ac-form-label">Credit Term's Overdue Limit</span>
             <input
               type="text"
               appAmount
@@ -498,7 +575,7 @@
           </label>
 
           <label class="cell">
-            Credit Control
+            <span class="ac-form-label">Credit Control</span>
             <select formControlName="scope">
               <option value="ALL">All Documents</option>
               <option value="BYDOC">By Document</option>
@@ -551,8 +628,8 @@
             </label>
 
             <div class="mode-body">
-              <label
-                >Suspend Reason
+              <label>
+                Suspend Reason
                 <input formControlName="suspendReason" />
               </label>
             </div>
@@ -560,21 +637,34 @@
         </div>
       </div>
 
-      <div class="dialog-actions">
-        <button class="btn cancel" (click)="showCredit = false">Cancel</button>
-        <button class="btn primary" (click)="saveCreditControl()">OK</button>
+      <div class="ac-dialog-footer">
+        <button
+          class="ac-btn ac-btn-ghost"
+          type="button"
+          (click)="showCredit = false"
+        >
+          Cancel
+        </button>
+        <button
+          class="ac-btn ac-btn-primary"
+          type="button"
+          (click)="saveCreditControl()"
+        >
+          OK
+        </button>
       </div>
     </div>
   </div>
 </div>
 
-<!-- Confirm delete contact -->
+<!-- ============ CONFIRM DELETE CONTACT ============ -->
 <div class="dialog" *ngIf="showContactDeleteConfirm">
-  <div class="dialog-panel-small" role="dialog" aria-modal="true">
-    <div class="dialog-title">
-      Delete Contact
+  <div class="dialog-panel-small ac-card-no-padding" role="dialog" aria-modal="true">
+    <div class="ac-dialog-header">
+      <span>Delete Contact</span>
       <button
-        class="x"
+        class="ac-dialog-close"
+        type="button"
         (click)="closeContactDeleteConfirm()"
         aria-label="Close"
       >
@@ -582,67 +672,94 @@
       </button>
     </div>
 
-    <div class="dialog-body">
+    <div class="ac-dialog-body">
       <p>
         Are you sure you want to delete
-        <b>{{ selectedContact?.name || "this contact" }}</b
-        >?
+        <b>{{ selectedContact?.name || 'this contact' }}</b>?
       </p>
     </div>
 
-    <div class="dialog-actions">
-      <button class="btn cancel" (click)="closeContactDeleteConfirm()">
+    <div class="ac-dialog-footer">
+      <button
+        class="ac-btn ac-btn-ghost"
+        type="button"
+        (click)="closeContactDeleteConfirm()"
+      >
         Cancel
       </button>
-      <button class="btn danger" (click)="confirmDeleteContact()">
+      <button
+        class="ac-btn ac-btn-danger"
+        type="button"
+        (click)="confirmDeleteContact()"
+      >
         Delete
       </button>
     </div>
   </div>
 </div>
 
-<!-- Success popup -->
+<!-- ============ SUCCESS POPUP ============ -->
 <div class="dialog" *ngIf="showSuccess">
   <div
-    class="dialog-panel-small"
+    class="dialog-panel-small ac-card-no-padding"
     role="dialog"
     aria-modal="true"
     style="min-width: 360px"
   >
     <div
-      class="dialog-title"
-      style="background: linear-gradient(180deg, #9be28a 0%, #62c84f 100%)"
+      class="ac-dialog-header"
     >
-      Success
-      <button class="x" (click)="closeSuccess()" aria-label="Close">×</button>
+      <span>Success</span>
+      <button
+        class="ac-dialog-close"
+        type="button"
+        (click)="closeSuccess()"
+        aria-label="Close"
+      >
+        ×
+      </button>
     </div>
-    <div class="dialog-body">
+    <div class="ac-dialog-body">
       <p style="margin: 8px 0; font-weight: 600; color: #14532d">
         {{ successMsg }}
       </p>
     </div>
-    <div class="dialog-actions">
-      <button class="btn primary" (click)="closeSuccess()">OK</button>
+    <div class="ac-dialog-footer">
+      <button
+        class="ac-btn ac-btn-primary"
+        type="button"
+        (click)="closeSuccess()"
+      >
+        OK
+      </button>
     </div>
   </div>
 </div>
 
-<!-- ===================== BRANCH EDITOR POPUP ===================== -->
+<!-- ============ BRANCH EDITOR ============ -->
 <div class="dialog" *ngIf="showBranchEditor">
-  <div class="dialog-panel-small" style="width: min(720px, 96vw)">
-    <div class="dialog-title">
-      {{ branchEditIndex === -1 ? "Add Branch" : "Edit Branch" }}
-      <button class="x" (click)="closeBranchEditor()">×</button>
+  <div class="dialog-panel-small ac-card-no-padding" style="width: min(720px, 96vw)">
+    <div class="ac-dialog-header">
+      <span>
+        {{ branchEditIndex === -1 ? 'Add Branch' : 'Edit Branch' }}
+      </span>
+      <button
+        class="ac-dialog-close"
+        type="button"
+        (click)="closeBranchEditor()"
+      >
+        ×
+      </button>
     </div>
 
-    <form class="dialog-body" [formGroup]="branchForm">
+    <form class="ac-dialog-body" [formGroup]="branchForm">
       <div class="grid2">
         <label>Branch Code<input formControlName="code" /></label>
         <label>Branch Name<input formControlName="name" /></label>
       </div>
 
-      <label class="wide"
-        >Address
+      <label class="wide">
+        Address
         <textarea rows="3" formControlName="address"></textarea>
       </label>
 
@@ -655,8 +772,8 @@
         <label>Phone 2<input formControlName="phone2" /></label>
         <label>Fax 1<input formControlName="fax1" /></label>
         <label>Fax 2<input formControlName="fax2" /></label>
-        <label
-          >Area
+        <label>
+          Area
           <select formControlName="area">
             <option *ngFor="let a of areas" [ngValue]="a.code">
               {{ a.name }}
@@ -666,10 +783,17 @@
       </div>
     </form>
 
-    <div class="dialog-actions">
-      <button class="btn cancel" (click)="closeBranchEditor()">Cancel</button>
+    <div class="ac-dialog-footer">
       <button
-        class="btn primary"
+        class="ac-btn ac-btn-ghost"
+        type="button"
+        (click)="closeBranchEditor()"
+      >
+        Cancel
+      </button>
+      <button
+        class="ac-btn ac-btn-primary"
+        type="button"
         (click)="saveBranchEditor()"
         [disabled]="!branchForm.valid"
       >
@@ -679,38 +803,55 @@
   </div>
 </div>
 
-<!-- ===================== CONFIRM DELETE BRANCH ===================== -->
+<!-- ============ CONFIRM DELETE BRANCH ============ -->
 <div class="dialog" *ngIf="showBranchDeleteConfirm">
-  <div class="dialog-panel-small" role="dialog" aria-modal="true">
-    <div class="dialog-title">
-      Delete Branch
-      <button class="x" (click)="closeBranchDeleteConfirm()" aria-label="Close">
+  <div class="dialog-panel-small ac-card-no-padding" role="dialog" aria-modal="true">
+    <div class="ac-dialog-header">
+      <span>Delete Branch</span>
+      <button
+        class="ac-dialog-close"
+        type="button"
+        (click)="closeBranchDeleteConfirm()"
+        aria-label="Close"
+      >
         ×
       </button>
     </div>
 
-    <div class="dialog-body">
+    <div class="ac-dialog-body">
       <p>
         Are you sure you want to delete
-        <b>{{ selectedBranch?.code || "this branch" }}</b
-        >?
+        <b>{{ selectedBranch?.code || 'this branch' }}</b>?
       </p>
     </div>
 
-    <div class="dialog-actions">
-      <button class="btn cancel" (click)="closeBranchDeleteConfirm()">
+    <div class="ac-dialog-footer">
+      <button
+        class="ac-btn ac-btn-ghost"
+        type="button"
+        (click)="closeBranchDeleteConfirm()"
+      >
         Cancel
       </button>
-      <button class="btn danger" (click)="confirmDeleteBranch()">Delete</button>
+      <button
+        class="ac-btn ac-btn-danger"
+        type="button"
+        (click)="confirmDeleteBranch()"
+      >
+        Delete
+      </button>
     </div>
   </div>
 </div>
 
+<!-- ============ CONFIRM DELETE DEBTOR ============ -->
 <div class="dialog" *ngIf="showDeleteDebtorConfirm">
-  <div class="dialog-panel-small" role="dialog" aria-modal="true">
-    <div class="dialog-title">
-      Delete Debtor &nbsp;<button
-        class="x"
+  <div class="dialog-panel-small ac-card-no-padding" role="dialog" aria-modal="true">
+    <div class="ac-dialog-header">
+      <span>Delete Debtor</span>
+      <button
+        class="ac-dialog-close"
+        type="button"
         (click)="closeDeleteDebtorConfirm()"
         aria-label="Close"
       >
@@ -718,19 +859,28 @@
       </button>
     </div>
 
-    <div class="dialog-body">
+    <div class="ac-dialog-body">
       <p>
         Are you sure you want to delete
-        <b>{{ selected?.debtorAccount }}</b>
-        ?
+        <b>{{ selected?.debtorAccount }}</b>?
       </p>
     </div>
 
-    <div class="dialog-actions">
-      <button class="btn cancel" (click)="closeDeleteDebtorConfirm()">
+    <div class="ac-dialog-footer">
+      <button
+        class="ac-btn ac-btn-ghost"
+        type="button"
+        (click)="closeDeleteDebtorConfirm()"
+      >
         Cancel
       </button>
-      <button class="btn danger" (click)="deleteDebtor()">Delete</button>
+      <button
+        class="ac-btn ac-btn-danger"
+        type="button"
+        (click)="deleteDebtor()"
+      >
+        Delete
+      </button>
     </div>
   </div>
 </div>

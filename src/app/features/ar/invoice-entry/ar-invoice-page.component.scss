@@ -221,4 +221,35 @@ input.invalid, select.invalid {
   }
 }
 
+/* ===== Popup New / Edit A/R Invoice – giống style Contra ===== */
+
+/* Body dùng flex: phần nội dung cuộn riêng, footer dính đáy */
+.ac-dialog-body {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  padding: 16px 18px 14px;
+}
+
+/* Vùng cuộn – chứa grid 3 cột, To box, Lines */
+.ac-dialog-scroll {
+  max-height: calc(100vh - 220px);  /* tương tự Contra */
+  overflow: auto;
+  padding-right: 4px;
+  padding-bottom: 8px;
+}
+
+/* Footer luôn nằm dưới, không bị cuộn */
+.ac-dialog-footer {
+  margin-top: 8px;
+  padding-top: 10px;
+  border-top: 1px solid #e5e7eb;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.ac-dialog-footer .spacer {
+  flex: 1 1 auto;
+}
 

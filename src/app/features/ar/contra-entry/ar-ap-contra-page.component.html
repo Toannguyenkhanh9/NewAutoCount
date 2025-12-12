@@ -151,7 +151,7 @@
 
   <!-- ========== MODAL: NEW / VIEW A/R & A/P CONTRA ENTRY ========== -->
 <div class="ac-dialog-backdrop" *ngIf="showContraForm">
-  <div class="ac-card ac-dialog-panel-xl">
+  <div class="ac-card-no-padding ac-dialog-panel-xl">
     <!-- HEADER -->
     <div class="ac-dialog-header">
       <span>
@@ -537,7 +537,7 @@
 
   <!-- ===== DELETE CONFIRM ===== -->
   <div class="ac-dialog-backdrop" *ngIf="showDeleteConfirm">
-    <div class="ac-card ac-dialog-panel-sm" role="dialog" aria-modal="true">
+    <div class="ac-card-no-padding ac-dialog-panel-sm" role="dialog" aria-modal="true">
       <div class="ac-dialog-header">
         <span>Delete Receive Payment</span>
         <button
@@ -574,7 +574,7 @@
   <!-- ===== SUCCESS ===== -->
   <div class="ac-dialog-backdrop" *ngIf="showSuccess">
     <div
-      class="ac-card ac-dialog-panel-sm ac-dialog-success"
+      class="ac-card-no-padding ac-dialog-panel-sm ac-dialog-success"
       role="dialog"
       aria-modal="true"
     >
@@ -606,8 +606,8 @@
   </div>
 
   <!-- ===== SAVE CONFIRM ===== -->
-  <div class="ac-dialog-backdrop" *ngIf="showSaveConfirm">
-    <div class="ac-card ac-dialog-panel-sm" role="dialog" aria-modal="true">
+<div class="ac-dialog-backdrop" *ngIf="showSaveConfirm">
+  <div class="ac-card-no-padding ac-dialog-panel-sm" role="dialog" aria-modal="true">
       <div class="ac-dialog-header">
         <span>Confirm</span>
         <button
