@@ -172,3 +172,131 @@
     font-weight: 600;
   }
 }
+/* Nút trigger menu company */
+.company-menu-trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* Avatar initials trên toolbar & trong menu */
+.company-initials {
+  width: 26px;
+  height: 26px;
+  border-radius: 6px;
+  background: #1d4ed8;        /* blue */
+  color: #fff;
+  font-size: 12px;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 1px 0 rgba(0, 0, 0, 0.15);
+}
+
+.company-initials--lg {
+  width: 30px;
+  height: 30px;
+  margin-right: 8px;
+}
+
+.company-initials--sm {
+  width: 24px;
+  height: 24px;
+  margin-right: 8px;
+  background: #eff6ff;
+  color: #1d4ed8;
+}
+
+/* Dòng header trong menu */
+.company-menu-header {
+  opacity: 1 !important;
+  font-weight: 600;
+}
+
+/* Label ORGANIZATION */
+.company-menu-section-label {
+  padding: 4px 16px 6px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  color: #9ca3af;
+}
+
+/* Item company thường */
+.company-menu-item-other.mat-menu-item {
+  height: 36px;
+}
+
+/* Nút Create New Account Book đậm hơn một tí */
+.company-menu-item-create span {
+  font-weight: 600;
+}
+.company-menu-trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* Logo chữ cái đầu */
+.company-logo {
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  color: #fff;
+  font-size: 14px;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 0 0 1px rgba(15, 23, 42, 0.05);
+}
+
+.company-logo--lg {
+  width: 32px;
+  height: 32px;
+  margin-right: 10px;
+}
+
+.company-logo--sm {
+  width: 24px;
+  height: 24px;
+  margin-right: 8px;
+  font-size: 13px;
+}
+
+/* 6 màu kiểu Xero */
+.company-logo--c1 { background: #f97373; } /* đỏ nhạt */
+.company-logo--c2 { background: #f59e0b; } /* cam */
+.company-logo--c3 { background: #10b981; } /* xanh lá */
+.company-logo--c4 { background: #3b82f6; } /* xanh dương */
+.company-logo--c5 { background: #6366f1; } /* indigo */
+.company-logo--c6 { background: #ec4899; } /* hồng */
+
+/* Text ở trigger */
+.company-menu-label {
+  max-width: 140px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Header item */
+.company-menu-header {
+  opacity: 1 !important;
+  font-weight: 600;
+}
+
+/* ORGANIZATION label */
+.company-menu-section-label {
+  padding: 4px 16px 6px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  color: #9ca3af;
+}
+
+/* Create button hơi đậm hơn */
+.company-menu-item-create span {
+  font-weight: 600;
+}

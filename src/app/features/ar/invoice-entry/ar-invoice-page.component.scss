@@ -206,10 +206,14 @@ input.invalid, select.invalid {
     color: #475569;
   }
   .value {
-    min-width: 140px;
-    text-align: right;
-    font-weight: 600;
-    color: #0f172a;
+  min-width: 140px;
+  text-align: right;
+  padding: 6px 10px;
+  border-radius: 10px;
+  border: 1px solid #e2e8f0;
+  background: #f8fafc;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
   }
   .value.warn {
     color: #b91c1c;

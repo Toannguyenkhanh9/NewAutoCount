@@ -1214,3 +1214,48 @@ body {
   padding: 0 2px;
   color: #ffffff;                          // icon X màu trắng
 }
+/* Icon delete đỏ, nhỏ gọn – dùng chung nhiều page */
+.ac-btn-icon-danger {
+  --ac-del-bg: #fee2e2;       /* đỏ rất nhạt */
+  --ac-del-bg-hover: #fecaca;
+  --ac-del-border: #fecaca;
+  --ac-del-icon: #b91c1c;     /* đỏ đậm cho icon */
+
+  min-width: 0;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border-radius: 10px;       /* tròn */
+  border: 1px solid var(--ac-del-border);
+  background: var(--ac-del-bg);
+  color: var(--ac-del-icon);
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  box-shadow: none;
+  cursor: pointer;
+  line-height: 1;
+}
+
+/* Hover / active */
+.ac-btn-icon-danger:hover:not(:disabled) {
+  background: var(--ac-del-bg-hover);
+}
+
+.ac-btn-icon-danger:active:not(:disabled) {
+  transform: translateY(1px);
+}
+
+/* Icon bên trong (span.ico, emoji, svg...) */
+.ac-btn-icon-danger .ico {
+  font-size: 14px;
+}
+
+/* Disabled: mờ đi, không hover */
+.ac-btn-icon-danger:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}

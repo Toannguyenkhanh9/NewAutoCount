@@ -13,63 +13,85 @@
       </div>
     </div>
 
-    <!-- 👇 NÚT COMPANY – nằm NGAY SAU LOGO, TRƯỚC DASHBOARD -->
-    <button
-      mat-button
-      [matMenuTriggerFor]="companyMenu"
-      class="company-menu-trigger"
-    >
-      <mat-icon>business</mat-icon>
-      <span class="company-menu-label">
-        {{ (companyName$ | async) || 'Select company' }}
-      </span>
-      <mat-icon>expand_more</mat-icon>
-    </button>
+<!-- 👇 NÚT COMPANY – ngay sau logo -->
+<button
+  mat-button
+  [matMenuTriggerFor]="companyMenu"
+  class="company-menu-trigger"
+>
+  <!-- Logo: 1 ký tự đầu, nhiều màu -->
+  <span
+    class="company-logo"
+    [ngClass]="companyColorClass((companyName$ | async) || '')"
+  >
+    {{ companyLogoChar((companyName$ | async) || '') }}
+  </span>
+
+  <!-- Tên: viết tắt (NC1) -->
+  <span class="company-menu-label">
+    {{ companyAcronym((companyName$ | async) || '') || 'Select company' }}
+  </span>
+
+  <mat-icon>expand_more</mat-icon>
+</button>
 
 <mat-menu #companyMenu="matMenu">
-  <!-- Header: company đang chọn, disable -->
+  <!-- 1️⃣ Company đang login -->
   <button mat-menu-item disabled class="company-menu-header">
-    <mat-icon>business</mat-icon>
-    <span>{{ (companyName$ | async) || 'Select company' }}</span>
+    <span
+      class="company-logo company-logo--lg"
+      [ngClass]="companyColorClass((companyName$ | async) || '')"
+    >
+      {{ companyLogoChar((companyName$ | async) || '') }}
+    </span>
+    <span>
+      {{ companyAcronym((companyName$ | async) || '') || 'Select company' }}
+    </span>
   </button>
 
-  <!-- Các company khác (màu khác, có thể click) -->
+  <!-- 2️⃣ Settings -->
+  <button mat-menu-item [routerLink]="['/settings']">
+    <mat-icon>settings</mat-icon>
+    <span>Settings</span>
+  </button>
+
+  <!-- 3️⃣ Divider -->
+  <mat-divider></mat-divider>
+
+  <!-- 4️⃣ ORGANIZATION label -->
+  <div class="company-menu-section-label">ORGANIZATION</div>
+
+  <!-- 5️⃣ Các công ty khác -->
   <button
     mat-menu-item
     *ngFor="let c of otherCompanies"
     class="company-menu-item-other"
     (click)="selectCompanyFromMenu(c)"
   >
-    <mat-icon>business</mat-icon>
-    <span>{{ c.Company }}</span>
+    <span
+      class="company-logo company-logo--sm"
+      [ngClass]="companyColorClass(c.Company)"
+    >
+      {{ companyLogoChar(c.Company) }}
+    </span>
+    <span>{{ companyAcronym(c.Company) }}</span>
   </button>
 
+  <!-- 6️⃣ Divider -->
   <mat-divider></mat-divider>
 
-  <!-- Settings -->
-  <button mat-menu-item [routerLink]="['/settings']">
-    <mat-icon>settings</mat-icon>
-    <span>Settings</span>
-  </button>
-
-  <!-- Manage Account Book -->
-  <button mat-menu-item [routerLink]="['/book/manage-account-book']">
-    <mat-icon>menu_book</mat-icon>
-    <span>Manage Account Book</span>
-  </button>
-
-  <mat-divider></mat-divider>
-
-  <!-- Create Account Book (ở cuối list) -->
+  <!-- 7️⃣ Create New Account Book -->
   <button
     mat-menu-item
     class="company-menu-item-create"
     [routerLink]="['/book/create-account-book']"
   >
     <mat-icon>add_business</mat-icon>
-    <span>Create Account Book</span>
+    <span>Create New Account Book</span>
   </button>
 </mat-menu>
+
+
 
 
     <!-- NAV CHÍNH: Dashboard, Account Books, ... -->
