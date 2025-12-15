@@ -14,20 +14,8 @@
 
 /* header form */
 .hdr .row{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;}
-label{display:flex;flex-direction:column;gap:6px;font-weight:600;color:#334155;}
-label.wide{grid-column:1 / -1;}
-input,select,textarea{border:1px solid #d7deea;border-radius:8px;padding:8px 10px;}
 
-/* lines */
-.lines{margin-top:8px;}
-.lines-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;}
-.lines-head .title{font-weight:800;color:#0f2c61;}
-.tablewrap{border:1px solid #cfe0ff;border-radius:8px;overflow:auto; }
-.lines table thead th{background:#f0f6ff;border-bottom:1px solid #d7e5ff;}
-.lines table td input,.lines table td select{height:30px;padding:0 8px;}
-.totals{margin-top:10px;display:flex;flex-direction:column;gap:6px;align-items:flex-end;}
-.totals .row{display:flex;gap:24px;min-width:260px;justify-content:space-between;color:#0f2c61;}
-.totals .row.grand{font-size:18px;font-weight:800;color:#0b3d0b;}
+
 
 /* small grids */
 .grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;}
@@ -46,49 +34,6 @@ input,select,textarea{border:1px solid #d7deea;border-radius:8px;padding:8px 10p
 .to-title{ font-weight:600; margin-bottom:6px; }
 .to-text{ width:100%; border:0; background:transparent; resize:none; line-height:1.35; }
 /* Sales A/C grid tidy spacing */
-.lines table {
-  width: 100%;
-  border-collapse: separate;
-  border-spacing: 0;
-}
-
-.lines table thead th,
-.lines table tbody td {
-  padding: 8px 10px;               /* tăng padding chung */
-}
-
-.lines table tbody td input {
-  height: 34px;
-  padding: 6px 10px;               /* input thoáng hơn */
-  border-radius: 8px;
-}
-
-/* cột Amount rộng vừa, căn phải */
-.lines table thead th:nth-child(4),
-.lines table tbody td:nth-child(4) {
-  width: 180px;
-  text-align: right;
-}
-
-/* cột nút hành động – chừa khoảng mép phải, canh giữa */
-.lines table thead th:last-child,
-.lines table tbody td:last-child {
-  width: 56px;                     /* đủ chỗ cho nút */
-  padding-left: 8px;
-  padding-right: 12px;             /* tránh dính mép phải */
-  text-align: center;
-}
-
-/* nút delete gọn gàng */
-.lines table .btn.danger {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 36px;
-  height: 34px;
-  padding: 0;
-  border-radius: 10px;
-}
 .sum-row{
   display: flex;
   align-items: baseline;          /* chữ & số thẳng hàng đẹp */
@@ -187,10 +132,7 @@ td.neg {               /* nếu chỉ muốn mỗi ô Outstanding */
   color: #b91c1c;
   font-weight: 600;
 }
-input.invalid, select.invalid {
-  border-color: #ef4444;
-  box-shadow: 0 0 0 3px rgba(239,68,68,.15);
-}
+
 .err { color:#b91c1c; font-size:.85rem; margin-top:4px; }
 .with-search { display:flex; gap:8px; align-items:center; }
 .totals-grid {
@@ -225,35 +167,6 @@ input.invalid, select.invalid {
   }
 }
 
-/* ===== Popup New / Edit A/R Invoice – giống style Contra ===== */
 
-/* Body dùng flex: phần nội dung cuộn riêng, footer dính đáy */
-.ac-dialog-body {
-  display: flex;
-  flex-direction: column;
-  gap: 0;
-  padding: 16px 18px 14px;
-}
 
-/* Vùng cuộn – chứa grid 3 cột, To box, Lines */
-.ac-dialog-scroll {
-  max-height: calc(100vh - 220px);  /* tương tự Contra */
-  overflow: auto;
-  padding-right: 4px;
-  padding-bottom: 8px;
-}
-
-/* Footer luôn nằm dưới, không bị cuộn */
-.ac-dialog-footer {
-  margin-top: 8px;
-  padding-top: 10px;
-  border-top: 1px solid #e5e7eb;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.ac-dialog-footer .spacer {
-  flex: 1 1 auto;
-}
 

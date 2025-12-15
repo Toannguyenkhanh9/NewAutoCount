@@ -1258,3 +1258,13 @@ body {
   cursor: not-allowed;
   transform: none;
 }
+/* lines */
+.lines{margin-top:8px;}
+.lines-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;}
+.lines-head .title{font-weight:800;color:#0f2c61;}
+.tablewrap{border:1px solid #cfe0ff;border-radius:8px;overflow:auto; }
+.lines table thead th{background:#f0f6ff;border-bottom:1px solid #d7e5ff;}
+.lines table td input,.lines table td select{height:30px;padding:0 8px;}
+.totals{margin-top:10px;display:flex;flex-direction:column;gap:6px;align-items:flex-end;}
+.totals .row{display:flex;gap:24px;min-width:260px;justify-content:space-between;color:#0f2c61;}
+.totals .row.grand{font-size:18px;font-weight:800;color:#0b3d0b;}
