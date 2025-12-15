@@ -283,8 +283,8 @@
 
 /* badge 2 chữ cái */
 .user-avatar-badge {
-  width: 32px;
-  height: 32px;
+  width: 40px;
+  height: 40px;
   border-radius: 999px;
   background: #0f766e;       /* teal */
   color: #ffffff;
@@ -292,7 +292,7 @@
   align-items: center;
   justify-content: center;
   font-weight: 600;
-  font-size: 13px;
+  font-size: 20px;
   text-transform: uppercase;
 }
 
@@ -302,6 +302,7 @@
   font-weight: 700;
   font-size: 13px;
   color: #111827;
+  min-width: 200px;
 }
 
 /* tạo một chút khoảng cách giữa header và item đầu tiên */
@@ -314,13 +315,13 @@
 }
 
 .user-avatar {
-  width: 32px;
-  height: 32px;
+  width: 45px;
+  height: 45px;
   border-radius: 999px;
   background: #0f766e;
   color: #fff;
   font-weight: 700;
-  font-size: 13px;
+  font-size: 22px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -339,4 +340,10 @@
 .user-menu .mat-menu-item span {
   text-transform: none;
   font-weight: 400;
+}
+.menu-user {
+    min-width: 200px;
+}
+.user-menu {
+  background-color: #f3f6fb;
 }

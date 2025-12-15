@@ -25,7 +25,7 @@
         routerLinkActive="nav-item-active"
         [routerLinkActiveOptions]="{ exact: true }"
       >
-        <mat-icon class="nav-icon" *ngIf="item.icon">{{ item.icon }}</mat-icon>
+        <!-- <mat-icon class="nav-icon" *ngIf="item.icon">{{ item.icon }}</mat-icon> -->
         <span>{{ item.label }}</span>
       </button>
 
@@ -36,7 +36,7 @@
           class="nav-item nav-item-has-children"
           [matMenuTriggerFor]="menu"
         >
-          <mat-icon class="nav-icon" *ngIf="item.icon">{{ item.icon }}</mat-icon>
+          <!-- <mat-icon class="nav-icon" *ngIf="item.icon">{{ item.icon }}</mat-icon> -->
           <span>{{ item.label }}</span>
           <mat-icon class="nav-chevron">expand_more</mat-icon>
         </button>

@@ -196,40 +196,4 @@ input.no-ph[type="date"]:valid::-webkit-datetime-edit {
 .knock-table td.out-gt0 {/* xóa nền vàng cũ nếu còn */
   color: #2563eb;                     /* blue-600 */                /* tùy chọn: đậm hơn chút cho dễ nhìn */
 }
-.cn-detail-pane {
-  margin-top: .5rem;
-  border: 1px solid #dfe6ef;
-  background: #f9fcff;
-  border-radius: 6px;
-  overflow: hidden;
-}
 
-.cn-detail-header {
-  background: #eaf3ff;
-  color: #2b5ea8;
-  font-weight: 600;
-  text-align: center;
-  padding: 6px 10px;
-  border-bottom: 1px solid #dfe6ef;
-}
-
-.cn-subgrid {
-  width: 100%;
-  border-collapse: collapse;
-
-  thead th {
-    background: #f2f6ff;
-    font-weight: 600;
-  }
-  th, td {
-    padding: 6px 10px;
-    border-bottom: 1px solid #eef2f6;
-  }
-  tfoot th {
-    background: #f7faff;
-  }
-}
-
-.table .text-end { text-align: right; }
-.table .text-center { text-align: center; }
-.table .text-muted { color: #6c757d; }

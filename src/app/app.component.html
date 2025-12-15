@@ -1,9 +1,6 @@
 <div class="app-shell">
   <!-- Header chỉ hiện khi đã login & không ở trang login -->
-  <mat-toolbar
-    class="app-toolbar"
-    *ngIf="(isAuthenticated$ | async) && !isLoginRoute"
-  >
+  <mat-toolbar class="app-toolbar" *ngIf="(isAuthenticated$ | async) && !isLoginRoute">
     <!-- Logo AutoCount -->
     <div class="brand">
       <div class="brand-logo">AC</div>
@@ -13,68 +10,53 @@
       </div>
     </div>
 
-<!-- NÚT COMPANY TRÊN TOOLBAR -->
-<button
-  mat-button
-  [matMenuTriggerFor]="companyMenu"
-  class="company-menu-trigger"
->
-  <span class="company-menu-label">
-    <span class="company-menu-text">
-      {{ (companyName$ | async) || 'Select company' }}
-    </span>
-    <mat-icon class="company-menu-chevron">expand_more</mat-icon>
-  </span>
-</button>
+    <!-- NÚT COMPANY TRÊN TOOLBAR -->
+    <button mat-button [matMenuTriggerFor]="companyMenu" class="company-menu-trigger">
+      <span class="company-menu-label">
+        <span class="company-menu-text">
+          {{ (companyName$ | async) || 'Select company' }}
+        </span>
+        <mat-icon class="company-menu-chevron">expand_more</mat-icon>
+      </span>
+    </button>
 
 
-<mat-menu #companyMenu="matMenu">
-  <!-- 1️⃣ Company đang login -->
-  <button mat-menu-item disabled class="company-menu-header">
-    <span class="company-initials company-initials--lg">
-      {{ companyInitials((companyName$ | async) || '') }}
-    </span>
-    <span>{{ (companyName$ | async) || 'Select company' }}</span>
-  </button>
+    <mat-menu #companyMenu="matMenu">
+      <!-- 1️⃣ Company đang login -->
+      <button mat-menu-item disabled class="company-menu-header">
+        <span class="company-initials company-initials--lg">
+          {{ companyInitials((companyName$ | async) || '') }}
+        </span>
+        <span>{{ (companyName$ | async) || 'Select company' }}</span>
+      </button>
 
-  <!-- 2️⃣ Settings -->
-  <button mat-menu-item [routerLink]="['/settings']">
-    <mat-icon>settings</mat-icon>
-    <span>Settings</span>
-  </button>
+      <!-- 2️⃣ Settings -->
+      <button mat-menu-item [routerLink]="['/settings']">
+        <mat-icon>settings</mat-icon>
+        <span>Settings</span>
+      </button>
 
-<mat-divider class="company-menu-divider"></mat-divider>
+      <mat-divider class="company-menu-divider"></mat-divider>
 
-<div class="company-menu-section-label">ORGANIZATION</div>
+      <div class="company-menu-section-label">ORGANIZATION</div>
 
-<!-- 5️⃣ Các company khác (đã loại company đang login) -->
-<button
-  mat-menu-item
-  *ngFor="let c of otherCompanies; let i = index"
-  class="company-menu-item-other"
-  (click)="selectCompanyFromMenu(c)"
->
-  <span
-    class="company-initials company-initials--sm"
-    [ngClass]="companyColorClass(i)"
-  >
-    {{ companyInitials(c.Company) }}
-  </span>
-  <span class="company-name">{{ c.Company }}</span>
-</button>
+      <!-- 5️⃣ Các company khác (đã loại company đang login) -->
+      <button mat-menu-item *ngFor="let c of otherCompanies; let i = index" class="company-menu-item-other"
+        (click)="selectCompanyFromMenu(c)">
+        <span class="company-initials company-initials--sm" [ngClass]="companyColorClass(i)">
+          {{ companyInitials(c.Company) }}
+        </span>
+        <span class="company-name">{{ c.Company }}</span>
+      </button>
 
-<mat-divider class="company-menu-divider"></mat-divider>
+      <mat-divider class="company-menu-divider"></mat-divider>
 
-  <!-- 5️⃣ Create New Account Book -->
-  <button
-    mat-menu-item
-    class="company-menu-item-create"
-    [routerLink]="['/book/create-account-book']"
-  >
-    <mat-icon>add_business</mat-icon>
-    <span>Create New Account Book &nbsp; &nbsp; &nbsp;</span>
-  </button>
-</mat-menu>
+      <!-- 5️⃣ Create New Account Book -->
+      <button mat-menu-item class="company-menu-item-create" [routerLink]="['/book/create-account-book']">
+        <mat-icon>add_business</mat-icon>
+        <span>Create New Account Book &nbsp; &nbsp; &nbsp;</span>
+      </button>
+    </mat-menu>
 
 
 
@@ -83,48 +65,42 @@
     <app-top-nav class="flex-fill"></app-top-nav>
 
     <!-- User menu bên phải -->
-<div class="user-area">
-  <button
-    mat-icon-button
-    [matMenuTriggerFor]="userMenu"
-    class="user-avatar-btn"
-  >
-    <span class="user-avatar-badge">
-      {{ userInitials((userDisplayName$ | async) || '') }}
-    </span>
-  </button>
+    <div class="user-area">
+      <button mat-icon-button [matMenuTriggerFor]="userMenu" class="user-avatar-btn">
+        <span class="user-avatar-badge">
+          {{ userInitials((userDisplayName$ | async) || '') }}
+        </span>
+      </button>
 
-  <mat-menu #userMenu="matMenu" class="user-menu">
-    <!-- Header: tên đầy đủ, in đậm -->
-    <div class="user-menu-header" *ngIf="(userDisplayName$ | async) as u">
-      {{ u | uppercase }}
+      <mat-menu #userMenu="matMenu" class="user-menu">
+        <!-- Header: tên đầy đủ, in đậm -->
+        <div class="user-menu-header" *ngIf="(userDisplayName$ | async) as u">
+          {{ u | uppercase }}
+        </div>
+
+        <!-- Profile -->
+        <button mat-menu-item>
+          <mat-icon>person</mat-icon>
+          <span>Profile</span>
+        </button>
+
+        <!-- Account -->
+        <button mat-menu-item>
+          <mat-icon>account_box</mat-icon>
+          <span>Account</span>
+        </button>
+        <mat-divider class="company-menu-divider"></mat-divider>
+        <!-- Log out -->
+        <button mat-menu-item (click)="logout()">
+          <mat-icon>logout</mat-icon>
+          <span>Log out</span>
+        </button>
+      </mat-menu>
     </div>
-
-    <!-- Profile -->
-    <button mat-menu-item>
-      <mat-icon>person</mat-icon>
-      <span>Profile</span>
-    </button>
-
-    <!-- Account -->
-    <button mat-menu-item>
-      <mat-icon>account_box</mat-icon>
-      <span>Account</span>
-    </button>
-<mat-divider class="company-menu-divider"></mat-divider>
-    <!-- Log out -->
-    <button mat-menu-item (click)="logout()">
-      <mat-icon>logout</mat-icon>
-      <span>Log out</span>
-    </button>
-  </mat-menu>
-</div>
   </mat-toolbar>
 
   <main class="app-content">
-    <app-breadcrumb
-      *ngIf="(isAuthenticated$ | async) && !isLoginRoute"
-    ></app-breadcrumb>
+    <app-breadcrumb *ngIf="(isAuthenticated$ | async) && !isLoginRoute"></app-breadcrumb>
 
     <div class="page-wrapper">
       <router-outlet></router-outlet>

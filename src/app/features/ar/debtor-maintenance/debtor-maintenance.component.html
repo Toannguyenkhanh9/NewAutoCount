@@ -1,4 +1,5 @@
 <div class="ac-page">
+    <div class="ac-card">
   <!-- ============ HEADER ============ -->
   <div class="ac-page-header">
     <div>
@@ -17,7 +18,6 @@
       />
 
       <button class="ac-btn ac-btn-primary" type="button" (click)="newDebtor()">
-        <span class="ico plus"></span>
         New
       </button>
 
@@ -27,7 +27,6 @@
         [disabled]="!selected"
         (click)="editDebtor()"
       >
-        <span class="ico edit"></span>
         Edit
       </button>
 
@@ -37,7 +36,6 @@
         [disabled]="!selected"
         (click)="onDeleteDebtor()"
       >
-        <span class="ico trash"></span>
         Delete
       </button>
     </div>
@@ -99,7 +97,7 @@
       </button>
     </div>
   </div>
-
+</div>
   <!-- ============ PRINT LISTING ============ -->
   <div class="dialog" *ngIf="showPrint">
     <div class="dialog-panel ac-card-no-padding ac-dialog-panel-lg">
@@ -260,7 +258,7 @@
   </div>
 
   <!-- ============ CREATE / EDIT / VIEW DEBTOR ============ -->
-  <div class="dialog" *ngIf="showForm">
+  <div class="ac-dialog-backdrop" *ngIf="showForm">
     <div class="dialog-panel ac-card-no-padding ac-dialog-panel-xl">
       <div class="ac-dialog-header">
         <span>
@@ -283,6 +281,7 @@
       </div>
 
       <form [formGroup]="debtorForm" class="ac-dialog-body">
+        <div class="ac-dialog-scroll">
         <!-- Profile -->
         <div class="gbox">
           <div class="gbox-title">Profile</div>
@@ -532,6 +531,7 @@
           >
             Save
           </button>
+        </div>
         </div>
       </form>
     </div>

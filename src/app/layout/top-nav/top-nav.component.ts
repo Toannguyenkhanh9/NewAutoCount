@@ -79,15 +79,6 @@ export class TopNavComponent {
         { label: 'Balance Sheet Statement', path: '/general-ledger/balance-sheet-statement' },
       ],
     },
-    {
-      label: 'Tools',
-      icon: 'settings',
-      children: [
-        { label: 'Chart of Accounts', path: '/settings/accounts' },
-        { label: 'Tax Codes', path: '/settings/tax-codes' },
-        { label: 'Users & Roles', path: '/settings/users' },
-      ],
-    },
   ];
 
   // trạng thái mobile menu
