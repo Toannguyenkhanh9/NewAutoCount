@@ -358,9 +358,9 @@
 
                   <!-- Checkbox: Block new invoices... -->
                   <div class="credit-limit-row" [class.disabled]="!debtorForm.get('creditLimitAmount')?.value">
-                    <label class="credit-limit-checkbox">
-                      <input type="checkbox" formControlName="blockInvoicesWhenLimitReached"
-                        [disabled]="!debtorForm.get('creditLimitAmount')?.value" />
+                    <label class="ac-checkbox-row credit-limit-block" [class.is-disabled]="creditLimitDisabled">
+                      <input type="checkbox" formControlName="blockNewInvoicesWhenLimitReached"
+                        [disabled]="creditLimitDisabled" />
                       <span>Block new invoices when credit limit is reached</span>
                     </label>
                   </div>

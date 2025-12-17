@@ -410,6 +410,7 @@ export class DebtorMaintenanceComponent implements OnInit {
     this.setupCreditControlReactions();
     this.initBranchForm();
     this.initCurrencyLists();
+     this.setupCreditLimitWatcher();
   }
 
   // ========= Currency helpers =========
@@ -668,6 +669,7 @@ export class DebtorMaintenanceComponent implements OnInit {
     this.activeSection = 'contact';
     this.initCurrencyLists();
     setTimeout(() => this.computePaneMinHeight(), 0);
+     this.setupCreditLimitWatcher();
   }
 
   viewDebtor() {
@@ -1085,25 +1087,34 @@ export class DebtorMaintenanceComponent implements OnInit {
         return false;
     }
   }
-  private setupCreditLimitWatcher() {
-    const limitCtrl = this.debtorForm.get('creditLimitAmount');
-    const blockCtrl = this.debtorForm.get('blockInvoicesWhenLimitReached');
+  
+creditLimitDisabled = true; // mặc định: chưa nhập limit => disable
 
-    if (!limitCtrl || !blockCtrl) return;
+private setupCreditLimitWatcher(): void {
+  const amountCtrl = this.debtorForm.get('creditLimitAmount');
+  const blockCtrl = this.debtorForm.get('blockNewInvoicesWhenLimitReached');
 
-    const update = (val: any) => {
-      const hasValue =
-        val !== null && val !== '' && !isNaN(Number(val)) && Number(val) > 0;
+  if (!amountCtrl || !blockCtrl) return;
 
-      if (!hasValue) {
-        blockCtrl.disable({ emitEvent: false });
-        blockCtrl.setValue(false, { emitEvent: false });
-      } else {
-        blockCtrl.enable({ emitEvent: false });
-      }
-    };
+  const updateState = (raw: unknown) => {
+    const value = typeof raw === 'string'
+      ? parseFloat(raw.replace(/,/g, '')) || 0
+      : (Number(raw) || 0);
 
-    update(limitCtrl.value);
-    limitCtrl.valueChanges.subscribe(update);
-  }
+    // không nhập hoặc <= 0 => disable
+    this.creditLimitDisabled = value <= 0;
+
+    if (this.creditLimitDisabled) {
+      // luôn tắt checkbox khi disable
+      blockCtrl.setValue(false, { emitEvent: false });
+    }
+  };
+
+  // chạy lần đầu
+  updateState(amountCtrl.value);
+
+  // nghe thay đổi
+  amountCtrl.valueChanges.subscribe(v => updateState(v));
+}
+
 }

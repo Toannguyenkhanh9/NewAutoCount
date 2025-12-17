@@ -1474,3 +1474,50 @@ body {
   font-size: 12px;
   color: #6b7280;
 }
+/* ==== FORM FIELD CHUNG (không đụng tới checkbox) ==== */
+/* Đừng style thẳng label nữa, chỉ style class .ac-form-field */
+.ac-form-field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 13px;
+  color: #374151;
+}
+
+.ac-form-field-label {
+  font-weight: 500;
+  margin-bottom: 2px;
+}
+
+.ac-form-control {
+  border: 1px solid #d1d5db;
+  border-radius: 2px;
+  padding: 8px 10px;
+  font-size: 13px;
+  font-family: inherit;
+  box-sizing: border-box;
+}
+
+/* ==== CHECKBOX + LABEL TRÊN CÙNG 1 HÀNG (dùng chung) ==== */
+
+.ac-checkbox-row {
+  display: inline-flex;          /* luôn nằm trên 1 hàng */
+  align-items: center;
+  gap: 8px;
+}
+
+.ac-checkbox-row input[type='checkbox'],
+.ac-checkbox-row input[type='radio'] {
+  flex: 0 0 auto;
+  margin: 0;
+}
+
+.ac-checkbox-row span {
+  flex: 1 1 auto;
+}
+
+/* Nếu em vẫn còn rule label { display:flex; ... } đâu đó
+   thì thêm dòng này để ép .ac-checkbox-row quay lại nằm ngang */
+label.ac-checkbox-row {
+  flex-direction: row !important;
+}
