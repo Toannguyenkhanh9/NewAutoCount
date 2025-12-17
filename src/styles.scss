@@ -115,6 +115,7 @@ h5 {
   .ac-page-title {
     font-size: 24px;
     font-weight: 600;
+    padding-bottom: 10px;
   }
 
   .ac-page-subtitle {
@@ -210,7 +211,7 @@ select {
   box-sizing: border-box;
 
   /* 👇 chiều cao chuẩn cho cả textbox & select */
-  height: 32px;
+  height: 35px;
   line-height: 20px;
 }
 textarea {
@@ -1305,3 +1306,171 @@ body {
 .table .text-end { text-align: right; }
 .table .text-center { text-align: center; }
 .table .text-muted { color: #6c757d; }
+/* Input có icon bên trái (Email, Phone, …) */
+.field-with-leading-icon {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+/* hàng icon + textbox */
+.field-with-leading-icon .icon-input-row {
+  display: flex;
+  align-items: center;
+}
+
+/* ô vuông chứa icon */
+.field-with-leading-icon .icon-box {
+  flex: 0 0 36px;
+  height: 36px;
+  border: 1px solid #d1d5db;
+  border-radius: 2px 0 0 2px;
+  border-right: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f3f4f6;
+  color: #4b5563;
+  font-size: 14px;
+}
+
+/* textbox bên phải – dính liền icon, full width */
+.field-with-leading-icon .icon-input-control {
+  flex: 1 1 auto;
+  height: 36px;
+  border: 1px solid #d1d5db;
+  border-radius: 0 2px 2px 0;
+  border-left: 0;
+  padding: 8px 10px;
+  font-size: 13px;
+  font-family: inherit;
+  box-sizing: border-box;
+}
+/* ================== CURRENCY DROPDOWN ================== */
+
+.currency-field {
+  position: relative;
+  display: block;
+}
+
+/* nút trigger giống ô select */
+.currency-trigger {
+  margin-top: 4px;
+  border: 1px solid #d1d5db;
+  border-radius: 2px;
+  padding: 6px 10px;
+  background: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+}
+
+.currency-trigger-main {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.currency-trigger-label {
+  font-size: 13px;
+  color: #111827;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.currency-trigger-code {
+  font-size: 12px;
+  color: #6b7280;
+}
+
+.currency-arrow {
+  font-size: 14px;
+  color: #6b7280;
+}
+
+/* PANEL DROPDOWN */
+.currency-panel {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  margin-top: 4px;
+  border: 1px solid #d1d5db;
+  border-radius: 2px;
+  background: #ffffff;
+  box-shadow: 0 4px 16px rgba(15, 23, 42, 0.16);
+  max-height: 320px;
+  display: flex;
+  flex-direction: column;
+  z-index: 30;
+}
+
+/* hàng search */
+.currency-search-row {
+  display: flex;
+  align-items: center;
+  padding: 6px 8px 8px;
+  border-bottom: 1px solid #e5e7eb;
+  background: #f9fafb;
+  gap: 6px;
+}
+
+.currency-search-icon {
+  font-size: 14px;
+  color: #6b7280;
+}
+
+.currency-search-row input {
+  flex: 1 1 auto;
+  border: 1px solid #d1d5db;
+  border-radius: 2px;
+  padding: 6px 8px;
+  font-size: 13px;
+}
+
+/* nhóm My currencies / All currencies */
+.currency-group {
+  max-height: 260px;
+  overflow-y: auto;
+}
+
+.currency-group-title {
+  padding: 6px 12px 4px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: #9ca3af;
+}
+
+/* từng dòng currency */
+.currency-row {
+  width: 100%;
+  border: 0;
+  background: #ffffff;
+  padding: 6px 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 13px;
+  cursor: pointer;
+  font-weight: 100;
+}
+
+.currency-row:hover {
+  background: #f3f6fb;
+}
+
+.currency-name {
+  flex: 1 1 auto;
+  text-align: left;
+}
+
+.currency-code {
+  flex: 0 0 auto;
+  font-size: 12px;
+  color: #6b7280;
+}
