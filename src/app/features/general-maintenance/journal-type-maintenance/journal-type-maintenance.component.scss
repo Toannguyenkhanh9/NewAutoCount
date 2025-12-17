@@ -1,5 +1,7 @@
-/* ===== Page layout ===== */
-.page { padding: 16px; }
+@import '../../../../styles/maintenance-shared.scss';
+
+/* Journal Type page specifics */
+.journal-type-page { padding-top: 16px; }
 
 .header {
   display: grid;

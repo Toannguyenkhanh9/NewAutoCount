@@ -3,6 +3,38 @@
   padding: 16px;
 }
 
+/* Currency page layout (account-type style) */
+.currency-page { padding-top: 16px; }
+.currency-header { margin-bottom: 12px; }
+.currency-toolbar { display: flex; align-items: center; gap: 8px; }
+.currency-search {
+  min-width: 260px;
+  padding: 8px 10px;
+  border: 1px solid #d9e4d6;
+  border-radius: 8px;
+  outline: none;
+  background: #fff;
+}
+
+.currency-grid { margin-top: 4px; }
+.ac-row-selected td { background: #e5f2ff !important; }
+.mono { font-family: 'Consolas', 'Fira Code', monospace; }
+.clip { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.empty { text-align: center; color: #888; padding: 10px 0; }
+
+.currency-footer { margin-top: 10px; display: flex; justify-content: space-between; align-items: center; font-size: 12px; }
+.currency-rec { color: #666; }
+.currency-pager { display:flex; align-items:center; gap:4px; }
+.account-type-pg-btn { padding:2px 6px; min-width:auto; font-size:11px; }
+.account-type-pg-label { margin:0 4px; }
+
+/* reuse small utilities from previous styles */
+.ac-table { width:100%; border-collapse:separate; border-spacing:0; }
+.ac-table th{ background:#f7fafc; border-bottom:1px solid #e8eef5; color:#0f172a; font-weight:700; text-align:left; padding:10px 12px; }
+.ac-table td{ border-bottom:1px solid #f0f4f9; padding:10px 12px; vertical-align:middle; color:#111827; }
+
+.flag-dot{ display:inline-block; width:12px; height:12px; border-radius:50%; background:#22c55e; box-shadow:0 0 0 3px rgba(34,197,94,.18); }
+
 .header {
   display: grid;
   grid-template-columns: 1fr auto;
@@ -83,6 +115,15 @@
   background: #f9fcf8;
 }
 
+/* Pager buttons (small) */
+.pager .btn.ghost {
+  background: transparent;
+  border: 1px solid transparent;
+  padding: 4px 8px;
+  border-radius: 6px;
+}
+.pager .btn.ghost:disabled { opacity: 0.45; cursor: default; }
+
 /* Pills */
 .pill {
   display: inline-block;
@@ -139,6 +180,25 @@
 .modal-body {
   padding: 14px 16px;
   overflow: auto;
+}
+
+/* Dialog: add spacing between action buttons in rate manager */
+.ac-dialog-body .ac-table td .ac-btn { margin-left: 8px; }
+
+/* Ensure table cells inside dialogs have slight right padding for visual breathing room */
+.ac-dialog-body .ac-table td { padding-right: 18px; }
+
+/* Make dialog action buttons compact and inline to match other maintenance pages */
+.ac-dialog-body .ac-table td {
+  white-space: nowrap;
+}
+.ac-dialog-body .ac-table td .ac-btn {
+  padding: 6px 10px;
+  border-radius: 6px;
+  font-size: 13px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .form {

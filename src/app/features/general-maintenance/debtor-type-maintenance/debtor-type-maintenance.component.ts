@@ -23,6 +23,9 @@ export class DebtorTypeMaintenanceComponent {
   selectedIndex: number | null = null;
   // filter
   q = '';
+  // paging
+  page = 1;
+  pageSize = 10;
 
   // mock data
   rows: DebtorTypeRow[] = [
@@ -66,6 +69,10 @@ export class DebtorTypeMaintenanceComponent {
     return this.rows.filter((r) =>
       (r.typeCode + ' ' + r.description).toLowerCase().includes(s)
     );
+  }
+
+  pageCount(): number {
+    return Math.max(1, Math.ceil(this.filteredRows().length / this.pageSize));
   }
 
   // toolbar

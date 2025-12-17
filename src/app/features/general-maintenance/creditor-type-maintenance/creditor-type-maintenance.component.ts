@@ -71,10 +71,25 @@ export class CreditorTypeMaintenanceComponent
       description2nd: '',
       active: false,
     },
+    // Additional mock rows for pagination / testing
+    { typeCode: 'SUP1', description: 'SUPPLIER 1', description2nd: '', active: true },
+    { typeCode: 'SUP2', description: 'SUPPLIER 2', description2nd: '', active: true },
+    { typeCode: 'SUP3', description: 'SUPPLIER 3', description2nd: '', active: false },
+    { typeCode: 'SUP4', description: 'SUPPLIER 4', description2nd: '', active: true },
+    { typeCode: 'SUP5', description: 'SUPPLIER 5', description2nd: '', active: false },
+    { typeCode: 'SUP6', description: 'SUPPLIER 6', description2nd: '', active: true },
+    { typeCode: 'SUP7', description: 'SUPPLIER 7', description2nd: '', active: true },
+    { typeCode: 'SUP8', description: 'SUPPLIER 8', description2nd: '', active: false },
+    { typeCode: 'SUP9', description: 'SUPPLIER 9', description2nd: '', active: true },
+    { typeCode: 'SUP10', description: 'SUPPLIER 10', description2nd: '', active: true },
   ];
 
   /** Dòng đang chọn trong bảng */
-  selectedIndex: number | null = null;
+  selected: CreditorTypeRow | null = null;
+
+  // Paging
+  page = 1;
+  pageSize = 12;
 
   /** Modal state */
   showModal = false;
@@ -156,26 +171,26 @@ export class CreditorTypeMaintenanceComponent
   }
 
   // ================== Table interactions ==================
-  onRowClick(i: number): void {
-    this.selectedIndex = this.selectedIndex === i ? null : i;
-  }
   canDelete(): boolean {
-    return this.selectedRow !== null;
+    return this.selected !== null;
   }
   onDelete() {
-    if (!this.selectedRow) return;
+    if (!this.selected) return;
     this.showDeleteConfirm = true;
   }
   confirmDelete(): void {
-    const r = this.selectedRow;
+    const r = this.selected;
     if (!r) return;
     this.deleteRow(r);
     this.closeDeleteConfirm();
   }
   get selectedRow(): CreditorTypeRow | null {
-    if (this.selectedIndex == null) return null;
-    const list = this.filteredRows();
-    return list[this.selectedIndex] ?? null;
+    return this.selected;
+  }
+
+  pageCount(): number {
+    const n = this.filteredRows().length;
+    return n === 0 ? 1 : Math.ceil(n / this.pageSize);
   }
 
   // ================== CRUD ==================
@@ -211,7 +226,7 @@ export class CreditorTypeMaintenanceComponent
     const idx = this.rows.findIndex((x) => x.typeCode === r.typeCode);
     if (idx >= 0) {
       this.rows.splice(idx, 1);
-      this.selectedIndex = null;
+      this.selected = null;
     }
   }
 
@@ -261,7 +276,7 @@ export class CreditorTypeMaintenanceComponent
       }
       else this.rows.push(payload);
     }
-    this.selectedIndex = null;
+    this.selected = null;
     this.closeModal();
     const msg = this.isEditing
       ? 'Updated successfully.'

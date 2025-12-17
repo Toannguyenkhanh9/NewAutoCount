@@ -1,342 +1,248 @@
-<div class="page">
-  <div class="titlebar">
-    <h1>Currency Maintenance</h1>
+<!-- Currency maintenance page (cleaned) -->
+<div class="ac-page currency-page">
+    <div class="ac-card">
+        <div class="ac-page-header currency-header">
+            <div>
+                <div class="ac-page-title">Currency Maintenance</div>
+                <div class="ac-page-subtitle">Maintain currencies and exchange rate settings.</div>
+            </div>
 
-    <div class="toolbar">
-      <input
-        class="search1"
-        [(ngModel)]="q"
-        placeholder="Search code / word / symbol..."
-      />
-      <button class="btn primary" (click)="onNew()">New</button>
-      <button class="btn" [disabled]="!selected" (click)="onEdit()">
-        Edit
-      </button>
-      <button
-        class="btn danger"
-        [disabled]="!selected || isBase(selected)"
-        (click)="onDelete()"
-      >
-        Delete
-      </button>
-      <div class="spacer"></div>
-      <button class="btn primary" (click)="openRateManager()">
-        Currency Rate
-      </button>
+            <div class="currency-toolbar">
+                <input class="currency-search" [(ngModel)]="q" placeholder="Search code / word / symbol..." (input)="page = 1" />
+
+                <button class="ac-btn ac-btn-primary" (click)="onNew()">New</button>
+                <button class="ac-btn" [disabled]="!selected" (click)="onEdit()">Edit</button>
+                <button class="ac-btn ac-btn-danger" [disabled]="!selected || isBase(selected)" (click)="onDelete()">Delete</button>
+                <button class="ac-btn ac-btn-primary" (click)="openRateManager()">Currency Rate</button>
+            </div>
+        </div>
+
+        <div class="currency-grid">
+            <table class="ac-table">
+                <thead>
+                    <tr>
+                        <th class="col-flag"></th>
+                        <th style="width: 140px">Currency Code</th>
+                        <th>Currency Word</th>
+                        <th style="width: 120px">Currency Symbol</th>
+                        <th class="text-end" style="width: 140px">Bank Buy Rate</th>
+                        <th class="text-end" style="width: 140px">Bank Sell Rate</th>
+                        <th style="width: 170px">Exchange Gain Account</th>
+                        <th style="width: 170px">Exchange Loss Account</th>
+                        <th style="width: 180px">Exchange Gain/Loss Journal</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let r of filteredRows() | slice : (page - 1) * pageSize : (page - 1) * pageSize + pageSize; trackBy: trackByCode" (click)="pick(r)" [class.ac-row-selected]="selected === r">
+                        <td class="col-flag"><span *ngIf="isBase(r)" class="flag-dot" title="Base Currency"></span></td>
+                        <td class="mono">{{ r.code }}</td>
+                        <td class="clip" [title]="r.word1">{{ r.word1 }}</td>
+                        <td class="mono">{{ r.symbol }}</td>
+                        <td class="text-end">{{ r.bankBuyRate | number : '1.4-4' }}</td>
+                        <td class="text-end">{{ r.bankSellRate | number : '1.4-4' }}</td>
+                        <td>{{ r.gainAcc }}</td>
+                        <td>{{ r.lossAcc }}</td>
+                        <td>{{ r.journal }}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="currency-footer">
+            <div class="currency-rec">Records: {{ filteredRows().length }}</div>
+
+            <div class="currency-pager">
+                <button class="ac-btn ac-btn-ghost account-type-pg-btn" [disabled]="page === 1" (click)="page = 1">&laquo;</button>
+                <button class="ac-btn ac-btn-ghost account-type-pg-btn" [disabled]="page === 1" (click)="page = page - 1">&lsaquo;</button>
+                <span class="account-type-pg-label">Page {{ page }} / {{ pageCount() }}</span>
+                <button class="ac-btn ac-btn-ghost account-type-pg-btn" [disabled]="page === pageCount()" (click)="page = page + 1">&rsaquo;</button>
+                <button class="ac-btn ac-btn-ghost account-type-pg-btn" [disabled]="page === pageCount()" (click)="page = pageCount()">&raquo;</button>
+            </div>
+        </div>
     </div>
-  </div>
-
-  <div class="card">
-    <table class="grid">
-      <thead>
-        <tr>
-          <th class="col-flag"></th>
-          <th style="width: 140px">Currency Code</th>
-          <th>Currency Word</th>
-          <th style="width: 120px">Currency Symbol</th>
-          <th class="text-end" style="width: 140px">Bank Buy Rate</th>
-          <th class="text-end" style="width: 140px">Bank Sell Rate</th>
-          <th style="width: 170px">Exchange Gain Account</th>
-          <th style="width: 170px">Exchange Loss Account</th>
-          <th style="width: 180px">Exchange Gain/Loss Journal</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr
-          *ngFor="let r of filteredRows(); trackBy: trackByCode"
-          (click)="pick(r)"
-          [class.active]="isPicked(r)"
-        >
-        <td class="col-flag">
-          <span *ngIf="isBase(r)" class="flag-dot" title="Base Currency"></span>
-        </td>
-          <td class="monospace">
-            {{ r.code }}
-          </td>
-          <td class="clip" [title]="r.word1">{{ r.word1 }}</td>
-          <td class="monospace">{{ r.symbol }}</td>
-          <td class="text-end">{{ r.bankBuyRate | number : "1.4-4" }}</td>
-          <td class="text-end">{{ r.bankSellRate | number : "1.4-4" }}</td>
-          <td>{{ r.gainAcc }}</td>
-          <td>{{ r.lossAcc }}</td>
-          <td>{{ r.journal }}</td>
-        </tr>
-      </tbody>
-    </table>
-
-    <div class="footer">Records: {{ filteredRows().length }}</div>
-  </div>
 </div>
 
-<!-- Currency Edit Dialog -->
-<div class="dialog" *ngIf="showModal">
-  <div class="dialog-panel">
-    <div class="dialog-title">
-      {{ isEdit ? "Edit Currency" : "New Currency" }}
-      <button class="x" (click)="closeModal()">✕</button>
-    </div>
-
-    <div class="dialog-body">
-      <div class="grid2">
-        <label
-          >Currency Code
-          <input
-            class="inp code-field"
-            [(ngModel)]="form.code"
-            [readonly]="isEdit"
-            placeholder="USD"
-          />
-        </label>
-
-        <label
-          >Currency Symbol
-          <input class="inp" [(ngModel)]="form.symbol" placeholder="USD / $" />
-        </label>
-      </div>
-      <br />
-      <div class="grid2">
-        <label
-          >Currency Word
-          <input class="inp" [(ngModel)]="form.word1" placeholder="US Dollar" />
-        </label>
-
-        <label
-          >Currency Word 2
-          <input
-            class="inp"
-            [(ngModel)]="form.word2"
-            placeholder="(optional)"
-          />
-        </label>
-      </div>
-      <br />
-      <div class="grid2">
-        <label
-          >Bank Buy Rate
-          <input
-            class="inp"
-            appAmount
-            type="text"
-            [decimals]="2"
-            [(ngModel)]="form.bankBuyRate"
-          />
-        </label>
-
-        <label
-          >Bank Sell Rate
-          <input
-            class="inp"
-            appAmount
-            type="text"
-            [decimals]="2"
-            [(ngModel)]="form.bankSellRate"
-          />
-        </label>
-      </div>
-      <br />
-      <div class="group">
-        <div class="group-title" style="font-size: 15px; font-weight: bold">
-          Account and Journal Type Setting for Currency Exchange Gain/Loss
+<!-- Dialogs (new/edit, rate manager, rate form, delete confirms, success) -->
+<div class="ac-dialog-backdrop" *ngIf="showModal">
+    <div class="ac-card-no-padding ac-dialog-panel-lg">
+        <div class="ac-dialog-header">
+            <span>{{ isEdit ? 'Edit Currency' : 'New Currency' }}</span>
+            <button type="button" class="ac-dialog-close" (click)="closeModal()">×</button>
         </div>
-        <div class="form-grid">
-          <label
-            >Exchange Gain Account
-            <select class="inp" [(ngModel)]="form.gainAcc">
-              <option *ngFor="let a of accounts" [ngValue]="a">{{ a }}</option>
-            </select>
-          </label>
-          <br />
-          <label
-            >Exchange Loss Account
-            <select class="inp" [(ngModel)]="form.lossAcc">
-              <option *ngFor="let a of accounts" [ngValue]="a">{{ a }}</option>
-            </select>
-          </label>
-          <br />
-          <label
-            >Exchange Gain/Loss Journal
-            <select class="inp" [(ngModel)]="form.journal">
-              <option *ngFor="let j of journals" [ngValue]="j">{{ j }}</option>
-            </select>
-          </label>
+        <div class="ac-dialog-body">
+            <div class="ac-dialog-form-grid-2">
+                <label class="ac-form-field">
+                    <span class="ac-form-label">Currency Code</span>
+                    <input class="mono" [(ngModel)]="form.code" [readOnly]="isEdit" placeholder="USD" />
+                </label>
+                <label class="ac-form-field">
+                    <span class="ac-form-label">Currency Symbol</span>
+                    <input [(ngModel)]="form.symbol" placeholder="USD / $" />
+                </label>
+                <label class="ac-form-field">
+                    <span class="ac-form-label">Currency Word</span>
+                    <input [(ngModel)]="form.word1" placeholder="US Dollar" />
+                </label>
+                <label class="ac-form-field">
+                    <span class="ac-form-label">Currency Word 2</span>
+                    <input [(ngModel)]="form.word2" placeholder="(optional)" />
+                </label>
+                <label class="ac-form-field">
+                    <span class="ac-form-label">Bank Buy Rate</span>
+                    <input class="mono" appAmount type="text" [decimals]="2" [(ngModel)]="form.bankBuyRate" />
+                </label>
+                <label class="ac-form-field">
+                    <span class="ac-form-label">Bank Sell Rate</span>
+                    <input class="mono" appAmount type="text" [decimals]="2" [(ngModel)]="form.bankSellRate" />
+                </label>
+                <label class="ac-form-field">
+                    <span class="ac-form-label">Exchange Gain Account</span>
+                    <select [(ngModel)]="form.gainAcc">
+                        <option *ngFor="let a of accounts" [ngValue]="a">{{ a }}</option>
+                    </select>
+                </label>
+                <label class="ac-form-field">
+                    <span class="ac-form-label">Exchange Loss Account</span>
+                    <select [(ngModel)]="form.lossAcc">
+                        <option *ngFor="let a of accounts" [ngValue]="a">{{ a }}</option>
+                    </select>
+                </label>
+                <label class="ac-form-field">
+                    <span class="ac-form-label">Exchange Gain/Loss Journal</span>
+                    <select [(ngModel)]="form.journal">
+                        <option *ngFor="let j of journals" [ngValue]="j">{{ j }}</option>
+                    </select>
+                </label>
+            </div>
         </div>
-      </div>
+        <div class="ac-dialog-footer">
+            <button class="ac-btn ac-btn-ghost" (click)="closeModal()">Cancel</button>
+            <button class="ac-btn ac-btn-primary" (click)="save()">OK</button>
+        </div>
     </div>
-
-    <div class="dialog-actions">
-      <button class="btn cancel" (click)="closeModal()">Cancel</button>
-      <button class="btn primary" (click)="save()">OK</button>
-    </div>
-  </div>
 </div>
 
-<!-- Currency Rate Maintenance -->
-<div class="dialog" *ngIf="showRateMgr">
-  <div class="dialog-panel wide">
-    <div class="dialog-title">
-      Currency Rate Maintenance — {{ rateForCode }}
-      <button class="x" (click)="closeRateMgr()">✕</button>
+<!-- Currency Rate Manager -->
+<div class="ac-dialog-backdrop" *ngIf="showRateMgr">
+    <div class="ac-card-no-padding ac-dialog-panel-lg">
+        <div class="ac-dialog-header">
+            <span>Currency Rate Maintenance — {{ rateForCode }}</span>
+            <button type="button" class="ac-dialog-close" (click)="closeRateMgr()">×</button>
+        </div>
+        <div class="ac-dialog-body">
+            <table class="ac-table">
+                <thead>
+                    <tr>
+                        <th style="width:140px">From Date</th>
+                        <th style="width:140px">To Date</th>
+                        <th class="text-end" style="width:160px">Bank Buy Rate</th>
+                        <th class="text-end" style="width:160px">Bank Sell Rate</th>
+                        <th style="width:220px"></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let r of rateRows; let i = index">
+                        <td>{{ r.from }}</td>
+                        <td>{{ r.to || '-' }}</td>
+                        <td class="text-end">{{ r.buy | number : '1.4-4' }}</td>
+                        <td class="text-end">{{ r.sell | number : '1.4-4' }}</td>
+                        <td class="text-end">
+                            <button class="ac-btn ac-btn-primary" (click)="editRate(i)">Edit</button>
+                            <button class="ac-btn ac-btn-danger" (click)="askDeleteRate(i)">Delete</button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            <div style="margin-top:10px; display:flex; gap:8px; align-items:center;">
+                <button class="ac-btn ac-btn-primary" (click)="addRate()">Add</button>
+                <div style="flex:1"></div>
+                <button class="ac-btn ac-btn-primary" (click)="commitRates()">Close</button>
+            </div>
+        </div>
     </div>
-
-    <div class="dialog-body">
-      <table class="grid">
-        <thead>
-          <tr>
-            <th style="width: 140px">From Date</th>
-            <th style="width: 140px">To Date</th>
-            <th class="text-end" style="width: 160px">Bank Buy Rate</th>
-            <th class="text-end" style="width: 160px">Bank Sell Rate</th>
-            <th style="width: 220px"></th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr *ngFor="let r of rateRows; let i = index">
-            <td>{{ r.from }}</td>
-            <td>{{ r.to || "-" }}</td>
-            <td class="text-end">{{ r.buy | number : "1.4-4" }}</td>
-            <td class="text-end">{{ r.sell | number : "1.4-4" }}</td>
-            <td class="text-end">
-              <button class="btn primary" (click)="editRate(i)">Edit</button>&nbsp;
-              <button class="btn small danger" (click)="askDeleteRate(i)">
-                Delete
-              </button>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-
-      <div class="toolbar" style="margin-top: 10px">
-        <button class="btn primary" (click)="addRate()">Add</button>
-        <div class="spacer"></div>
-        <button class="btn primary" (click)="commitRates()">Close</button>
-      </div>
-    </div>
-  </div>
 </div>
 
 <!-- Small Rate Form -->
-<div class="dialog" *ngIf="showRateForm">
-  <div class="dialog-panel small">
-    <div class="dialog-title">
-      Currency Rate Maintenance
-      <button class="x" (click)="showRateForm = false">✕</button>
+<div class="ac-dialog-backdrop" *ngIf="showRateForm">
+    <div class="ac-card-no-padding ac-dialog-panel-sm">
+        <div class="ac-dialog-header">
+            <span>Currency Rate</span>
+            <button type="button" class="ac-dialog-close" (click)="showRateForm = false">×</button>
+        </div>
+        <div class="ac-dialog-body">
+            <div class="ac-dialog-form-grid-2">
+                <label class="ac-form-field">
+                    <span class="ac-form-label">From Date</span>
+                    <input class="inp" type="date" [(ngModel)]="rateForm.from" />
+                </label>
+                <label class="ac-form-field">
+                    <span class="ac-form-label">To Date</span>
+                    <input class="inp" type="date" [(ngModel)]="rateForm.to" />
+                </label>
+                <label class="ac-form-field">
+                    <span class="ac-form-label">Bank Buy Rate</span>
+                    <input class="inp" appAmount type="text" [decimals]="2" [(ngModel)]="rateForm.buy" />
+                </label>
+                <label class="ac-form-field">
+                    <span class="ac-form-label">Bank Sell Rate</span>
+                    <input class="inp" appAmount type="text" [decimals]="2" [(ngModel)]="rateForm.sell" />
+                </label>
+            </div>
+        </div>
+        <div class="ac-dialog-footer">
+            <button class="ac-btn ac-btn-ghost" (click)="showRateForm = false">Cancel</button>
+            <button class="ac-btn ac-btn-primary" (click)="saveRateForm()">OK</button>
+        </div>
     </div>
-    <div class="dialog-body">
-      <div class="grid2">
-        <label
-          >From Date
-          <input class="inp" type="date" [(ngModel)]="rateForm.from" />
-        </label>
-        <label
-          >To Date
-          <input class="inp" type="date" [(ngModel)]="rateForm.to" />
-        </label>
-      </div>
-      <br>
-      <div class="grid2">
-        <label
-          >Bank Buy Rate
-          <input
-            class="inp"
-            appAmount
-            type="text"
-            [decimals]="2"
-            [(ngModel)]="rateForm.buy"
-          />
-        </label>
-        <label
-          >Bank Sell Rate
-          <input
-            class="inp"
-            appAmount
-            type="text"
-            [decimals]="2"
-            [(ngModel)]="rateForm.sell"
-          />
-        </label>
-      </div>
-    </div>
-    <div class="dialog-actions">
-      <button class="btn cancel" (click)="showRateForm = false">Cancel</button>
-      <button class="btn primary" (click)="saveRateForm()">OK</button>
-    </div>
-  </div>
 </div>
-<div class="dialog" *ngIf="showDeleteConfirm">
-  <div class="dialog-panel-small" role="dialog" aria-modal="true">
-    <div class="dialog-title">
-      Delete Currency &nbsp;<button
-        class="x"
-        (click)="closeDeleteConfirm()"
-        aria-label="Close"
-      >
-        ×
-      </button>
-    </div>
 
-    <div class="dialog-body">
-      <p>
-        Are you sure you want to delete
-        <b>{{ selected?.code }}</b>
-        ?
-      </p>
+<!-- Delete Confirm -->
+<div class="ac-dialog-backdrop" *ngIf="showDeleteConfirm">
+    <div class="ac-card-no-padding ac-dialog-panel-sm" role="dialog" aria-modal="true">
+        <div class="ac-dialog-header">
+            <span>Delete Currency</span>
+            <button type="button" class="ac-dialog-close" (click)="closeDeleteConfirm()">×</button>
+        </div>
+        <div class="ac-dialog-body">
+            <p>Are you sure you want to delete <b>{{ selected?.code }}</b>?</p>
+        </div>
+        <div class="ac-dialog-footer">
+            <button class="ac-btn ac-btn-ghost" (click)="closeDeleteConfirm()">Cancel</button>
+            <button class="ac-btn ac-btn-danger" (click)="Delete()">Delete</button>
+        </div>
     </div>
-
-    <div class="dialog-actions">
-      <button class="btn cancel" (click)="closeDeleteConfirm()">Cancel</button>
-      <button class="btn danger" (click)="Delete()">Delete</button>
-    </div>
-  </div>
 </div>
-<!-- Confirm delete a rate row -->
-<div class="dialog" *ngIf="showRateDeleteConfirm">
-  <div class="dialog-panel-small" role="dialog" aria-modal="true">
-    <div class="dialog-title">
-      Delete Currency Rate
-      <button class="x" (click)="cancelDeleteRate()">✕</button>
-    </div>
 
-    <div class="dialog-body">
-      <p>
-        Are you sure you want to delete the rate
-        <b>from {{ rateToDeletePreview?.from }}</b>
-        <span *ngIf="rateToDeletePreview?.to">
-          to {{ rateToDeletePreview?.to }}</span
-        >?
-      </p>
-      <p class="muted">
-        Buy: {{ rateToDeletePreview?.buy | number : "1.4-4" }} — Sell:
-        {{ rateToDeletePreview?.sell | number : "1.4-4" }}
-      </p>
+<!-- Rate delete confirm -->
+<div class="ac-dialog-backdrop" *ngIf="showRateDeleteConfirm">
+    <div class="ac-card-no-padding ac-dialog-panel-sm" role="dialog" aria-modal="true">
+        <div class="ac-dialog-header">
+            <span>Delete Currency Rate</span>
+            <button type="button" class="ac-dialog-close" (click)="cancelDeleteRate()">×</button>
+        </div>
+        <div class="ac-dialog-body">
+            <p>Are you sure you want to delete the rate <b>from {{ rateToDeletePreview?.from }}</b> <span *ngIf="rateToDeletePreview?.to">to {{ rateToDeletePreview?.to }}</span>?</p>
+            <p class="muted">Buy: {{ rateToDeletePreview?.buy | number : '1.4-4' }} — Sell: {{ rateToDeletePreview?.sell | number : '1.4-4' }}</p>
+        </div>
+        <div class="ac-dialog-footer">
+            <button class="ac-btn ac-btn-ghost" (click)="cancelDeleteRate()">Cancel</button>
+            <button class="ac-btn ac-btn-danger" (click)="confirmDeleteRate()">Delete</button>
+        </div>
     </div>
-
-    <div class="dialog-actions">
-      <button class="btn cancel" (click)="cancelDeleteRate()">Cancel</button>
-      <button class="btn danger" (click)="confirmDeleteRate()">Delete</button>
-    </div>
-  </div>
 </div>
-<div class="dialog" *ngIf="showSuccess">
-  <div
-    class="dialog-panel-small"
-    role="dialog"
-    aria-modal="true"
-    style="min-width: 360px"
-  >
-    <div
-      class="dialog-title"
-      style="background: linear-gradient(180deg, #9be28a 0%, #62c84f 100%)"
-    >
-      Success
-      <button class="x" (click)="closeSuccess()" aria-label="Close">×</button>
+
+<!-- Success -->
+<div class="ac-dialog-backdrop" *ngIf="showSuccess">
+    <div class="ac-card-no-padding ac-dialog-panel-sm" role="dialog" aria-modal="true">
+        <div class="ac-dialog-header" style="background: linear-gradient(180deg,#9be28a 0%, #62c84f 100%);">
+            <span>Success</span>
+            <button type="button" class="ac-dialog-close" (click)="closeSuccess()">×</button>
+        </div>
+        <div class="ac-dialog-body">
+            <p style="margin:8px 0; font-weight:600; color:#14532d">{{ successMsg }}</p>
+        </div>
+        <div class="ac-dialog-footer">
+            <button class="ac-btn ac-btn-primary" (click)="closeSuccess()">OK</button>
+        </div>
     </div>
-    <div class="dialog-body">
-      <p style="margin: 8px 0; font-weight: 600; color: #14532d">
-        {{ successMsg }}
-      </p>
-    </div>
-    <div class="dialog-actions">
-      <button class="btn primary" (click)="closeSuccess()">OK</button>
-    </div>
-  </div>
 </div>

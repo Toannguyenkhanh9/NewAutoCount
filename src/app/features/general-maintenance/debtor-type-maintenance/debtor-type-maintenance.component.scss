@@ -1,89 +1,7 @@
-/* ===== Page layout ===== */
-.page { padding: 16px; }
+@import '../../../../styles/maintenance-shared.scss';
 
-.header {
-  display: grid;
-  grid-template-columns: 1fr auto;
-  align-items: center;
-  gap: 12px;
-  margin-bottom: 12px;
-  background: linear-gradient(180deg, #d8efcf, #cdeac4);
-  border: 1px solid #c8e2b9;
-  border-radius: 8px;
-  padding: 10px 12px;
-
-  .title { font-weight: 700; font-size: 18px; color: #183d25; }
-  .tools { display: flex; gap: 8px; align-items: center; }
-}
-
-.search {
-  min-width: 280px;
-  padding: 8px 10px;
-  border: 1px solid #d9e4d6;
-  border-radius: 8px;
-  outline: none;
-  background: #fff;
-}
-/* Card/Grid */
-.card {
-  background: #fff;
-  border: 1px solid #e8eee6;
-  border-radius: 10px;
-  overflow: hidden;
-  box-shadow: 0 1px 4px rgba(0,0,0,.04);
-}
-
-.grid {
-  width: 100%;
-  border-collapse: collapse;
-
-  thead th {
-    text-align: left;
-    font-weight: 700;
-    font-size: 13px;
-    color: #1d3b28;
-    background: #f5faf3;
-    border-bottom: 1px solid #e6efe1;
-    padding: 10px 12px;
-  }
-
-  tbody td {
-    padding: 10px 12px;
-    border-bottom: 1px solid #f1f4f0;
-  }
-
-  tbody tr {
-    cursor: pointer;
-
-    &:hover  { background: #fbfefb; }
-    &.active { background: #eef7ea; }
-  }
-}
-
-.text-end    { text-align: end; }
-.text-center { text-align: center; }
-.monospace   { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace; }
-
-.footer {
-  padding: 10px 12px;
-  font-size: 12px;
-  color: #49614f;
-  background: #f9fcf8;
-}
-
-/* Pills */
-.pill {
-  display:inline-block;
-  padding:2px 8px;
-  border-radius:999px;
-  font-size:12px;
-  border:1px solid #e6ede3;
-
-  &.ok  { color:#0d7a30; background:#e8f7ec; border-color:#d0eed8; }
-  &.bad { color:#8d1e1e; background:#fdeaea; border-color:#f8d1d1; }
-}
-
-/* ===== Modal ===== */
+/* Component-specific styles (kept from previous debtor file) */
+/* Modal / form / grid overrides that are specific to debtor page */
 .modal-layer {
   position: fixed;
   inset: 0;
@@ -146,29 +64,29 @@
   gap: 8px;
   background: #fbfefb;
 }
-/* con trỏ và hover nhẹ */
+
+/* gridwrap small helpers */
 .gridwrap tbody tr { cursor: pointer; }
 .gridwrap tbody tr:hover { background: #f7fbf7; }
 
-/* dòng được CHỌN – “xanh nhạt + viền trong” giống form trước */
 .gridwrap tbody tr.active {
-  background: #eaf7e3;                 /* nền xanh nhạt */
-  box-shadow: inset 0 0 0 2px #8fd06b;  /* viền nổi bật */
+  background: #eaf7e3;
+  box-shadow: inset 0 0 0 2px #8fd06b;
 }
-.gridwrap tbody tr.active td {
-  border-color: #d9ecd1;                /* nếu có border cell */
-}
+.gridwrap tbody tr.active td { border-color: #d9ecd1; }
+
 .inp.readonly{
-  background: #f3f4f6;     /* xám nhạt */
-  color: #6b7280;          /* xám chữ */
-  border-color: #e5e7eb;   /* xám viền */
+  background: #f3f4f6;
+  color: #6b7280;
+  border-color: #e5e7eb;
   cursor: not-allowed;
 }
-.inp.readonly:focus{
-  outline: none;
-  box-shadow: none;
-  border-color: #e5e7eb;
-}
-.inp.readonly::placeholder{
-  color: #9ca3af;
-}
+.inp.readonly:focus{ outline: none; box-shadow: none; border-color: #e5e7eb; }
+.inp.readonly::placeholder{ color: #9ca3af; }
+
+/* pager helpers (kept) */
+.currency-footer { display:flex; align-items:center; gap:12px; padding:10px 12px; background:#fbfefb; }
+.currency-rec { color:#49614f; font-size:13px }
+.currency-pager { margin-left:auto; display:flex; gap:6px; align-items:center }
+.account-type-pg-btn { padding:6px 8px; border-radius:6px }
+.account-type-pg-label { font-size:13px; color:#2b4f38 }

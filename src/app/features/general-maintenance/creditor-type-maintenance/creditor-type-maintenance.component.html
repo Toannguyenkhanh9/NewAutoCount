@@ -1,154 +1,179 @@
-<!-- Page Title + Actions -->
-<div class="page">
-  <div class="titlebar">
-    <h1>Creditor Type Maintenance</h1>
+<div class="ac-page creditor-type-page">
+  <div class="ac-card">
+    <!-- HEADER -->
+    <div class="ac-page-header creditor-type-header">
+      <div>
+        <div class="ac-page-title">Creditor Type Maintenance</div>
+        <div class="ac-page-subtitle">
+          Maintain creditor types used across the system.
+        </div>
+      </div>
 
-    <div class="toolbar">
-      <input
-        class="search1"
-        type="text"
-        placeholder="Search code / description / category..."
-        [(ngModel)]="q"
-      />
-      <button class="btn primary" (click)="openNew()">New</button>
-      <button class="btn" [disabled]="!selectedRow" (click)="openEdit()">
-        Edit
-      </button>
-      <button class="btn danger" [disabled]="!canDelete()" (click)="onDelete()">
-        Delete
-      </button>
+      <div class="creditor-type-toolbar">
+        <input
+          class="creditor-type-search"
+          type="text"
+          placeholder="Search code / description / category…"
+          [(ngModel)]="q"
+          (input)="page = 1"
+        />
+
+        <button class="ac-btn ac-btn-primary" (click)="openNew()">
+          New
+        </button>
+        <button class="ac-btn" [disabled]="!selectedRow" (click)="openEdit()">
+          Edit
+        </button>
+        <button
+          class="ac-btn ac-btn-danger"
+          [disabled]="!canDelete()"
+          (click)="onDelete()"
+        >
+          Delete
+        </button>
+      </div>
     </div>
-  </div>
 
-  <!-- Panel -->
-  <div class="panel">
-    <div class="panel-body">
-      <table class="table">
+    <!-- GRID -->
+    <div class="creditor-type-grid">
+      <table class="ac-table">
         <thead>
           <tr>
-            <th class="w-140">Creditor Type</th>
+            <th style="width: 140px">Creditor Type</th>
             <th>Description</th>
             <th>2nd Description</th>
-            <th class="w-140">Active</th>
+            <th style="width: 140px">Active</th>
           </tr>
         </thead>
+
         <tbody>
           <tr
-            *ngFor="let r of filteredRows(); let i = index"
-            (click)="onRowClick(i)"
-            [class.selected]="selectedIndex === i"
+            *ngFor="let r of filteredRows() | slice : (page - 1) * pageSize : (page - 1) * pageSize + pageSize"
+            (click)="selected = r"
+            [class.ac-row-selected]="selected === r"
           >
-            <td>{{ r.typeCode }}</td>
-            <td>{{ r.description }}</td>
-            <td>{{ r.description2nd }}</td>
+            <td class="mono">{{ r.typeCode }}</td>
+            <td class="clip" [title]="r.description">{{ r.description }}</td>
+            <td class="clip" [title]="r.description2nd">{{ r.description2nd || '-' }}</td>
             <td>
-              <span class="pill" [class.ok]="r.active" [class.no]="!r.active">
-                {{ r.active ? "Yes" : "No" }}
+              <span [ngClass]="r.active ? 'ac-badge-blue' : 'ac-badge-grey'">
+                {{ r.active ? 'Yes' : 'No' }}
               </span>
             </td>
           </tr>
+
+          <tr *ngIf="(filteredRows() || []).length === 0">
+            <td class="empty" colspan="4">No data</td>
+          </tr>
         </tbody>
       </table>
-
-      <div class="records">Records: {{ filteredRows().length }}</div>
     </div>
-  </div>
 
-  <!-- MODAL: moved to body in TS via #modalRoot -->
-  <div class="dialog" *ngIf="showModal">
-    <div class="dialog-panel" role="dialog">
-      <div class="dialog-title">
-        {{ isEditing ? "Edit Creditor Type" : "New Creditor Type" }}
-        <button class="x" (click)="closeModal()">×</button>
-      </div>
+    <!-- FOOTER / PAGER -->
+    <div class="creditor-type-footer">
+      <div class="creditor-type-rec">Records: {{ filteredRows().length }}</div>
 
-      <div class="dialog-body">
-        <div class="grid2">
-          <label
-            >Creditor Type
-            <input
-              #typeCodeRef
-              class="inp"
-              [(ngModel)]="editing.typeCode"
-              [class.readonly]="isEditing"
-              [readonly]="isEditing"
-              [class.invalid]="triedSave && !editing.typeCode"
-            />
-            <small class="error" *ngIf="triedSave && !editing.typeCode">
-              Creditor Type is required.
-            </small>
-          </label>
-          <label
-            >Description
-            <input class="inp" [(ngModel)]="editing.description" />
-          </label>
-        </div>
-        <br />
-        <div class="grid2">
-          <label
-            >2nd Description
-            <input class="inp" [(ngModel)]="editing.description2nd" />
-          </label>
-          <label
-            >Active
-            <select class="inp" [(ngModel)]="editing.active">
-              <option value="Yes">Yes</option>
-              <option value="No">No</option>
-            </select>
-          </label>
-        </div>
-      </div>
+      <div class="creditor-type-pager">
+        <button class="ac-btn ac-btn-ghost account-type-pg-btn" [disabled]="page === 1" (click)="page = 1">&laquo;</button>
+        <button class="ac-btn ac-btn-ghost account-type-pg-btn" [disabled]="page === 1" (click)="page = page - 1">&lsaquo;</button>
 
-      <div class="dialog-actions">
-        <button class="btn cancel" (click)="closeModal()">Cancel</button>
-        <button
-          class="btn primary"
-          (click)="save(typeCodeRef)"
-          [disabled]="!editing.typeCode"
-        >
-          Save
-        </button>
-      </div>
-    </div>
-  </div>
-  <div class="dialog" *ngIf="showDeleteConfirm">
-    <div class="dialog-panel-small" role="dialog" aria-modal="true">
-      <div class="dialog-title">
-        Delete Creditor Type &nbsp;<button
-          class="x"
-          (click)="closeDeleteConfirm()"
-          aria-label="Close"
-        >
-          ×
-        </button>
-      </div>
+        <span class="account-type-pg-label">Page {{ page }} / {{ pageCount() }}</span>
 
-      <div class="dialog-body">
-        <p>
-          Are you sure you want to delete
-          <b>{{ selectedRow?.typeCode }}</b>
-          ?
-        </p>
-      </div>
-
-      <div class="dialog-actions">
-        <button class="btn cancel" (click)="closeDeleteConfirm()">Cancel</button>
-        <button class="btn danger" (click)="confirmDelete()">Delete</button>
+        <button class="ac-btn ac-btn-ghost account-type-pg-btn" [disabled]="page === pageCount()" (click)="page = page + 1">&rsaquo;</button>
+        <button class="ac-btn ac-btn-ghost account-type-pg-btn" [disabled]="page === pageCount()" (click)="page = pageCount()">&raquo;</button>
       </div>
     </div>
   </div>
 </div>
-<div class="dialog" *ngIf="showSuccess">
-  <div class="dialog-panel-small" role="dialog" aria-modal="true" style="min-width: 360px">
-    <div class="dialog-title" style="background: linear-gradient(180deg,#9be28a 0%, #62c84f 100%);">
-       Success
-      <button class="x" (click)="closeSuccess()" aria-label="Close">×</button>
+
+<!-- NEW / EDIT DIALOG -->
+<div class="ac-dialog-backdrop" *ngIf="showModal">
+  <div class="ac-card-no-padding ac-dialog-panel-lg">
+    <div class="ac-dialog-header">
+      <span>{{ isEditing ? 'Edit Creditor Type' : 'New Creditor Type' }}</span>
+      <button type="button" class="ac-dialog-close" (click)="closeModal()">×</button>
     </div>
-    <div class="dialog-body">
-      <p style="margin: 8px 0; font-weight:600; color:#14532d">{{ successMsg }}</p>
+
+    <div class="ac-dialog-body">
+      <div class="ac-dialog-form-grid-2">
+        <label class="ac-form-field">
+          <span class="ac-form-label">Creditor Type</span>
+          <input
+            class="mono"
+            [(ngModel)]="editing.typeCode"
+            [readOnly]="isEditing"
+            [class.creditor-type-readonly]="isEditing"
+            required
+            placeholder="e.g. SUP"
+            #typeCodeRef
+          />
+          <div class="creditor-type-error" *ngIf="triedSave && !editing.typeCode">
+            Creditor Type is required
+          </div>
+        </label>
+
+        <label class="ac-form-field">
+          <span class="ac-form-label">Description</span>
+          <input [(ngModel)]="editing.description" required />
+        </label>
+
+        <label class="ac-form-field">
+          <span class="ac-form-label">2nd Description</span>
+          <input [(ngModel)]="editing.description2nd" name="description2nd" />
+        </label>
+
+        <label class="ac-form-field">
+          <span class="ac-form-label">Active</span>
+          <select [(ngModel)]="editing.active">
+            <option>Yes</option>
+            <option>No</option>
+          </select>
+        </label>
+      </div>
     </div>
-    <div class="dialog-actions">
-      <button class="btn primary" (click)="closeSuccess()">OK</button>
+
+    <div class="ac-dialog-footer">
+      <button class="ac-btn ac-btn-ghost" (click)="closeModal()">Cancel</button>
+      <button class="ac-btn ac-btn-primary" (click)="save(typeCodeRef)" [disabled]="!editing.typeCode">
+        {{ isEditing ? 'Save' : 'Create' }}
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- DELETE CONFIRM DIALOG -->
+<div class="ac-dialog-backdrop" *ngIf="showDeleteConfirm">
+  <div class="ac-card-no-padding ac-dialog-panel-sm" role="dialog" aria-modal="true">
+    <div class="ac-dialog-header">
+      <span>Delete Creditor Type</span>
+      <button class="ac-dialog-close" (click)="closeDeleteConfirm()" aria-label="Close">×</button>
+    </div>
+
+    <div class="ac-dialog-body">
+      <p>Are you sure you want to delete <b>{{ selectedRow?.typeCode }}</b>?</p>
+    </div>
+
+    <div class="ac-dialog-footer">
+      <button class="ac-btn ac-btn-ghost" (click)="closeDeleteConfirm()">Cancel</button>
+      <button class="ac-btn ac-btn-danger" (click)="confirmDelete()">Delete</button>
+    </div>
+  </div>
+</div>
+
+<!-- SUCCESS DIALOG -->
+<div class="ac-dialog-backdrop" *ngIf="showSuccess">
+  <div class="ac-card-no-padding ac-dialog-panel-sm creditor-type-success-dialog" role="dialog" aria-modal="true">
+    <div class="ac-dialog-header creditor-type-success-header">
+      <span>Success</span>
+      <button class="ac-dialog-close" (click)="closeSuccess()" aria-label="Close">×</button>
+    </div>
+
+    <div class="ac-dialog-body">
+      <p class="creditor-type-success-text">{{ successMsg }}</p>
+    </div>
+
+    <div class="ac-dialog-footer">
+      <button class="ac-btn ac-btn-primary" (click)="closeSuccess()">OK</button>
     </div>
   </div>
 </div>
