@@ -74,6 +74,9 @@ export class CurrencyMaintenanceComponent {
   // selection
   selected: CurrencyRow | null = null;
   showDeleteConfirm = false;
+  // paging
+  page = 1;
+  pageSize = 12;
   // modal Currency edit
   showModal = false;
   isEdit = false;
@@ -126,6 +129,11 @@ export class CurrencyMaintenanceComponent {
     return this.rows.filter((r) =>
       (r.code + ' ' + r.word1 + ' ' + r.symbol).toLowerCase().includes(s)
     );
+  }
+
+  pageCount(): number {
+    const n = this.filteredRows().length;
+    return n === 0 ? 1 : Math.ceil(n / this.pageSize);
   }
   pick(r: CurrencyRow) {
     this.selected = r;

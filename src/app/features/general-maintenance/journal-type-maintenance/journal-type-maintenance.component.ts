@@ -19,6 +19,9 @@ export interface EntryType {
 export class JournalTypeMaintenanceComponent {
   q = '';
   showDeleteConfirm = false;
+  // paging
+  page = 1;
+  pageSize = 10;
   /** Danh sách Entry Type (dropdown) */
   entryTypes: EntryType[] = [
     { id: 1, name: 'Payment Method' },
@@ -103,6 +106,10 @@ export class JournalTypeMaintenanceComponent {
   }
   trackByCode(_: number, r: JournalType) {
     return r.typeCode;
+  }
+
+  pageCount(): number {
+    return Math.max(1, Math.ceil(this.filteredRows().length / this.pageSize));
   }
 
   /** toolbar */

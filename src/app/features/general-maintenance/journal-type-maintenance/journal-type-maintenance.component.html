@@ -1,120 +1,116 @@
-<div class="page">
-  <div class="titlebar">
-    <h1>Journal Type Maintenance</h1>
+<div class="ac-page journal-type-page">
+  <div class="ac-card">
+    <div class="ac-page-header journal-type-header">
+      <div>
+        <div class="ac-page-title">Journal Type Maintenance</div>
+        <div class="ac-page-subtitle">Maintain journal types used across modules.</div>
+      </div>
 
-    <div class="toolbar">
-      <input class="search1" [(ngModel)]="q" placeholder="Search type / description..." />
-      <button class="btn primary" (click)="onNew()">New</button>
-      <button class="btn" [disabled]="!selected" (click)="onEdit()">Edit</button>
-      <button class="btn danger" [disabled]="!selected" (click)="onDelete()">Delete</button>
+      <div class="journal-type-toolbar account-type-toolbar">
+        <input type="text" class="account-type-search" [(ngModel)]="q" placeholder="Search type / description..." (input)="page = 1" />
+        <button class="ac-btn ac-btn-primary" (click)="onNew()">New</button>
+        <button class="ac-btn" [disabled]="!selected" (click)="onEdit()">Edit</button>
+        <button class="ac-btn ac-btn-danger" [disabled]="!selected" (click)="onDelete()">Delete</button>
+      </div>
     </div>
-  </div>
 
-  <div class="gridwrap">
-    <table>
-      <thead>
-        <tr>
-          <th style="width:170px">Journal Type</th>
-          <th>Description</th>
-          <th style="width:220px">2nd Description</th>
-          <th style="width:240px">Entry Type</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr *ngFor="let r of filteredRows(); trackBy: trackByCode"
-            (click)="pick(r)"
-            [class.active]="isPicked(r)">
-          <td class="monospace">{{ r.typeCode }}</td>
-          <td class="clip" [title]="r.description">{{ r.description }}</td>
-          <td class="clip" [title]="r.description2ND">{{ r.description2ND || '' }}</td>
-          <td>{{ getEntryName(r.entrytypeId) }}</td>
-        </tr>
-      </tbody>
-    </table>
+    <div class="journal-type-grid">
+      <table class="ac-table">
+        <thead>
+          <tr>
+            <th style="width:170px">Journal Type</th>
+            <th>Description</th>
+            <th style="width:220px">2nd Description</th>
+            <th style="width:240px">Entry Type</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let r of filteredRows() | slice : (page - 1) * pageSize : (page - 1) * pageSize + pageSize; trackBy: trackByCode" (click)="pick(r)" [class.ac-row-selected]="isPicked(r)">
+            <td class="mono">{{ r.typeCode }}</td>
+            <td class="clip" [title]="r.description">{{ r.description }}</td>
+            <td class="clip" [title]="r.description2ND">{{ r.description2ND || '' }}</td>
+            <td>{{ getEntryName(r.entrytypeId) }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
 
-    <div class="footer">Records: {{ filteredRows().length }}</div>
+    <div class="account-type-footer">
+      <div class="account-type-rec">Records: {{ filteredRows().length }}</div>
+      <div class="account-type-pager">
+        <button class="ac-btn ac-btn-ghost account-type-pg-btn" [disabled]="page === 1" (click)="page = 1">&laquo;</button>
+        <button class="ac-btn ac-btn-ghost account-type-pg-btn" [disabled]="page === 1" (click)="page = page - 1">&lsaquo;</button>
+        <span class="account-type-pg-label">Page {{ page }} / {{ pageCount() }}</span>
+        <button class="ac-btn ac-btn-ghost account-type-pg-btn" [disabled]="page === pageCount()" (click)="page = page + 1">&rsaquo;</button>
+        <button class="ac-btn ac-btn-ghost account-type-pg-btn" [disabled]="page === pageCount()" (click)="page = pageCount()">&raquo;</button>
+      </div>
+    </div>
   </div>
 </div>
 
-<!-- Modal -->
-<div class="dialog" *ngIf="showModal">
-  <div class="dialog-panel" role="dialog" aria-modal="true">
-    <div class="dialog-title">
-      {{ isEdit ? 'Edit Journal Type' : 'New Journal Type' }}
-      <button class="x" (click)="close()">✕</button>
+<!-- Dialogs -->
+<div class="ac-dialog-backdrop" *ngIf="showModal">
+  <div class="ac-card-no-padding ac-dialog-panel-lg">
+    <div class="ac-dialog-header">
+      <span>{{ isEdit ? 'Edit Journal Type' : 'New Journal Type' }}</span>
+      <button type="button" class="ac-dialog-close" (click)="close()">×</button>
     </div>
-
-    <div class="dialog-body">
-      <div class="grid2">
-        <label>Journal Type
-          <input class="inp monospace"
-                 [(ngModel)]="form.typeCode"
-                 [readonly]="isEdit"
-                 [class.readonly]="isEdit"
-                 placeholder="e.g. BANK-B" />
+    <div class="ac-dialog-body">
+      <div class="ac-dialog-form-grid-2">
+        <label class="ac-form-field">
+          <span class="ac-form-label">Journal Type</span>
+          <input class="inp mono" [(ngModel)]="form.typeCode" [readOnly]="isEdit" placeholder="e.g. BANK-B" />
         </label>
-
-        <label>Description
+        <label class="ac-form-field">
+          <span class="ac-form-label">Description</span>
           <input class="inp" [(ngModel)]="form.description" placeholder="e.g. BANK RECEIPTS AND PAYMENT" />
         </label>
-      </div>
-      <br>
-    <div class="grid2">
-        <label>2nd Description
+        <label class="ac-form-field">
+          <span class="ac-form-label">2nd Description</span>
           <input class="inp" [(ngModel)]="form.description2ND" placeholder="Optional" />
         </label>
-
-        <label>Entry Type
+        <label class="ac-form-field">
+          <span class="ac-form-label">Entry Type</span>
           <select class="inp" [(ngModel)]="form.entrytypeId">
             <option *ngFor="let t of entryTypes" [ngValue]="t.id">{{ t.name }}</option>
           </select>
         </label>
       </div>
     </div>
-
-    <div class="dialog-actions">
-      <button class="btn cancel" (click)="close()">Cancel</button>
-      <button class="btn primary" (click)="save()">Save</button>
+    <div class="ac-dialog-footer">
+      <button class="ac-btn ac-btn-ghost" (click)="close()">Cancel</button>
+      <button class="ac-btn ac-btn-primary" (click)="save()">Save</button>
     </div>
   </div>
 </div>
-<div class="dialog" *ngIf="showDeleteConfirm">
-  <div class="dialog-panel-small" role="dialog" aria-modal="true">
-    <div class="dialog-title">
-      Delete Journal Type  &nbsp;<button
-        class="x"
-        (click)="closeDeleteConfirm()"
-        aria-label="Close"
-      >
-        ×
-      </button>
-    </div>
 
-    <div class="dialog-body">
-      <p>
-        Are you sure you want to delete
-        <b>{{ selected?.typeCode }}</b>
-        ?
-      </p>
+<div class="ac-dialog-backdrop" *ngIf="showDeleteConfirm">
+  <div class="ac-card-no-padding ac-dialog-panel-sm" role="dialog" aria-modal="true">
+    <div class="ac-dialog-header">
+      <span>Delete Journal Type</span>
+      <button type="button" class="ac-dialog-close" (click)="closeDeleteConfirm()">×</button>
     </div>
-
-    <div class="dialog-actions">
-      <button class="btn" (click)="closeDeleteConfirm()">Cancel</button>
-      <button class="btn danger" (click)="Delete()">Delete</button>
+    <div class="ac-dialog-body">
+      <p>Are you sure you want to delete <b>{{ selected?.typeCode }}</b>?</p>
+    </div>
+    <div class="ac-dialog-footer">
+      <button class="ac-btn ac-btn-ghost" (click)="closeDeleteConfirm()">Cancel</button>
+      <button class="ac-btn ac-btn-danger" (click)="Delete()">Delete</button>
     </div>
   </div>
 </div>
-<div class="dialog" *ngIf="showSuccess">
-  <div class="dialog-panel-small" role="dialog" aria-modal="true" style="min-width: 360px">
-    <div class="dialog-title" style="background: linear-gradient(180deg,#9be28a 0%, #62c84f 100%);">
-       Success
-      <button class="x" (click)="closeSuccess()" aria-label="Close">×</button>
+
+<div class="ac-dialog-backdrop" *ngIf="showSuccess">
+  <div class="ac-card-no-padding ac-dialog-panel-sm" role="dialog" aria-modal="true">
+    <div class="ac-dialog-header" style="background: linear-gradient(180deg,#9be28a 0%, #62c84f 100%);">
+      <span>Success</span>
+      <button type="button" class="ac-dialog-close" (click)="closeSuccess()">×</button>
     </div>
-    <div class="dialog-body">
-      <p style="margin: 8px 0; font-weight:600; color:#14532d">{{ successMsg }}</p>
+    <div class="ac-dialog-body">
+      <p style="margin:8px 0; font-weight:600; color:#14532d">{{ successMsg }}</p>
     </div>
-    <div class="dialog-actions">
-      <button class="btn primary" (click)="closeSuccess()">OK</button>
+    <div class="ac-dialog-footer">
+      <button class="ac-btn ac-btn-primary" (click)="closeSuccess()">OK</button>
     </div>
   </div>
 </div>
