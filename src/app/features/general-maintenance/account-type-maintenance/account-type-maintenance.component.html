@@ -237,33 +237,23 @@
 </div>
 
 <!-- SUCCESS DIALOG -->
-<div class="ac-dialog-backdrop" *ngIf="showSuccess">
-  <div
-    class="ac-card-no-padding ac-dialog-panel-sm account-type-success-dialog"
-    role="dialog"
-    aria-modal="true"
-  >
-    <div class="ac-dialog-header account-type-success-header">
-      <span>Success</span>
-      <button
-        class="ac-dialog-close"
-        (click)="closeSuccess()"
-        aria-label="Close"
-      >
-        ×
-      </button>
-    </div>
-
-    <div class="ac-dialog-body">
-      <p class="account-type-success-text">
-        {{ successMsg }}
-      </p>
-    </div>
-
-    <div class="ac-dialog-footer">
-      <button class="ac-btn ac-btn-primary" (click)="closeSuccess()">
-        OK
-      </button>
+  <div class="ac-dialog-backdrop" *ngIf="showSuccess">
+    <div class="ac-card-no-padding ac-dialog-panel-sm ac-dialog-success" role="dialog" aria-modal="true" style="min-width: 360px">
+      <div class="ac-dialog-header ac-dialog-success-header">
+        <span>Success</span>
+        <button class="ac-dialog-close" type="button" (click)="closeSuccess()" aria-label="Close">
+          ×
+        </button>
+      </div>
+      <div class="ac-dialog-body">
+        <p class="ac-dialog-success-text">
+          {{ successMsg }}
+        </p>
+      </div>
+      <div class="ac-dialog-footer">
+        <button type="button" class="ac-btn ac-btn-primary" (click)="closeSuccess()">
+          OK
+        </button>
+      </div>
     </div>
   </div>
-</div>

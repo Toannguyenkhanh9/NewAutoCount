@@ -14,9 +14,13 @@ import { FormsModule } from '@angular/forms';
 import { AmountInputDirective } from '../../../_share/directives';
 import { JournalType } from '../../../_share/models/general-maintenance';
 import { DebtorRow } from '../../../_share/models/ar';
-
+import { LucideIconsModule } from '../../../_share/lucide-icons';
 type Status = 'OPEN' | 'POSTED' | 'VOID';
-
+interface DebtorCurrency {
+  code: string;
+  name: string;
+  isDefault?: boolean;
+}
 interface ItemRef {
   code: string;
   name: string;
@@ -69,6 +73,7 @@ type PaymentLine = {
     FormsModule,
     ReactiveFormsModule,
     AmountInputDirective,
+    LucideIconsModule
   ],
   templateUrl: './ar-invoice-page.component.html',
   styleUrls: ['./ar-invoice-page.component.scss'],
@@ -240,6 +245,7 @@ export class ArInvoicePageComponent implements OnInit {
   showDebtorPicker = false;
   debtorQuery = '';
   debtorFiltered: DebtorRow[] = [];
+  showDueShortcuts = false;
   openDebtorDropdown() {
     this.debtorQuery = '';
     this.debtorFiltered = [...(this.debtors ?? [])];
@@ -251,12 +257,12 @@ export class ArInvoicePageComponent implements OnInit {
     this.debtorFiltered = !q
       ? [...src]
       : src.filter(
-          (d) =>
-            (d.debtorAccount || '').toLowerCase().includes(q) ||
-            (d.companyName || '').toLowerCase().includes(q) ||
-            (d.billAddress || '').toLowerCase().includes(q) ||
-            (d.phone || '').toLowerCase().includes(q)
-        );
+        (d) =>
+          (d.debtorAccount || '').toLowerCase().includes(q) ||
+          (d.companyName || '').toLowerCase().includes(q) ||
+          (d.billAddress || '').toLowerCase().includes(q) ||
+          (d.phone || '').toLowerCase().includes(q)
+      );
   }
   pickDebtor(d: DebtorRow) {
     this.invForm.patchValue({ debtor: d.debtorAccount });
@@ -272,6 +278,7 @@ export class ArInvoicePageComponent implements OnInit {
   }
   ngOnInit() {
     if (this.acLinesFA.length === 0) this.addAcLine();
+        this.initCurrencyLists();
   }
   trackByIndex(index: number, _item: any): number {
     return index;
@@ -410,7 +417,7 @@ export class ArInvoicePageComponent implements OnInit {
   showPrint = false;
   printForm!: FormGroup;
   showPreview = false;
-
+  showAddRowMenu = false;
   buildForms() {
     this.invForm = this.fb.group({
       // header
@@ -430,6 +437,7 @@ export class ArInvoicePageComponent implements OnInit {
       grandTotal: [0],
       outstanding: [0],
       continueNew: [true],
+      currency: [''],
     });
     if (this.acLinesFA.length === 0) this.addAcLine();
     this.findForm = this.fb.group({
@@ -453,7 +461,25 @@ export class ArInvoicePageComponent implements OnInit {
     this.acLinesFA.push(this.createLine());
     this.accNoSugs.push([]);
   }
+  addRows(count: number) {
+    if (this.formMode === 'view') {
+      return;
+    }
+    for (let i = 0; i < count; i++) {
+      this.addAcLine();
+    }
+  }
 
+  toggleAddRowMenu() {
+    if (this.formMode === 'view') {
+      return;
+    }
+    this.showAddRowMenu = !this.showAddRowMenu;
+  }
+
+  closeAddRowMenu() {
+    this.showAddRowMenu = false;
+  }
   recalcLine(i: number) {
     // nếu cần auto điền mô tả từ accNo thì xử lý ở đây
     this.recalcTotals();
@@ -558,6 +584,71 @@ export class ArInvoicePageComponent implements OnInit {
       { emitEvent: false }
     );
   }
+  /**
+   * Mở / đóng menu quick due date.
+   * Dùng $event.stopPropagation() để không lan ra ngoài.
+   */
+  toggleDueShortcuts(event: MouseEvent): void {
+    event.stopPropagation();
+    this.showDueShortcuts = !this.showDueShortcuts;
+  }
+
+  /**
+   * set Due date dựa trên Issue date (docDate) với các option nhanh.
+   */
+  applyDueShortcut(
+    kind: 'IN_7' | 'IN_14' | 'FIRST_NEXT' | 'TWENTIETH_NEXT' | 'END_NEXT' | 'RESET'
+  ): void {
+    const baseYmd: string = this.invForm.value.docDate || this.todayYMD();
+    let newDue: string | null = null;
+
+    switch (kind) {
+      case 'IN_7':
+        newDue = this.addDaysYMD(baseYmd, 7);
+        break;
+      case 'IN_14':
+        newDue = this.addDaysYMD(baseYmd, 14);
+        break;
+      case 'FIRST_NEXT':
+        newDue = this.firstOfNextMonthYMD(baseYmd);
+        break;
+      case 'TWENTIETH_NEXT':
+        newDue = this.twentiethOfNextMonthYMD(baseYmd);
+        break;
+      case 'END_NEXT':
+        newDue = this.endOfNextMonthYMD(baseYmd);
+        break;
+      case 'RESET':
+        // dùng logic terms hiện tại của anh
+        this.recalcDue();
+        break;
+    }
+
+    if (newDue) {
+      this.invForm.get('dueDate')?.setValue(newDue);
+    }
+
+    this.showDueShortcuts = false;
+  }
+  private firstOfNextMonthYMD(ymd: string): string {
+    const [y, m] = ymd.split('-').map(Number);
+    // tháng JS: 0-based, nên m là tháng hiện tại; m + 1 = tháng sau, ngày 1
+    const d = new Date(y, m, 1);
+    return this.toYMD(d);
+  }
+
+  private twentiethOfNextMonthYMD(ymd: string): string {
+    const [y, m] = ymd.split('-').map(Number);
+    const d = new Date(y, m, 20); // 20 của tháng sau
+    return this.toYMD(d);
+  }
+
+  private endOfNextMonthYMD(ymd: string): string {
+    const [y, m] = ymd.split('-').map(Number);
+    // day 0 của (tháng sau + 1) = ngày cuối của tháng sau
+    const d = new Date(y, m + 1, 0);
+    return this.toYMD(d);
+  }
 
   // totals
   recalcTotals() {
@@ -579,12 +670,12 @@ export class ArInvoicePageComponent implements OnInit {
     let list = !q
       ? this.invoices
       : this.invoices.filter(
-          (i) =>
-            i.docNo.toLowerCase().includes(q) ||
-            i.debtor.toLowerCase().includes(q) ||
-            i.debtorName.toLowerCase().includes(q) ||
-            i.description?.toLowerCase().includes(q)
-        );
+        (i) =>
+          i.docNo.toLowerCase().includes(q) ||
+          i.debtor.toLowerCase().includes(q) ||
+          i.debtorName.toLowerCase().includes(q) ||
+          i.description?.toLowerCase().includes(q)
+      );
     list = [...list].sort((a, b) => {
       const va = String(a[this.sortBy] ?? '').toLowerCase();
       const vb = String(b[this.sortBy] ?? '').toLowerCase();
@@ -916,4 +1007,121 @@ export class ArInvoicePageComponent implements OnInit {
       this.select(inv); // vẫn dùng select(...) để nạp history
     }
   }
+  closeForm() {
+    this.showForm = false;
+    this.invForm.markAsPristine();
+  }
+  showCurrencyPanel = false;
+  currencySearch = '';
+  currencies: DebtorCurrency[] = [
+    { code: 'MYR', name: 'Malaysian Ringgit', isDefault: true },
+    { code: 'USD', name: 'US Dollar' },
+    { code: 'EUR', name: 'Euro' },
+    { code: 'SGD', name: 'Singapore Dollar' },
+    { code: 'THB', name: 'Thai Baht' },
+    { code: 'JPY', name: 'Japanese Yen' },
+    { code: 'CNY', name: 'Chinese Yuan' },
+    { code: 'AUD', name: 'Australian Dollar' },
+  ];
+
+  /** “My currencies” – ví dụ: default + currency đang chọn */
+  myCurrencies: DebtorCurrency[] = [];
+
+  /** All currencies sau khi filter bằng ô search */
+  filteredCurrencies: DebtorCurrency[] = [];
+
+  toggleCurrencyPanel(): void {
+    if (this.showCurrencyPanel) {
+      this.closeCurrencyPanel();
+    } else {
+      this.openCurrencyPanel();
+    }
+  }
+
+  openCurrencyPanel(): void {
+    this.showCurrencyPanel = true;
+    this.currencySearch = '';
+    this.filteredCurrencies = [...this.currencies];
+  }
+
+  closeCurrencyPanel(): void {
+    this.showCurrencyPanel = false;
+  }
+
+  onCurrencySearchChange(value: string): void {
+    this.currencySearch = value;
+    this.filterCurrencies();
+  }
+
+  filterCurrencies(): void {
+    const term = (this.currencySearch || '').trim().toLowerCase();
+    if (!term) {
+      this.filteredCurrencies = [...this.currencies];
+      return;
+    }
+
+    this.filteredCurrencies = this.currencies.filter((c) => {
+      const name = (c.name || '').toLowerCase();
+      const code = c.code.toLowerCase();
+      return name.includes(term) || code.includes(term);
+    });
+  }
+
+  selectCurrency(cur: DebtorCurrency): void {
+    this.invForm.patchValue({ currency: cur.code });
+    this.updateMyCurrencies();
+    this.closeCurrencyPanel();
+  }
+  private updateMyCurrencies(): void {
+    const currentCode = this.invForm.get('currency')?.value;
+
+    const codes = new Set<string>();
+    this.myCurrencies = [];
+
+    // luôn ưu tiên default
+    for (const c of this.currencies) {
+      if (c.isDefault) {
+        this.myCurrencies.push(c);
+        codes.add(c.code);
+      }
+    }
+
+    // thêm currency đang chọn nếu chưa có trong list
+    const current = this.currencies.find((c) => c.code === currentCode);
+    if (current && !codes.has(current.code)) {
+      this.myCurrencies.unshift(current);
+      codes.add(current.code);
+    }
+  }
+    /** Currency đang chọn để hiển thị trên nút */
+  get selectedCurrency(): DebtorCurrency | undefined {
+    const code = this.invForm.get('currency')?.value;
+    return this.currencies.find((c) => c.code === code);
+  }
+
+  /** Label hiển thị trên nút trigger */
+  get currencyDisplayLabel(): string {
+    const cur = this.selectedCurrency;
+    if (!cur) return 'Select currency';
+    return `${cur.name || cur.code} (${cur.code})`;
+  }
+
+  /** Khởi tạo “My currencies” và danh sách filter */
+  private initCurrencyLists(): void {
+    // currency mặc định trong form
+    let currentCode =
+      this.invForm.get('currency')?.value ||
+      this.currencies.find((c) => c.isDefault)?.code ||
+      this.currencies[0]?.code;
+
+    if (!currentCode) {
+      currentCode = 'MYR';
+    }
+
+    this.invForm.patchValue({ currency: currentCode }, { emitEvent: false });
+
+    this.updateMyCurrencies();
+    this.filteredCurrencies = [...this.currencies];
+  }
+
 }

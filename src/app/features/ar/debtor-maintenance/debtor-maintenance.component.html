@@ -26,12 +26,12 @@
         <table class="ac-table">
           <thead>
             <tr>
-              <th (click)="setSort('debtorAccount')">Code</th>
-              <th>Customer Name</th>
-              <th>Company/SSM ID</th>
-              <th>Phone</th>
-              <th>Customer's TIN</th>
-              <th>Active</th>
+              <th class="ac-text-left" (click)="setSort('debtorAccount')">Code</th>
+              <th class="ac-text-left">Customer Name</th>
+              <th class="ac-text-left">Company/SSM ID</th>
+              <th class="ac-text-left">Phone</th>
+              <th class="ac-text-left">Customer's TIN</th>
+              <th class="ac-text-left">Active</th>
             </tr>
           </thead>
           <tbody>
@@ -357,10 +357,10 @@
                   </label>
 
                   <!-- Checkbox: Block new invoices... -->
-                  <div class="credit-limit-row" [class.disabled]="!debtorForm.get('creditLimitAmount')?.value">
-                    <label class="ac-checkbox-row credit-limit-block" [class.is-disabled]="creditLimitDisabled">
+                  <div class="credit-limit-row" >
+                    <label class="ac-checkbox-row credit-limit-block" >
                       <input type="checkbox" formControlName="blockNewInvoicesWhenLimitReached"
-                        [disabled]="creditLimitDisabled" />
+                       />
                       <span>Block new invoices when credit limit is reached</span>
                     </label>
                   </div>
@@ -395,6 +395,64 @@
       </div>
     </div>
   </ng-container>
+  <div class="ac-dialog-backdrop" *ngIf="showSuccess">
+    <div
+      class="ac-card-no-padding ac-dialog-panel-sm ac-dialog-success"
+      role="dialog"
+      aria-modal="true"
+    >
+      <div class="ac-dialog-header ac-dialog-success-header">
+        <span>Success</span>
+        <button
+          class="ac-dialog-close"
+          (click)="closeSuccess()"
+          aria-label="Close"
+        >
+          ×
+        </button>
+      </div>
+      <div class="ac-dialog-body">
+        <p class="ac-dialog-success-text">
+          {{ successMsg }}
+        </p>
+      </div>
+      <div class="ac-dialog-footer">
+        <button
+          class="ac-btn ac-btn-primary"
+          type="button"
+          (click)="closeSuccess()"
+        >
+          OK
+        </button>
+      </div>
+    </div>
+  </div>
+<div class="ac-dialog-backdrop" *ngIf="showDeleteDebtorConfirm">
+  <div class="ac-card-no-padding ac-dialog-panel-sm" role="dialog" aria-modal="true">
+    <div class="ac-dialog-header">
+      Delete Debtor &nbsp;<button
+        class="ac-dialog-close"
+        (click)="closeDeleteDebtorConfirm()"
+        aria-label="Close"
+      >
+        ×
+      </button>
+    </div>
 
+    <div class="ac-dialog-body">
+      <p>
+        Are you sure you want to delete
+        <b>{{ selected?.debtorAccount }}</b>
+        ?
+      </p>
+    </div>
 
+    <div class="ac-dialog-footer">
+      <button class="ac-btn ac-btn-ghost" (click)="closeDeleteDebtorConfirm()">
+        Cancel
+      </button>
+      <button class="ac-btn ac-btn-danger" (click)="deleteDebtor()">Delete</button>
+    </div>
+  </div>
+</div>
 </div>

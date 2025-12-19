@@ -1,182 +1,194 @@
 <div class="ac-page">
+  <ng-container *ngIf="!showForm">
     <div class="ac-card">
-  <!-- ============ HEADER ============ -->
-  <div class="ac-page-header">
-    <div>
-      <div class="ac-page-title">A/R Invoice Entry</div>
-      <div class="ac-page-subtitle">
-        Record and manage sales invoices and their payment history.
-      </div>
-    </div>
+      <!-- ============ HEADER ============ -->
+      <div class="ac-page-header">
+        <div>
+          <div class="ac-page-title">A/R Invoice Entry</div>
+          <div class="ac-page-subtitle">
+            Record and manage sales invoices and their payment history.
+          </div>
+        </div>
 
-    <div class="ac-page-toolbar" role="toolbar">
-      <input class="ac-form-control ac-page-search" type="text" [(ngModel)]="q"
-        placeholder="Search invoice no / company name..." />
+        <div class="ac-page-toolbar" role="toolbar">
+          <input class="ac-form-control ac-page-search" type="text" [(ngModel)]="q"
+            placeholder="Search invoice no / company name..." />
 
-      <button type="button" class="ac-btn ac-btn-primary" (click)="newInvoice()">
-        <span class="ico plus"></span>
-        New
-      </button>
+          <button type="button" class="ac-btn ac-btn-primary" (click)="newInvoice()">
+            <span class="ico plus"></span>
+            New
+          </button>
 
-      <button type="button" class="ac-btn" [disabled]="!selected" (click)="editInvoice()">
-        <span class="ico edit"></span>
-        Edit
-      </button>
+          <button type="button" class="ac-btn" [disabled]="!selected" (click)="editInvoice()">
+            <span class="ico edit"></span>
+            Edit
+          </button>
 
-      <button type="button" class="ac-btn ac-btn-danger" [disabled]="!selected" (click)="openDeleteInvoiceConfirm()">
-        <span class="ico trash"></span>
-        Delete
-      </button>
-    </div>
-  </div>
-
-  <!-- ============ LIST + HISTORY ============ -->
-  <div class="list-shell">
-    <!-- Main grid -->
-    <div class="ac-card ac-card-no-padding main-grid">
-      <div class="ac-tablewrap">
-        <table class="ac-table">
-          <thead>
-            <tr>
-              <th (click)="setSort('docDate')">Invoice No</th>
-              <th (click)="setSort('docNo')">Date</th>
-              <th (click)="setSort('debtor')">Company Name</th>
-              <th>Description</th>
-              <th class="ac-text-right">Total</th>
-              <th class="ac-text-right">Outstanding</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr *ngFor="let inv of paged" (click)="toggleSelect(inv)" [class.ac-row-selected]="selected === inv"
-              [class.ac-row-overdue]="isOverdue(inv)">
-              <td>{{ inv.docNo }}</td>
-              <td>{{ inv.docDate }}</td>
-              <td>{{ inv.debtor }} — {{ inv.debtorName }}</td>
-              <td>{{ inv.description || '-' }}</td>
-              <td class="ac-text-right">
-                {{ inv.grandTotal | number : '1.2-2' }}
-              </td>
-              <td class="ac-text-right">
-                {{ inv.outstanding | number : '1.2-2' }}
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-
-    <!-- Payment history -->
-    <div class="ac-card ac-card-no-padding payment-panel" *ngIf="selected">
-      <div class="pp-head">
-        <div class="pp-title">
-          Payment History
-          <ng-container *ngIf="selected">
-            &nbsp;—&nbsp;<b>{{ selected.docNo }}</b>
-          </ng-container>
+          <button type="button" class="ac-btn ac-btn-danger" [disabled]="!selected"
+            (click)="openDeleteInvoiceConfirm()">
+            <span class="ico trash"></span>
+            Delete
+          </button>
         </div>
       </div>
 
-      <div class="pp-body" *ngIf="selected; else noSel">
-        <div class="ac-tablewrap">
-          <table class="ac-table ac-table-sm">
-            <colgroup>
-              <col style="width: 12%" />
-              <col style="width: 20%" />
-              <col style="width: 42%" />
-              <col style="width: 13%" />
-              <col style="width: 13%" />
-            </colgroup>
-            <thead>
-              <tr>
-                <th style="width: 90px">Type</th>
-                <th style="width: 120px">No.</th>
-                <th>Description</th>
-                <th style="width: 120px">Date</th>
-                <th class="ac-text-right" style="width: 140px">Amount</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr *ngFor="let p of paymentHistory">
-                <td>{{ p.type }}</td>
-                <td>{{ p.no }}</td>
-                <td class="cut">{{ p.description || '-' }}</td>
-                <td>{{ p.date }}</td>
-                <td class="ac-text-right">
-                  {{ p.amount | number : '1.2-2' }}
-                </td>
-              </tr>
-              <tr *ngIf="!paymentHistory.length">
-                <td colspan="5" class="ac-text-center ac-text-muted">
-                  — No payment —
-                </td>
-              </tr>
-            </tbody>
-          </table>
+      <!-- ============ LIST + HISTORY ============ -->
+      <div class="list-shell">
+        <!-- Main grid -->
+        <div class="ac-card ac-card-no-padding main-grid">
+          <div class="ac-tablewrap">
+            <table class="ac-table">
+              <thead>
+                <tr>
+                  <th class="ac-text-left" (click)="setSort('docDate')">Invoice No</th>
+                  <th class="ac-text-left" (click)="setSort('docNo')">Date</th>
+                  <th class="ac-text-left" (click)="setSort('debtor')">Company Name</th>
+                  <th class="ac-text-left" >Description</th>
+                  <th class="ac-text-right">Total</th>
+                  <th class="ac-text-right">Outstanding</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let inv of paged" (click)="toggleSelect(inv)" [class.ac-row-selected]="selected === inv"
+                  [class.ac-row-overdue]="isOverdue(inv)">
+                  <td>{{ inv.docNo }}</td>
+                  <td>{{ inv.docDate }}</td>
+                  <td>{{ inv.debtor }} — {{ inv.debtorName }}</td>
+                  <td>{{ inv.description || '-' }}</td>
+                  <td class="ac-text-right">
+                    {{ inv.grandTotal | number : '1.2-2' }}
+                  </td>
+                  <td class="ac-text-right">
+                    {{ inv.outstanding | number : '1.2-2' }}
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Payment history -->
+        <div class="ac-card ac-card-no-padding payment-panel" *ngIf="selected">
+          <div class="pp-head">
+            <div class="pp-title">
+              Payment History
+              <ng-container *ngIf="selected">
+                &nbsp;—&nbsp;<b>{{ selected.docNo }}</b>
+              </ng-container>
+            </div>
+          </div>
+
+          <div class="pp-body" *ngIf="selected; else noSel">
+            <div class="ac-tablewrap">
+              <table class="ac-table ac-table-sm">
+                <colgroup>
+                  <col style="width: 12%" />
+                  <col style="width: 20%" />
+                  <col style="width: 42%" />
+                  <col style="width: 13%" />
+                  <col style="width: 13%" />
+                </colgroup>
+                <thead>
+                  <tr>
+                    <th class="ac-text-left" style="width: 90px">Type</th>
+                    <th class="ac-text-left" style="width: 120px">No.</th>
+                    <th class="ac-text-left" >Description</th>
+                    <th class="ac-text-left" style="width: 120px">Date</th>
+                    <th class="ac-text-right" style="width: 140px">Amount</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let p of paymentHistory">
+                    <td>{{ p.type }}</td>
+                    <td>{{ p.no }}</td>
+                    <td class="cut">{{ p.description || '-' }}</td>
+                    <td>{{ p.date }}</td>
+                    <td class="ac-text-right">
+                      {{ p.amount | number : '1.2-2' }}
+                    </td>
+                  </tr>
+                  <tr *ngIf="!paymentHistory.length">
+                    <td colspan="5" class="ac-text-center ac-text-muted">
+                      — No payment —
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <ng-template #noSel>
+            <div class="pp-empty">
+              Select an invoice to see its payment history.
+            </div>
+          </ng-template>
         </div>
       </div>
 
-      <ng-template #noSel>
-        <div class="pp-empty">
-          Select an invoice to see its payment history.
+      <!-- ============ PAGER ============ -->
+      <div class="ac-page-footer">
+        <div class="ac-pager">
+          <button type="button" class="ac-btn ac-pager-btn" (click)="goFirst()">
+            &laquo;
+          </button>
+          <button type="button" class="ac-btn ac-pager-btn" (click)="goPrev()">
+            &lsaquo;
+          </button>
+
+          <span class="ac-pager-label">
+            Page {{ page }} / {{ totalPages }}
+          </span>
+
+          <button type="button" class="ac-btn ac-pager-btn" (click)="goNext()">
+            &rsaquo;
+          </button>
+          <button type="button" class="ac-btn ac-pager-btn" (click)="goLast()">
+            &raquo;
+          </button>
         </div>
-      </ng-template>
+      </div>
     </div>
-  </div>
-
-  <!-- ============ PAGER ============ -->
-  <div class="ac-page-footer">
-    <div class="ac-pager">
-      <button type="button" class="ac-btn ac-pager-btn" (click)="goFirst()">
-        &laquo;
-      </button>
-      <button type="button" class="ac-btn ac-pager-btn" (click)="goPrev()">
-        &lsaquo;
-      </button>
-
-      <span class="ac-pager-label">
-        Page {{ page }} / {{ totalPages }}
-      </span>
-
-      <button type="button" class="ac-btn ac-pager-btn" (click)="goNext()">
-        &rsaquo;
-      </button>
-      <button type="button" class="ac-btn ac-pager-btn" (click)="goLast()">
-        &raquo;
-      </button>
-    </div>
-  </div>
-</div>
+  </ng-container>
   <!-- ================== MODALS ================== -->
 
   <!-- INVOICE FORM (New/Edit/View) -->
-  <div class="ac-dialog-backdrop" *ngIf="showForm">
-    <div class="dialog-panel ac-card-no-padding ac-dialog-panel-xl">
-      <!-- HEADER -->
-      <div class="ac-dialog-header">
-        <span>
-          {{
-          formMode === 'new'
-          ? 'New A/R Invoice'
-          : formMode === 'edit'
-          ? 'Edit A/R Invoice'
-          : 'View A/R Invoice'
-          }}
-        </span>
-        <button type="button" class="ac-dialog-close" (click)="showForm = false" aria-label="Close">
-          ✕
-        </button>
+  <ng-container *ngIf="showForm">
+    <div class="inv-form">
+      <!-- top title (giống Debtor) -->
+      <div class="inv-header">
+        <div>
+          <h2 class="inv-title">
+            {{
+            formMode === 'new'
+            ? 'New A/R Invoice'
+            : formMode === 'edit'
+            ? 'Edit A/R Invoice'
+            : 'View A/R Invoice'
+            }}
+            <ng-container *ngIf="formMode !== 'new' && invForm?.value?.docNo">
+              &nbsp;—&nbsp;{{ invForm.value.docNo }}
+            </ng-container>
+          </h2>
+          <p class="inv-subtitle">
+            Record and manage sales invoices and their payment history.
+          </p>
+        </div>
       </div>
 
-      <!-- BODY + SCROLL + FOOTER -->
-      <form [formGroup]="invForm" class="ac-dialog-body">
-        <!-- VÙNG CUỘN (giống Contra: ac-dialog-scroll) -->
-        <div class="ac-dialog-scroll">
-          <!-- FORM GRID 3 CỘT -->
-          <div class="ac-dialog-form-grid-3">
-            <!-- Debtor / Journal / Ref2 -->
-            <label>
-              Debtor
-              <div class="inline-field">
+      <!-- BODY: header fields + lines -->
+      <form [formGroup]="invForm" class="inv-body">
+        <div class="inv-body-inner">
+          <!-- ==== HEADER GRID (giống Xero) ==== -->
+          <div class="inv-header-grid">
+            <!-- Contact -->
+            <label class="inv-field inv-field-contact">
+              <span class="inv-label">Contact</span>
+
+              <div class="inv-contact-input ac-input-prefix-group">
+                <!-- icon người -->
+                <span class="ac-input-prefix-icon"><lucide-icon name="user" [size]="15"
+                    color="#111827"></lucide-icon></span>
+
                 <select class="ac-form-control" formControlName="debtor" (change)="onDebtorChanged()">
                   <option value="">Select debtor...</option>
                   <option *ngFor="let d of debtors" [ngValue]="d.debtorAccount">
@@ -184,37 +196,79 @@
                   </option>
                 </select>
 
-                <button type="button" class="ac-btn ac-btn-ghost" (click)="openDebtorDropdown()" title="Search debtors"
+                <!-- nút search bên phải -->
+                <button type="button" class="inv-contact-search" (click)="openDebtorDropdown()" title="Search debtors"
                   aria-label="Search debtors">
-                  🔎
+                  <lucide-icon name="search" [size]="15" color="#111827"></lucide-icon>
                 </button>
               </div>
-              <div class="err" *ngIf="isInvalid('debtor')">
+
+              <div class="inv-error" *ngIf="isInvalid('debtor')">
                 Please select a debtor.
               </div>
             </label>
 
-            <label>
-              Journal Type
-              <select class="ac-form-control" formControlName="journalType" [disabled]="formMode === 'view'">
-                <option *ngFor="let j of journalTypes" [ngValue]="j.typeCode">
-                  {{ j.typeCode }}
-                </option>
-              </select>
+            <!-- Issue date -->
+            <label class="inv-field">
+              <span class="inv-label">Issue date</span>
+              <div class="ac-input-prefix-group">
+                <span class="ac-input-prefix-icon"><lucide-icon name="calendar" [size]="15"
+                    color="#111827"></lucide-icon></span>
+                <input type="date" class="ac-form-control" formControlName="docDate" (change)="recalcDue()"
+                  [readonly]="formMode === 'view'" />
+              </div>
+            </label>
+            <!-- Due date + quick options -->
+            <label class="inv-field inv-field-due">
+              <span class="inv-label">Due date</span>
+              <div class="ac-input-prefix-group">
+                <div class="inv-due-input">
+                  <span class="ac-input-prefix-icon"><lucide-icon name="calendar" [size]="15"
+                      color="#111827"></lucide-icon></span>
+                  <!-- BỎ readonly cố định, chỉ readonly khi view -->
+                  <input style="padding-left: 32px;" type="date" class="ac-form-control" formControlName="dueDate"
+                    [readonly]="formMode === 'view'" />
+
+                  <!-- nút mở menu ngày nhanh -->
+                  <button type="button" class="inv-due-shortcut-btn" (click)="toggleDueShortcuts($event)"
+                    aria-label="Quick due date">
+                    ⋯
+                  </button>
+                </div>
+              </div>
+              <!-- menu các lựa chọn ngày nhanh -->
+              <div class="inv-due-shortcuts" *ngIf="showDueShortcuts" (click)="$event.stopPropagation()">
+                <button type="button" (click)="applyDueShortcut('IN_7')">In 7 days</button>
+                <button type="button" (click)="applyDueShortcut('IN_14')">In 14 days</button>
+                <button type="button" (click)="applyDueShortcut('FIRST_NEXT')">
+                  1st of next month
+                </button>
+                <button type="button" (click)="applyDueShortcut('TWENTIETH_NEXT')">
+                  20th of next month
+                </button>
+                <button type="button" (click)="applyDueShortcut('END_NEXT')">
+                  End of next month
+                </button>
+
+                <button type="button" class="reset" (click)="applyDueShortcut('RESET')">
+                  Reset to default due date
+                </button>
+              </div>
             </label>
 
-            <label>
-              Ref. No.2
-              <input class="ac-form-control" formControlName="ref2" [readonly]="formMode === 'view'" />
-            </label>
 
-            <!-- Invoice No / Date / Terms / Due Date -->
-            <label>
-              Invoice No
-              <input class="ac-form-control" formControlName="docNo"
-                [readonly]="invForm.value.autoNumbering || formMode !== 'new'" placeholder="&lt;&lt;new&gt;&gt;"
-                [class.invalid]="isInvalid('docNo')" />
-              <div class="err" *ngIf="isInvalid('docNo')">
+
+            <!-- Invoice number -->
+            <label class="inv-field">
+              <span class="inv-label">Invoice number</span>
+              <div class="ac-input-prefix-group">
+                <span class="ac-input-prefix-icon"><lucide-icon name="hash" [size]="15"
+                    color="#111827"></lucide-icon></span>
+                <input class="ac-form-control" formControlName="docNo"
+                  [readonly]="invForm.value.autoNumbering || formMode !== 'new'" placeholder="&lt;&lt;new&gt;&gt;"
+                  [class.invalid]="isInvalid('docNo')" />
+              </div>
+              <div class="inv-error" *ngIf="isInvalid('docNo')">
                 <ng-container *ngIf="invForm.get('docNo')?.errors?.['pattern']">
                   Only letters, numbers, '-', '_' and '/' are allowed.
                 </ng-container>
@@ -224,59 +278,121 @@
               </div>
             </label>
 
-            <label>
-              Date
-              <input type="date" class="ac-form-control" formControlName="docDate" (change)="recalcDue()"
-                [readonly]="formMode === 'view'" />
+            <!-- Reference -->
+            <label class="inv-field">
+              <span class="inv-label">Reference</span>
+              <div class="ac-input-prefix-group">
+                <span class="ac-input-prefix-icon"><lucide-icon name="hash" [size]="15"
+                    color="#0c0c0c"></lucide-icon></span>
+                <input class="ac-form-control" formControlName="ref2" [readonly]="formMode === 'view'" />
+              </div>
             </label>
 
-            <label>
-              Terms
-              <select class="ac-form-control" formControlName="terms" (change)="recalcDue()"
-                [disabled]="formMode === 'view'">
-                <option *ngFor="let t of creditTerms" [ngValue]="t.code">
-                  {{ t.name }}
+            <!-- Journal type -->
+            <label class="inv-field">
+              <span class="inv-label">Journal type</span>
+               <div class="inv-contact-input ac-input-prefix-group">
+                <!-- icon người -->
+                <span class="ac-input-prefix-icon"><lucide-icon name="user" [size]="15"
+                    color="#111827"></lucide-icon></span>
+
+              <select class="ac-form-control" formControlName="journalType" [disabled]="formMode === 'view'">
+                <option *ngFor="let j of journalTypes" [ngValue]="j.typeCode">
+                  {{ j.typeCode }}
                 </option>
               </select>
+              </div>
+
             </label>
 
-            <label>
-              Due Date
-              <input type="date" class="ac-form-control" style="background-color: rgb(251 241 241)"
-                formControlName="dueDate" [readonly]="true" />
-            </label>
+            <!-- Currency -->
+            <label class="currency-field">
+              <span class="inv-label" style="font-weight: 600;">Currency</span>
 
-            <label class="wide">
-              Description
-              <input class="ac-form-control" formControlName="description" [readonly]="formMode === 'view'"
-                placeholder="Document description" />
+              <div class="ac-input-prefix-group">
+                <!-- chấm tròn nhỏ giống Xero -->
+                <span class="ac-input-prefix-icon ac-input-prefix-dot"></span>
+
+                <!-- trigger nhìn như 1 ô input -->
+                <div class="currency-trigger ac-form-control">
+                  <!-- <div class="currency-trigger ac-form-control" (click)="toggleCurrencyPanel()"> -->
+                  <div class="currency-trigger-main">
+                    <span class="currency-trigger-label">
+                      <ng-container *ngIf="selectedCurrency; else noCurrency">
+                        {{ selectedCurrency?.name || selectedCurrency?.code }}
+                        <span *ngIf="selectedCurrency?.isDefault">
+                          (default)
+                        </span>
+                      </ng-container>
+
+                      <ng-template #noCurrency>
+                        Select currency
+                      </ng-template>
+                    </span>
+
+                    <span class="currency-trigger-code" *ngIf="selectedCurrency?.code">
+                      {{ selectedCurrency?.code }}
+                    </span>
+                  </div>
+
+                  <span class="currency-arrow">▾</span>
+                </div>
+
+                <!-- PANEL DROPDOWN -->
+                <div class="currency-panel" *ngIf="showCurrencyPanel" (click)="$event.stopPropagation()">
+                  <!-- SEARCH BOX -->
+                  <div class="currency-search-row">
+                    <span class="currency-search-icon"> <lucide-icon name="search" [size]="15"
+                        color="#111827"></lucide-icon></span>
+                    <input type="text" [(ngModel)]="currencySearch" (input)="filterCurrencies()"
+                      placeholder="Search currency" />
+                  </div>
+
+                  <!-- MY CURRENCIES -->
+                  <div class="currency-group" *ngIf="myCurrencies?.length">
+                    <div class="currency-group-title">My currencies</div>
+
+                    <button type="button" class="currency-row" *ngFor="let c of myCurrencies"
+                      (click)="selectCurrency(c)">
+                      <span class="currency-name">
+                        {{ c.name || c.code }}
+                        <span *ngIf="c.isDefault">(default)</span>
+                      </span>
+                      <span class="currency-code">{{ c.code }}</span>
+                    </button>
+                  </div>
+
+                  <!-- ALL CURRENCIES -->
+                  <div class="currency-group">
+                    <div class="currency-group-title">All currencies</div>
+
+                    <button type="button" class="currency-row" *ngFor="let c of filteredCurrencies"
+                      (click)="selectCurrency(c)">
+                      <span class="currency-name">
+                        {{ c.name || c.code }}
+                      </span>
+                      <span class="currency-code">{{ c.code }}</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
             </label>
           </div>
 
-          <!-- To box -->
-          <div class="to-box">
-            <div class="to-title">To :</div>
+          <br>
+          <!-- ==== TO BOX ==== -->
+          <div class="inv-to-box">
+            <div class="to-title">To: </div>
             <textarea class="to-text" rows="3" readonly [value]="debtorToText"></textarea>
           </div>
-
-          <!-- Lines -->
-          <div class="lines">
-            <div class="lines-head">
-              <div class="title">Sales A/C</div>
-              <div class="actions">
-                <button type="button" class="ac-btn ac-btn-primary" (click)="addAcLine()"
-                  [disabled]="formMode === 'view'">
-                  <span class="ico plus"></span>
-                  Add
-                </button>
-              </div>
-            </div>
-
-            <div>
-              <table class="ac-table table bordered" style="width: 100%">
+          <br>
+          <!-- ==== LINES SECTION ==== -->
+          <div class="inv-lines">
+            <div class="inv-lines-tablewrap">
+              <table class="ac-table-addnew inv-lines-table">
                 <thead>
                   <tr>
-                    <th style="width: 200px">Sales A/C</th>
+                    <th style="width: 220px">Sales A/C</th>
                     <th style="width: 120px">To Acc. Rate</th>
                     <th>Description</th>
                     <th class="ac-text-right" style="width: 160px">Amount</th>
@@ -285,13 +401,14 @@
                 </thead>
                 <tbody *ngIf="invForm">
                   <tr *ngFor="
-                    let fg of acLineGroups;
-                    let i = index;
-                    trackBy: trackByIndex
-                  " [formGroup]="fg">
+              let fg of acLineGroups;
+              let i = index;
+              trackBy: trackByIndex
+            " [formGroup]="fg">
                     <td>
                       <input class="ac-form-control" formControlName="accNo" [attr.list]="'accnos-' + i"
-                        (focus)="prepAccNoSuggestions(i)" (input)="prepAccNoSuggestions(i)" />
+                        (focus)="prepAccNoSuggestions(i)" (input)="prepAccNoSuggestions(i)"
+                        [readonly]="formMode === 'view'" />
                       <datalist [id]="'accnos-' + i">
                         <option *ngFor="let s of accNoSugs[i]" [value]="s"></option>
                       </datalist>
@@ -311,51 +428,101 @@
                         (input)="recalcTotals()" [readonly]="formMode === 'view'" />
                     </td>
 
-                    <td class="ac-text-center">
+                    <td class="ac-text-center inv-line-remove">
                       <button type="button" class="ac-btn ac-btn-icon-danger" (click)="removeAcLine(i)"
                         [disabled]="formMode === 'view'">
                         🗑
                       </button>
                     </td>
                   </tr>
+
+                  <tr *ngIf="!acLineGroups.length">
+                    <td colspan="5" class="ac-text-center ac-text-muted">
+                      No lines
+                    </td>
+                  </tr>
                 </tbody>
               </table>
             </div>
 
-            <div class="totals-grid">
-              <div class="label">Total</div>
-              <div class="value">
-                {{ invForm.value.grandTotal | number : '1.2-2' }}
+            <!-- BOTTOM: Add row (trái) + Totals (phải) -->
+            <div class="inv-lines-bottom">
+              <!-- Add row dropdown -->
+              <div class="inv-addrow-wrapper" *ngIf="formMode !== 'view'">
+                <div class="inv-addrow-split" [class.open]="showAddRowMenu">
+                  <!-- nút chính: thêm 1 dòng -->
+                  <button type="button" class="ac-btn ac-btn-primary inv-addrow-main" (click)="addRows(1)">
+                    Add row
+                  </button>
+
+                  <!-- nút caret mở menu -->
+                  <button type="button" class="ac-btn ac-btn-primary inv-addrow-caret" (click)="toggleAddRowMenu()">
+                    ▾
+                  </button>
+
+                  <!-- menu chọn số dòng -->
+                  <div class="inv-addrow-menu" *ngIf="showAddRowMenu">
+                    <button type="button" class="inv-addrow-menu-item" (click)="addRows(5); closeAddRowMenu()">
+                      Add 5 rows
+                    </button>
+                    <button type="button" class="inv-addrow-menu-item" (click)="addRows(10); closeAddRowMenu()">
+                      Add 10 rows
+                    </button>
+                    <button type="button" class="inv-addrow-menu-item" (click)="addRows(20); closeAddRowMenu()">
+                      Add 20 rows
+                    </button>
+                  </div>
+                </div>
               </div>
-              <div class="label">Net Total</div>
-              <div class="value">
-                {{ invForm.value.grandTotal | number : '1.2-2' }}
-              </div>
-              <div class="label">Outstanding</div>
-              <div class="value">
-                {{ invForm.value.outstanding | number : '1.2-2' }}
+
+              <!-- Totals giữ nguyên bên phải -->
+              <div class="inv-totals">
+                <div class="row">
+                  <div class="label">Total</div>
+                  <div class="value">
+                    {{ invForm.value.grandTotal | number : '1.2-2' }}
+                  </div>
+                </div>
+                <div class="ac-amount-summary-divider-main"></div>
+                <div class="row total">
+                  <div class="label">Net Total</div>
+                  <div class="value">
+                    {{ invForm.value.grandTotal | number : '1.2-2' }}
+                  </div>
+                </div>
+                <div class="row total">
+                  <div class="label">Outstanding</div>
+                  <div class="value">
+                    {{ invForm.value.outstanding | number : '1.2-2' }}
+                  </div>
+                </div>
               </div>
             </div>
           </div>
+
         </div>
-        <!-- /ac-dialog-scroll -->
 
-        <!-- FOOTER DÍNH ĐÁY (giống Contra) -->
-        <div class="ac-dialog-footer">
-
-          <span class="spacer"></span>
-
-          <button type="button" class="ac-btn ac-btn-ghost" (click)="showForm = false">
+        <!-- FOOTER STICKY -->
+        <div class="inv-footer">
+          <label class="chk">
+            <input type="checkbox" formControlName="continueNew" />
+            <span>After save, proceed with new debit note entry</span>
+          </label>
+          <button type="button" class="ac-btn ac-btn-ghost" (click)="closeForm()">
             Cancel
           </button>
           <button *ngIf="formMode !== 'view'" type="button" class="ac-btn ac-btn-primary" (click)="saveInvoice()"
             [disabled]="invForm.invalid">
-            Save
+                        {{
+            formMode === 'new'
+            ? 'Create'
+            : 'Save'
+            }}
           </button>
         </div>
       </form>
     </div>
-  </div>
+  </ng-container>
 
 
   <!-- FIND dialog -->
@@ -580,8 +747,8 @@
   </div>
 
   <!-- DELETE INVOICE CONFIRM -->
-  <div class="dialog" *ngIf="showDeleteInvoiceConfirm">
-    <div class="dialog-panel-small ac-card-no-padding" role="dialog" aria-modal="true" style="min-width: 360px">
+  <div class="ac-dialog-backdrop" *ngIf="showDeleteInvoiceConfirm">
+    <div class="ac-card-no-padding ac-dialog-panel-sm" role="dialog" aria-modal="true" style="min-width: 360px">
       <div class="ac-dialog-header">
         <span>Delete Invoice</span>
         <button class="ac-dialog-close" type="button" (click)="closeDeleteInvoiceConfirm()" aria-label="Close">
@@ -608,16 +775,16 @@
   </div>
 
   <!-- SUCCESS POPUP -->
-  <div class="dialog" *ngIf="showSuccess">
-    <div class="dialog-panel-small ac-card-no-padding" role="dialog" aria-modal="true" style="min-width: 360px">
-      <div class="ac-dialog-header" style="background: linear-gradient(180deg, #9be28a 0%, #62c84f 100%)">
+  <div class="ac-dialog-backdrop" *ngIf="showSuccess">
+    <div class="ac-card-no-padding ac-dialog-panel-sm ac-dialog-success" role="dialog" aria-modal="true" style="min-width: 360px">
+      <div class="ac-dialog-header ac-dialog-success-header">
         <span>Success</span>
         <button class="ac-dialog-close" type="button" (click)="closeSuccess()" aria-label="Close">
           ×
         </button>
       </div>
       <div class="ac-dialog-body">
-        <p style="margin: 8px 0; font-weight: 600; color: #14532d">
+        <p class="ac-dialog-success-text">
           {{ successMsg }}
         </p>
       </div>

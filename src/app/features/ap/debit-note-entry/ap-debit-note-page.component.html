@@ -613,27 +613,35 @@
   </div>
 </div>
 <!-- Success popup -->
-<div class="dialog" *ngIf="showSuccess">
-  <div
-    class="dialog-panel-small"
-    role="dialog"
-    aria-modal="true"
-    style="min-width: 360px"
-  >
+  <div class="ac-dialog-backdrop" *ngIf="showSuccess">
     <div
-      class="dialog-title"
-      style="background: linear-gradient(180deg, #9be28a 0%, #62c84f 100%)"
+      class="ac-card-no-padding ac-dialog-panel-sm ac-dialog-success"
+      role="dialog"
+      aria-modal="true"
     >
-      Success
-      <button class="x" (click)="closeSuccess()" aria-label="Close">×</button>
-    </div>
-    <div class="dialog-body">
-      <p style="margin: 8px 0; font-weight: 600; color: #14532d">
-        {{ successMsg }}
-      </p>
-    </div>
-    <div class="dialog-actions">
-      <button class="btn primary" (click)="closeSuccess()">OK</button>
+      <div class="ac-dialog-header ac-dialog-success-header">
+        <span>Success</span>
+        <button
+          class="ac-dialog-close"
+          (click)="closeSuccess()"
+          aria-label="Close"
+        >
+          ×
+        </button>
+      </div>
+      <div class="ac-dialog-body">
+        <p class="ac-dialog-success-text">
+          {{ successMsg }}
+        </p>
+      </div>
+      <div class="ac-dialog-footer">
+        <button
+          class="ac-btn ac-btn-primary"
+          type="button"
+          (click)="closeSuccess()"
+        >
+          OK
+        </button>
+      </div>
     </div>
   </div>
-</div>

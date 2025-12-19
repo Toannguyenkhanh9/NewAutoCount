@@ -370,10 +370,13 @@ input[type='radio'] {
 .ac-table th {
   background: #f3f6fb;
   font-weight: 600;
-  text-align: left;
   color: #0077c8;
 }
-
+.ac-table-addnew th {
+    background: #f3f6fb;
+    font-weight: 600;
+    text-align: left;
+}
 .ac-table tr:nth-child(even) td {
   background: #fbfcff;
 }
@@ -529,6 +532,7 @@ select.inp {
   border: 1px solid $ac-border;
   border-radius: $ac-radius;
   background: #ffffff;
+  height: auto;
 }
 
 /* Textarea riêng – cho phép cao hơn */
@@ -652,7 +656,6 @@ textarea.inp {
 .ac-dialog-success-text {
   margin: 8px 0;
   font-weight: 600;
-  color: #14532d;
 }
 /* ===== Generic page toolbar & pager (list screens) ===== */
 .ac-page-toolbar {
@@ -692,6 +695,9 @@ textarea.inp {
 /* text helpers */
 .ac-text-right {
   text-align: right;
+}
+.ac-text-left {
+  text-align: left;
 }
 .ac-text-center {
   text-align: center;
@@ -1216,11 +1222,6 @@ body {
 }
 /* Icon delete đỏ, nhỏ gọn – dùng chung nhiều page */
 .ac-btn-icon-danger {
-  --ac-del-bg: #fee2e2;       /* đỏ rất nhạt */
-  --ac-del-bg-hover: #fecaca;
-  --ac-del-border: #fecaca;
-  --ac-del-icon: #b91c1c;     /* đỏ đậm cho icon */
-
   min-width: 0;
   width: 32px;
   height: 32px;
@@ -1516,8 +1517,247 @@ body {
   flex: 1 1 auto;
 }
 
-/* Nếu em vẫn còn rule label { display:flex; ... } đâu đó
-   thì thêm dòng này để ép .ac-checkbox-row quay lại nằm ngang */
 label.ac-checkbox-row {
   flex-direction: row !important;
+}
+.ac-input-prefix-group {
+  position: relative;
+  display: inline-block;
+  width: 100%;
+}
+
+.ac-input-prefix-group > input,
+.ac-input-prefix-group > select,
+.ac-input-prefix-group > .ac-form-control {
+  width: 100%;
+  box-sizing: border-box;
+  padding-left: 32px;          /* chừa chỗ cho icon bên trái */
+}
+
+/* icon nhỏ trong control */
+.ac-input-prefix-icon {
+  position: absolute;
+  left: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;        /* click không dính icon */
+  font-size: 14px;
+  color: #6b7280;
+}
+
+/* nếu dùng material icons */
+.ac-input-prefix-icon.material-icons {
+  font-size: 18px;
+  line-height: 1;
+}
+
+/* chấm tròn nhỏ cho Currency giống Xero */
+.ac-input-prefix-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+  background: #111827;
+}
+.inv-lines {
+  margin-top: 8px;
+}
+
+.inv-lines-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.inv-lines-head .title {
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.inv-lines-tablewrap {
+  border: 1px solid #e5e7eb;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.inv-lines-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.inv-lines-table thead {
+  background: #f3f4f6;
+}
+
+.inv-lines-table th,
+.inv-lines-table td {
+  padding: 6px 8px;
+  font-size: 13px;
+}
+
+.inv-line-remove .ac-btn {
+  padding: 0 8px;
+}
+
+/* ---------- Totals bên phải ---------- */
+
+.inv-totals {
+  margin-top: 16px;
+  margin-left: auto;
+  font-size: 15px;
+  min-width: 350px;
+}
+
+.inv-totals .row {
+  display: flex;
+  justify-content: space-between;
+  padding: 2px 0;
+}
+
+.inv-totals .row.total {
+  font-weight: 700;
+  margin-top: 4px;
+  padding-top: 6px;
+}
+
+.inv-totals .label {
+  color: #4b5563;
+}
+
+.inv-totals .value {
+  text-align: right;
+}
+/* dưới bảng: add-row bên trái + totals bên phải */
+.inv-lines-bottom {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-top: 8px;
+  gap: 16px;
+  min-height: 120px
+}
+
+/* ===== Add row dropdown ===== */
+.inv-addrow-wrapper {
+  position: relative;
+}
+
+.inv-addrow-split {
+  display: inline-flex;
+  position: relative;
+}
+
+.inv-addrow-main,
+.inv-addrow-caret {
+  border-radius: 4px;
+}
+
+.inv-addrow-main {
+  border-radius: 4px 0 0 4px;
+}
+
+.inv-addrow-caret {
+  border-radius: 0 4px 4px 0;
+  border-left-width: 0;
+  padding-inline: 8px;
+  font-size: 12px;
+}
+/* menu */
+.inv-addrow-menu {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  margin-top: 4px;
+  min-width: 160px;
+  background: #fff;
+  border: 1px solid #d1d5db;
+  box-shadow: 0 4px 10px rgba(15, 23, 42, 0.12);
+  z-index: 20;
+}
+
+.inv-addrow-menu-item {
+  display: block;
+  width: 100%;
+  padding: 6px 10px;
+  border: 0;
+  background: #fff;
+  text-align: left;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.inv-addrow-menu-item:hover {
+  background: #f3f4f6;
+}
+.inv-field-due {
+  position: relative;
+}
+
+.inv-due-input {
+  display: flex;
+  align-items: stretch;
+  position: relative;
+
+  .ac-form-control {
+    flex: 1 1 auto;
+    border-right: none; // dính liền nút ⋯
+  }
+}
+.ac-amount-summary-divider-main {
+    border-bottom: 3px solid #a6a9b0;
+    margin: 4px 0;
+}
+.payment-panel{
+  flex: 0 0 180px;          /* chiều cao: chỉnh nếu muốn */
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  background: #f9fafb;
+  display: flex;
+  flex-direction: column;
+}
+.payment-panel .pp-head{
+  padding: 8px 12px;
+  background: linear-gradient(180deg,#eef7ff 0%,#e6f0ff 100%);
+  border-bottom: 1px solid #e1e7f0;
+  border-radius: 8px 8px 0 0;
+  font-weight: 600;
+  color:#0f3b66;
+    text-align: center;
+}
+.payment-panel .pp-body{
+  padding: 8px 10px;
+  overflow: auto;
+}
+.payment-panel table{
+  width: 100%;
+  border-collapse: collapse;
+}
+.payment-panel th, .payment-panel td{
+  padding: 6px 8px;
+  border-bottom: 1px dashed #e5e7eb;
+}
+.payment-panel .pp-empty{
+  padding: 20px;
+  text-align: center;
+  color: #6b7280;
+}
+.inv-footer {
+  display: flex;
+  align-items: center;
+  padding: 12px 24px;
+  border-top: 1px solid #e5e7eb;
+  background: #f9fafb;
+  gap: 8px;
+}
+
+/* checkbox nằm sát bên trái, nút bị đẩy qua phải */
+.inv-footer .chk {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0;
+  margin-right: auto; // quan trọng: đẩy phần còn lại sang phải
 }

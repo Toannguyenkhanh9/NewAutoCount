@@ -410,7 +410,7 @@ export class DebtorMaintenanceComponent implements OnInit {
     this.setupCreditControlReactions();
     this.initBranchForm();
     this.initCurrencyLists();
-     this.setupCreditLimitWatcher();
+    this.setupCreditLimitWatcher();
   }
 
   // ========= Currency helpers =========
@@ -669,7 +669,7 @@ export class DebtorMaintenanceComponent implements OnInit {
     this.activeSection = 'contact';
     this.initCurrencyLists();
     setTimeout(() => this.computePaneMinHeight(), 0);
-     this.setupCreditLimitWatcher();
+    this.setupCreditLimitWatcher();
   }
 
   viewDebtor() {
@@ -1087,34 +1087,34 @@ export class DebtorMaintenanceComponent implements OnInit {
         return false;
     }
   }
-  
-creditLimitDisabled = true; // mặc định: chưa nhập limit => disable
 
-private setupCreditLimitWatcher(): void {
-  const amountCtrl = this.debtorForm.get('creditLimitAmount');
-  const blockCtrl = this.debtorForm.get('blockNewInvoicesWhenLimitReached');
+  creditLimitDisabled = true; // mặc định: chưa nhập limit => disable
 
-  if (!amountCtrl || !blockCtrl) return;
+  private setupCreditLimitWatcher(): void {
+    const amountCtrl = this.debtorForm.get('creditLimitAmount');
+    const blockCtrl = this.debtorForm.get('blockNewInvoicesWhenLimitReached');
 
-  const updateState = (raw: unknown) => {
-    const value = typeof raw === 'string'
-      ? parseFloat(raw.replace(/,/g, '')) || 0
-      : (Number(raw) || 0);
+    if (!amountCtrl || !blockCtrl) return;
 
-    // không nhập hoặc <= 0 => disable
-    this.creditLimitDisabled = value <= 0;
+    const updateState = (raw: unknown) => {
+      const value = typeof raw === 'string'
+        ? parseFloat(raw.replace(/,/g, '')) || 0
+        : (Number(raw) || 0);
 
-    if (this.creditLimitDisabled) {
-      // luôn tắt checkbox khi disable
-      blockCtrl.setValue(false, { emitEvent: false });
-    }
-  };
+      // không nhập hoặc <= 0 => disable
+      this.creditLimitDisabled = value <= 0;
 
-  // chạy lần đầu
-  updateState(amountCtrl.value);
+      if (this.creditLimitDisabled) {
+        // luôn tắt checkbox khi disable
+        blockCtrl.setValue(false, { emitEvent: false });
+      }
+    };
 
-  // nghe thay đổi
-  amountCtrl.valueChanges.subscribe(v => updateState(v));
-}
+    // chạy lần đầu
+    updateState(amountCtrl.value);
+
+    // nghe thay đổi
+    amountCtrl.valueChanges.subscribe(v => updateState(v));
+  }
 
 }

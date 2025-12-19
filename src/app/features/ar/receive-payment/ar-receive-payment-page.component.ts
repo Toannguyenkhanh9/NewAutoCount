@@ -70,6 +70,7 @@ type PaidLine = {
   styleUrls: ['./ar-receive-payment-page.component.scss'],
 })
 export class ArReceivePaymentPageComponent {
+    showAddRowMenu = false;
   // ====== master ======
   currencies: Array<'MYR' | 'USD' | 'SGD'> = ['MYR', 'USD', 'SGD'];
 
@@ -406,6 +407,14 @@ export class ArReceivePaymentPageComponent {
     this.methodsFA.push(fg);
     this.wireMethodRow(fg); // <— gắn watcher
     this.recalcTotals();
+  }
+    addRows(count: number) {
+    if (this.formMode === 'edit') {
+      return;
+    }
+    for (let i = 0; i < count; i++) {
+      this.addMethod();
+    }
   }
   removeMethod(i: number) {
     this.methodsFA.removeAt(i);
@@ -1286,5 +1295,15 @@ export class ArReceivePaymentPageComponent {
       0
     );
     this.detailOpen = true;
+  }
+    toggleAddRowMenu() {
+    if (this.formMode === 'edit') {
+      return;
+    }
+    this.showAddRowMenu = !this.showAddRowMenu;
+  }
+
+  closeAddRowMenu() {
+    this.showAddRowMenu = false;
   }
 }
