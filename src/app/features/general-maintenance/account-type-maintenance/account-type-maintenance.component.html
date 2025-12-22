@@ -82,7 +82,7 @@
     <!-- FOOTER / PAGER -->
     <div class="account-type-footer">
       <div class="account-type-rec">
-        Records: {{ filtered().length }}
+        Total Records: {{ filtered().length }}
       </div>
 
       <div class="account-type-pager">
@@ -208,7 +208,7 @@
 <div class="ac-dialog-backdrop" *ngIf="showDeleteConfirm">
   <div class="ac-card-no-padding ac-dialog-panel-sm" role="dialog" aria-modal="true">
     <div class="ac-dialog-header">
-      <span>Delete Debtor Type</span>
+      <span>Delete Account Type</span>
       <button
         class="ac-dialog-close"
         (click)="closeDeleteConfirm()"
