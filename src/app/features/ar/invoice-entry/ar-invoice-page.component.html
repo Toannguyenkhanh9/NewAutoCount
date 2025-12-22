@@ -43,7 +43,7 @@
                   <th class="ac-text-left" (click)="setSort('docDate')">Invoice No</th>
                   <th class="ac-text-left" (click)="setSort('docNo')">Date</th>
                   <th class="ac-text-left" (click)="setSort('debtor')">Company Name</th>
-                  <th class="ac-text-left" >Description</th>
+                  <th class="ac-text-left">Description</th>
                   <th class="ac-text-right">Total</th>
                   <th class="ac-text-right">Outstanding</th>
                 </tr>
@@ -92,7 +92,7 @@
                   <tr>
                     <th class="ac-text-left" style="width: 90px">Type</th>
                     <th class="ac-text-left" style="width: 120px">No.</th>
-                    <th class="ac-text-left" >Description</th>
+                    <th class="ac-text-left">Description</th>
                     <th class="ac-text-left" style="width: 120px">Date</th>
                     <th class="ac-text-right" style="width: 140px">Amount</th>
                   </tr>
@@ -127,6 +127,9 @@
 
       <!-- ============ PAGER ============ -->
       <div class="ac-page-footer">
+        <div class="ac-page-footer-info">
+          Total records: {{ filtered.length }}
+        </div>
         <div class="ac-pager">
           <button type="button" class="ac-btn ac-pager-btn" (click)="goFirst()">
             &laquo;
@@ -291,16 +294,16 @@
             <!-- Journal type -->
             <label class="inv-field">
               <span class="inv-label">Journal type</span>
-               <div class="inv-contact-input ac-input-prefix-group">
+              <div class="inv-contact-input ac-input-prefix-group">
                 <!-- icon người -->
                 <span class="ac-input-prefix-icon"><lucide-icon name="user" [size]="15"
                     color="#111827"></lucide-icon></span>
 
-              <select class="ac-form-control" formControlName="journalType" [disabled]="formMode === 'view'">
-                <option *ngFor="let j of journalTypes" [ngValue]="j.typeCode">
-                  {{ j.typeCode }}
-                </option>
-              </select>
+                <select class="ac-form-control" formControlName="journalType" [disabled]="formMode === 'view'">
+                  <option *ngFor="let j of journalTypes" [ngValue]="j.typeCode">
+                    {{ j.typeCode }}
+                  </option>
+                </select>
               </div>
 
             </label>
@@ -513,7 +516,7 @@
           </button>
           <button *ngIf="formMode !== 'view'" type="button" class="ac-btn ac-btn-primary" (click)="saveInvoice()"
             [disabled]="invForm.invalid">
-                        {{
+            {{
             formMode === 'new'
             ? 'Create'
             : 'Save'
@@ -776,7 +779,8 @@
 
   <!-- SUCCESS POPUP -->
   <div class="ac-dialog-backdrop" *ngIf="showSuccess">
-    <div class="ac-card-no-padding ac-dialog-panel-sm ac-dialog-success" role="dialog" aria-modal="true" style="min-width: 360px">
+    <div class="ac-card-no-padding ac-dialog-panel-sm ac-dialog-success" role="dialog" aria-modal="true"
+      style="min-width: 360px">
       <div class="ac-dialog-header ac-dialog-success-header">
         <span>Success</span>
         <button class="ac-dialog-close" type="button" (click)="closeSuccess()" aria-label="Close">
