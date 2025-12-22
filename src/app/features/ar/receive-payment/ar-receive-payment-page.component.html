@@ -124,25 +124,43 @@
         </table>
       </div>
     </div>
+    <div class="account-type-footer">
+      <div class="account-type-rec">
+        Total Records: 3
+      </div>
 
-    <!-- Pager -->
-    <div class="ac-page-footer">
-      <div class="ac-pager">
-        <button type="button" class="ac-btn ac-pager-btn" (click)="first()">
+      <div class="account-type-pager">
+        <button
+          class="ac-btn ac-btn-ghost account-type-pg-btn"
+          [disabled]="page === 1"
+          (click)="page = 1"
+        >
           &laquo;
         </button>
-        <button type="button" class="ac-btn ac-pager-btn" (click)="prev()">
+        <button
+          class="ac-btn ac-btn-ghost account-type-pg-btn"
+          [disabled]="page === 1"
+          (click)="page = page - 1"
+        >
           &lsaquo;
         </button>
 
-        <span class="ac-pager-label">
-          Page {{ page }} / {{ totalPages }}
+        <span class="account-type-pg-label">
+          Page {{ page }} / {{ 1 }}
         </span>
 
-        <button type="button" class="ac-btn ac-pager-btn" (click)="next()">
+        <button
+          class="ac-btn ac-btn-ghost account-type-pg-btn"
+          [disabled]="page === 1"
+          (click)="page = page + 1"
+        >
           &rsaquo;
         </button>
-        <button type="button" class="ac-btn ac-pager-btn" (click)="last()">
+        <button
+          class="ac-btn ac-btn-ghost account-type-pg-btn"
+          [disabled]="page === 1"
+          (click)="page = 1"
+        >
           &raquo;
         </button>
       </div>

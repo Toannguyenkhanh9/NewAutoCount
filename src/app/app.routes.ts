@@ -61,24 +61,24 @@ export const routes: Routes = [
   },
 
   // ===== Account Books =====
-{
-  path: 'book',
-  canActivate: [authGuard],
-  children: [
-    {
-      path: 'manage-account-book',
-      component: ManageAccountBookComponent,
-      title: 'Manage Account Book',
-      data: { breadcrumb: 'Manage Account Book' },
-    },
-    {
-      path: 'create-account-book',
-      component: CreateAccountBookPageComponent,
-      title: 'Create Account Book',
-      data: { breadcrumb: 'Create Account Book' },
-    },
-  ],
-},
+  {
+    path: 'book',
+    canActivate: [authGuard],
+    children: [
+      {
+        path: 'manage-account-book',
+        component: ManageAccountBookComponent,
+        title: 'Manage Account Book',
+        data: { breadcrumb: 'Manage Account Book' },
+      },
+      {
+        path: 'create-account-book',
+        component: CreateAccountBookPageComponent,
+        title: 'Create Account Book',
+        data: { breadcrumb: 'Create Account Book' },
+      },
+    ],
+  },
 
   // ===== General Maintenance =====
   {
@@ -149,6 +149,12 @@ export const routes: Routes = [
     canActivate: [authGuard],
     data: { breadcrumb: 'General Ledger (G/L)' },
     children: [
+      {
+        path: '',
+        pathMatch: 'full',
+        component: DashboardPageComponent,
+        title: 'General Ledger (G/L)',
+      },
       {
         path: 'account-maintenance',
         component: AccountMaintenanceComponent,
@@ -231,6 +237,12 @@ export const routes: Routes = [
     data: { breadcrumb: 'Accounts Payable (A/P)' },
     children: [
       {
+        path: '',
+        pathMatch: 'full',
+        component: DashboardPageComponent,
+        title: 'Accounts Payable (A/P)',
+      },
+      {
         path: 'credit-note-entry',
         component: ApCreditNotePageComponent,
         title: 'Credit Note Entry',
@@ -287,6 +299,12 @@ export const routes: Routes = [
     canActivate: [authGuard],
     data: { breadcrumb: 'Accounts Receivable (A/R)' },
     children: [
+      {
+        path: '',
+        pathMatch: 'full',
+        component: DashboardPageComponent,
+        title: 'Accounts Receivable (A/R)',
+      },
       {
         path: 'contra-entry',
         component: ArApContraPageComponent,
