@@ -379,6 +379,7 @@ export class DebtorMaintenanceComponent implements OnInit {
       sstRegNo: [''],
       creditLimitAmount: [null],                 // number | null
       blockInvoicesWhenLimitReached: [{ value: false, disabled: true }],
+
     });
 
     // Contact form

@@ -50,6 +50,47 @@
           </tbody>
         </table>
       </div>
+          <div class="account-type-footer">
+      <div class="account-type-rec">
+        Total Records: 3
+      </div>
+
+      <div class="account-type-pager">
+        <button
+          class="ac-btn ac-btn-ghost account-type-pg-btn"
+          [disabled]="page === 1"
+          (click)="page = 1"
+        >
+          &laquo;
+        </button>
+        <button
+          class="ac-btn ac-btn-ghost account-type-pg-btn"
+          [disabled]="page === 1"
+          (click)="page = page - 1"
+        >
+          &lsaquo;
+        </button>
+
+        <span class="account-type-pg-label">
+          Page {{ page }} / 1
+        </span>
+
+        <button
+          class="ac-btn ac-btn-ghost account-type-pg-btn"
+          [disabled]="page === 1"
+          (click)="page = page + 1"
+        >
+          &rsaquo;
+        </button>
+        <button
+          class="ac-btn ac-btn-ghost account-type-pg-btn"
+          [disabled]="page === 1"
+          (click)="page = 1"
+        >
+          &raquo;
+        </button>
+      </div>
+    </div>
     </div>
   </ng-container>
   <!-- ================= FORM MODE ================= -->
@@ -359,7 +400,7 @@
                   <!-- Checkbox: Block new invoices... -->
                   <div class="credit-limit-row" >
                     <label class="ac-checkbox-row credit-limit-block" >
-                      <input type="checkbox" formControlName="blockNewInvoicesWhenLimitReached"
+                      <input type="checkbox" formControlName="blockInvoicesWhenLimitReached"
                        />
                       <span>Block new invoices when credit limit is reached</span>
                     </label>
@@ -390,7 +431,11 @@
           Cancel
         </button>
         <button class="btn primary" type="button" (click)="saveDebtor()" [disabled]="debtorForm.invalid">
-          Save &amp; Close
+                      {{
+            formMode === 'new'
+            ? 'Create'
+            : 'Save'
+            }}
         </button>
       </div>
     </div>

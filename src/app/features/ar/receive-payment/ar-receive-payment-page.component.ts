@@ -10,7 +10,7 @@ import {
   AbstractControl,
 } from '@angular/forms';
 import { AmountInputDirective } from '../../../_share/directives';
-
+import { LucideIconsModule } from '../../../_share/lucide-icons';
 type Status = 'OPEN' | 'POSTED' | 'VOID';
 
 interface DebtorRow {
@@ -65,6 +65,7 @@ type PaidLine = {
     FormsModule,
     ReactiveFormsModule,
     AmountInputDirective,
+  LucideIconsModule,
   ],
   templateUrl: './ar-receive-payment-page.component.html',
   styleUrls: ['./ar-receive-payment-page.component.scss'],

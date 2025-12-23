@@ -73,7 +73,7 @@ type PaymentLine = {
     FormsModule,
     ReactiveFormsModule,
     AmountInputDirective,
-    LucideIconsModule
+    LucideIconsModule,
   ],
   templateUrl: './ar-invoice-page.component.html',
   styleUrls: ['./ar-invoice-page.component.scss'],
@@ -257,12 +257,12 @@ export class ArInvoicePageComponent implements OnInit {
     this.debtorFiltered = !q
       ? [...src]
       : src.filter(
-        (d) =>
-          (d.debtorAccount || '').toLowerCase().includes(q) ||
-          (d.companyName || '').toLowerCase().includes(q) ||
-          (d.billAddress || '').toLowerCase().includes(q) ||
-          (d.phone || '').toLowerCase().includes(q)
-      );
+          (d) =>
+            (d.debtorAccount || '').toLowerCase().includes(q) ||
+            (d.companyName || '').toLowerCase().includes(q) ||
+            (d.billAddress || '').toLowerCase().includes(q) ||
+            (d.phone || '').toLowerCase().includes(q)
+        );
   }
   pickDebtor(d: DebtorRow) {
     this.invForm.patchValue({ debtor: d.debtorAccount });
@@ -278,7 +278,7 @@ export class ArInvoicePageComponent implements OnInit {
   }
   ngOnInit() {
     if (this.acLinesFA.length === 0) this.addAcLine();
-        this.initCurrencyLists();
+    this.initCurrencyLists();
   }
   trackByIndex(index: number, _item: any): number {
     return index;
@@ -286,9 +286,7 @@ export class ArInvoicePageComponent implements OnInit {
   // Debtor đang chọn + text To:
   get selectedDebtor(): DebtorRow | undefined {
     const code = this.invForm?.value?.debtor;
-    return (this.debtors ?? []).find((d) => d.debtorAccount === code) as
-      | DebtorRow
-      | undefined;
+    return (this.debtors ?? []).find((d) => d.debtorAccount === code) as DebtorRow | undefined;
   }
   get debtorToText(): string {
     const d = this.selectedDebtor;
@@ -334,9 +332,7 @@ export class ArInvoicePageComponent implements OnInit {
     lines: Array<{ item: string; qty: number }>,
     dueDate: string
   ): Invoice {
-    const debtorName =
-      this.debtors.find((d) => d.debtorAccount === debtor)?.companyName ||
-      debtor;
+    const debtorName = this.debtors.find((d) => d.debtorAccount === debtor)?.companyName || debtor;
     const docDate = date;
     const dets: InvoiceLine[] = lines.map((l) => {
       const itm = this.items.find((i) => i.code === l.item)!;
@@ -524,9 +520,7 @@ export class ArInvoicePageComponent implements OnInit {
   prepAccNoSuggestions(i: number) {
     const start = this.currentMaxSuffix() + 1; // số tiếp theo
     const count = 10; // số lượng gợi ý
-    const list = Array.from({ length: count }, (_, k) =>
-      this.fmtAcc(start + k)
-    );
+    const list = Array.from({ length: count }, (_, k) => this.fmtAcc(start + k));
     this.accNoSugs[i] = list;
   }
 
@@ -579,10 +573,7 @@ export class ArInvoicePageComponent implements OnInit {
     const terms = this.invForm.value.terms || 'N0';
     const days = Number(String(terms).replace(/\D/g, '') || 0);
     const d = this.invForm.value.docDate || this.todayYMD();
-    this.invForm.patchValue(
-      { dueDate: this.addDaysYMD(d, days) },
-      { emitEvent: false }
-    );
+    this.invForm.patchValue({ dueDate: this.addDaysYMD(d, days) }, { emitEvent: false });
   }
   /**
    * Mở / đóng menu quick due date.
@@ -655,10 +646,7 @@ export class ArInvoicePageComponent implements OnInit {
     const sum = this.acLinesFA.controls
       .map((fg) => +((fg as FormGroup).value.amount || 0))
       .reduce((a, b) => a + b, 0);
-    this.invForm.patchValue(
-      { grandTotal: sum, outstanding: sum },
-      { emitEvent: false }
-    );
+    this.invForm.patchValue({ grandTotal: sum, outstanding: sum }, { emitEvent: false });
   }
   private today() {
     return new Date().toISOString().slice(0, 10);
@@ -670,12 +658,12 @@ export class ArInvoicePageComponent implements OnInit {
     let list = !q
       ? this.invoices
       : this.invoices.filter(
-        (i) =>
-          i.docNo.toLowerCase().includes(q) ||
-          i.debtor.toLowerCase().includes(q) ||
-          i.debtorName.toLowerCase().includes(q) ||
-          i.description?.toLowerCase().includes(q)
-      );
+          (i) =>
+            i.docNo.toLowerCase().includes(q) ||
+            i.debtor.toLowerCase().includes(q) ||
+            i.debtorName.toLowerCase().includes(q) ||
+            i.description?.toLowerCase().includes(q)
+        );
     list = [...list].sort((a, b) => {
       const va = String(a[this.sortBy] ?? '').toLowerCase();
       const vb = String(b[this.sortBy] ?? '').toLowerCase();
@@ -693,8 +681,7 @@ export class ArInvoicePageComponent implements OnInit {
     return this.filtered.slice(s, s + this.pageSize);
   }
   setSort(k: keyof Invoice) {
-    if (this.sortBy === k)
-      this.sortDir = this.sortDir === 'asc' ? 'desc' : 'asc';
+    if (this.sortBy === k) this.sortDir = this.sortDir === 'asc' ? 'desc' : 'asc';
     else {
       this.sortBy = k;
       this.sortDir = 'asc';
@@ -802,9 +789,7 @@ export class ArInvoicePageComponent implements OnInit {
     const v = (ctrl.value ?? '').trim();
     if (!v) return null; // rỗng = dùng auto, hợp lệ
     if (!/^[A-Za-z0-9\-_\/]+$/.test(v)) return { pattern: true };
-    const dup = this.invoices.some(
-      (x) => (x.docNo || '').toLowerCase() === v.toLowerCase()
-    );
+    const dup = this.invoices.some((x) => (x.docNo || '').toLowerCase() === v.toLowerCase());
     return dup ? { duplicate: true } : null;
   };
 
@@ -815,10 +800,7 @@ export class ArInvoicePageComponent implements OnInit {
   saveInvoice() {
     this.submitted = true;
     if (this.invForm.invalid) return; // chặn Save nếu form lỗi
-    localStorage.setItem(
-      'ar_inv_last_desc',
-      this.invForm.value.description || ''
-    );
+    localStorage.setItem('ar_inv_last_desc', this.invForm.value.description || '');
     const v = this.invForm.getRawValue();
     const docNo = v.autoNumbering && !v.docNo ? this.nextRunningNo() : v.docNo;
 
@@ -826,42 +808,49 @@ export class ArInvoicePageComponent implements OnInit {
     // TODO: call API create invoice
 
     if (v.continueNew) {
+      const jtDefault = this.journalTypes?.[0]?.typeCode ?? '';
+      const termsDefault = this.creditTerms?.[0]?.code ?? '';
       // reset form cho chứng từ mới
       this.invForm.reset({
+        docNo: this.nextNumber(),
+        docDate: this.today(),
+        dueDate: this.addDays(this.today(), 0),
         debtor: '',
-        journalType: 'SALES',
-        agent: '',
-        ref2: '',
-        autoNumbering: true,
-        docNo: '',
-        docDate: this.todayYMD(),
-        terms: 'N30',
-        dueDate: this.addDaysYMD(new Date(), 30),
-        description: localStorage.getItem('ar_inv_last_desc') || '',
+        debtorName: '',
+        currency: 'MYR',
+        rate: 1,
+        description: '',
+        status: 'OPEN',
+        subTotal: 0,
+        taxTotal: 0,
         grandTotal: 0,
         outstanding: 0,
+        journalType: jtDefault,
+        terms: termsDefault,
         continueNew: true,
       });
       while (this.acLinesFA.length) this.acLinesFA.removeAt(0);
       this.addAcLine();
+      this.formMode = 'new';
+      this.submitted = false;
+      this.invForm.markAsPristine();
+      this.invForm.markAsUntouched();
+
+      this.openSuccess((this.formMode === 'new' ? 'Create' : 'Edit') + ' invoice successfully.');
+      this.showForm = true;
+      return;
     }
     this.showForm = false;
-    this.openSuccess(
-      (this.formMode === 'new' ? 'Create' : 'Edit') + ' invoice successfully.'
-    );
+    this.openSuccess((this.formMode === 'new' ? 'Create' : 'Edit') + ' invoice successfully.');
   }
   private valueFromForm(): Invoice {
     const fv = this.invForm.getRawValue();
     // LẤY DÒNG VỚI KIỂU RÕ RÀNG
-    const lines: InvoiceLine[] = this.linesFA.controls.map(
-      (fg) => fg.getRawValue() as InvoiceLine
-    );
+    const lines: InvoiceLine[] = this.linesFA.controls.map((fg) => fg.getRawValue() as InvoiceLine);
     const subTotal = +lines.reduce((s, l) => s + l.amount, 0).toFixed(2);
     const taxTotal = +lines.reduce((s, l) => s + l.taxAmt, 0).toFixed(2);
     const grandTotal = +(subTotal + taxTotal).toFixed(2);
-    const debtorName =
-      this.debtors.find((d) => d.debtorAccount === fv.debtor)?.companyName ||
-      '';
+    const debtorName = this.debtors.find((d) => d.debtorAccount === fv.debtor)?.companyName || '';
     return {
       docNo: fv.docNo,
       docDate: fv.docDate,
@@ -907,8 +896,7 @@ export class ArInvoicePageComponent implements OnInit {
       const inDate = (!from || dt >= from) && (!to || dt <= to);
       const debtHit = !f.debtor || x.debtor === f.debtor;
       const statusHit = f.status === 'all';
-      const amtHit =
-        (!min || x.grandTotal >= min) && (!max || x.grandTotal <= max);
+      const amtHit = (!min || x.grandTotal >= min) && (!max || x.grandTotal <= max);
       return inDate && debtHit && statusHit && amtHit;
     });
   }
@@ -936,9 +924,7 @@ export class ArInvoicePageComponent implements OnInit {
         const statusHit = status === 'all';
         return inDate && debtHit && statusHit;
       })
-      .sort((a, b) =>
-        String(a[sortKey] ?? '').localeCompare(String(b[sortKey] ?? ''))
-      );
+      .sort((a, b) => String(a[sortKey] ?? '').localeCompare(String(b[sortKey] ?? '')));
   }
 
   // utils
@@ -1093,7 +1079,7 @@ export class ArInvoicePageComponent implements OnInit {
       codes.add(current.code);
     }
   }
-    /** Currency đang chọn để hiển thị trên nút */
+  /** Currency đang chọn để hiển thị trên nút */
   get selectedCurrency(): DebtorCurrency | undefined {
     const code = this.invForm.get('currency')?.value;
     return this.currencies.find((c) => c.code === code);
@@ -1123,5 +1109,4 @@ export class ArInvoicePageComponent implements OnInit {
     this.updateMyCurrencies();
     this.filteredCurrencies = [...this.currencies];
   }
-
 }
