@@ -14,7 +14,7 @@ import { FormsModule } from '@angular/forms';
 import { AmountInputDirective } from '../../../_share/directives';
 import { JournalType } from '../../../_share/models/general-maintenance';
 import { DebtorRow } from '../../../_share/models/ar';
-
+import { LucideIconsModule } from '../../../_share/lucide-icons';
 type Status = 'OPEN' | 'POSTED' | 'VOID';
 
 interface ItemRef {
@@ -70,6 +70,7 @@ type PaymentLine = {
     FormsModule,
     ReactiveFormsModule,
     AmountInputDirective,
+    LucideIconsModule,
   ],
   templateUrl: './ar-debit-note-page.component.html',
   styleUrls: ['./ar-debit-note-page.component.scss'],
@@ -241,6 +242,8 @@ export class ArDebitNotePageComponent {
   showDebtorPicker = false;
   debtorQuery = '';
   debtorFiltered: DebtorRow[] = [];
+  showDueShortcuts = false;
+  showAddRowMenu = false;
   openDebtorDropdown() {
     this.debtorQuery = '';
     this.debtorFiltered = [...(this.debtors ?? [])];
@@ -280,9 +283,7 @@ export class ArDebitNotePageComponent {
   // Debtor đang chọn + text To:
   get selectedDebtor(): DebtorRow | undefined {
     const code = this.invForm?.value?.debtor;
-    return (this.debtors ?? []).find((d) => d.debtorAccount === code) as
-      | DebtorRow
-      | undefined;
+    return (this.debtors ?? []).find((d) => d.debtorAccount === code) as DebtorRow | undefined;
   }
   get debtorToText(): string {
     const d = this.selectedDebtor;
@@ -301,33 +302,21 @@ export class ArDebitNotePageComponent {
       ],
       '2025-12-07'
     ),
-    this.mkInvoice(
-      'DN-0002',
-      '8/6/2025',
-      '300-C001',
-      [{ item: 'S24U-512', qty: 1 }],
-      '2025-11-07'
-    ),
-    this.mkInvoice(
-      'DN-0003',
-      '10/7/2025',
-      '300-D001',
-      [{ item: 'A54-128', qty: 3 }],
-      '2025-10-07'
-    ),
+    this.mkInvoice('DN-0002', '8/6/2025', '300-C001', [{ item: 'S24U-512', qty: 1 }], '2025-11-07'),
+    this.mkInvoice('DN-0003', '10/7/2025', '300-D001', [{ item: 'A54-128', qty: 3 }], '2025-10-07'),
   ];
 
   constructor(private fb: FormBuilder) {
     this.buildForms();
-      const dnPaid = this.mkInvoice(
-    'DN-0004',                // số chứng từ mẫu
-    '10/15/2025',             // ngày chứng từ
-    '300-B001',               // debtor
-    [{ item: 'CASE-01', qty: 10 }], // dòng chi tiết
-    '2025-12-15'              // due date
-  );
-  dnPaid.outstanding = 0;      // đã thanh toán đủ
-  this.invoices.push(dnPaid);
+    const dnPaid = this.mkInvoice(
+      'DN-0004', // số chứng từ mẫu
+      '10/15/2025', // ngày chứng từ
+      '300-B001', // debtor
+      [{ item: 'CASE-01', qty: 10 }], // dòng chi tiết
+      '2025-12-15' // due date
+    );
+    dnPaid.outstanding = 0; // đã thanh toán đủ
+    this.invoices.push(dnPaid);
   }
 
   private mkInvoice(
@@ -337,9 +326,7 @@ export class ArDebitNotePageComponent {
     lines: Array<{ item: string; qty: number }>,
     dueDate: string
   ): Invoice {
-    const debtorName =
-      this.debtors.find((d) => d.debtorAccount === debtor)?.companyName ||
-      debtor;
+    const debtorName = this.debtors.find((d) => d.debtorAccount === debtor)?.companyName || debtor;
     const docDate = date;
     const dets: InvoiceLine[] = lines.map((l) => {
       const itm = this.items.find((i) => i.code === l.item)!;
@@ -466,7 +453,25 @@ export class ArDebitNotePageComponent {
     this.acLinesFA.push(this.createLine());
     this.accNoSugs.push([]);
   }
+  addRows(count: number) {
+    if (this.formMode === 'view') {
+      return;
+    }
+    for (let i = 0; i < count; i++) {
+      this.addAcLine();
+    }
+  }
 
+  toggleAddRowMenu() {
+    if (this.formMode === 'view') {
+      return;
+    }
+    this.showAddRowMenu = !this.showAddRowMenu;
+  }
+
+  closeAddRowMenu() {
+    this.showAddRowMenu = false;
+  }
   recalcLine(i: number) {
     // nếu cần auto điền mô tả từ accNo thì xử lý ở đây
     this.recalcTotals();
@@ -511,9 +516,7 @@ export class ArDebitNotePageComponent {
   prepAccNoSuggestions(i: number) {
     const start = this.currentMaxSuffix() + 1; // số tiếp theo
     const count = 10; // số lượng gợi ý
-    const list = Array.from({ length: count }, (_, k) =>
-      this.fmtAcc(start + k)
-    );
+    const list = Array.from({ length: count }, (_, k) => this.fmtAcc(start + k));
     this.accNoSugs[i] = list;
   }
 
@@ -566,10 +569,7 @@ export class ArDebitNotePageComponent {
     const terms = this.invForm.value.terms || 'N0';
     const days = Number(String(terms).replace(/\D/g, '') || 0);
     const d = this.invForm.value.docDate || this.todayYMD();
-    this.invForm.patchValue(
-      { dueDate: this.addDaysYMD(d, days) },
-      { emitEvent: false }
-    );
+    this.invForm.patchValue({ dueDate: this.addDaysYMD(d, days) }, { emitEvent: false });
   }
 
   // totals
@@ -577,10 +577,7 @@ export class ArDebitNotePageComponent {
     const sum = this.acLinesFA.controls
       .map((fg) => +((fg as FormGroup).value.amount || 0))
       .reduce((a, b) => a + b, 0);
-    this.invForm.patchValue(
-      { grandTotal: sum, outstanding: sum },
-      { emitEvent: false }
-    );
+    this.invForm.patchValue({ grandTotal: sum, outstanding: sum }, { emitEvent: false });
   }
   private today() {
     return new Date().toISOString().slice(0, 10);
@@ -615,8 +612,7 @@ export class ArDebitNotePageComponent {
     return this.filtered.slice(s, s + this.pageSize);
   }
   setSort(k: keyof Invoice) {
-    if (this.sortBy === k)
-      this.sortDir = this.sortDir === 'asc' ? 'desc' : 'asc';
+    if (this.sortBy === k) this.sortDir = this.sortDir === 'asc' ? 'desc' : 'asc';
     else {
       this.sortBy = k;
       this.sortDir = 'asc';
@@ -726,9 +722,7 @@ export class ArDebitNotePageComponent {
     const v = (ctrl.value ?? '').trim();
     if (!v) return null; // rỗng = dùng auto, hợp lệ
     if (!/^[A-Za-z0-9\-_\/]+$/.test(v)) return { pattern: true };
-    const dup = this.invoices.some(
-      (x) => (x.docNo || '').toLowerCase() === v.toLowerCase()
-    );
+    const dup = this.invoices.some((x) => (x.docNo || '').toLowerCase() === v.toLowerCase());
     return dup ? { duplicate: true } : null;
   };
 
@@ -739,10 +733,7 @@ export class ArDebitNotePageComponent {
   saveInvoice() {
     this.submitted = true;
     if (this.invForm.invalid) return; // chặn Save nếu form lỗi
-    localStorage.setItem(
-      'ar_inv_last_desc',
-      this.invForm.value.description || ''
-    );
+    localStorage.setItem('ar_inv_last_desc', this.invForm.value.description || '');
     const v = this.invForm.getRawValue();
     const docNo = v.autoNumbering && !v.docNo ? this.nextRunningNo() : v.docNo;
 
@@ -751,43 +742,49 @@ export class ArDebitNotePageComponent {
 
     if (v.continueNew) {
       // reset form cho chứng từ mới
+      const jtDefault = this.journalTypes?.[0]?.typeCode ?? '';
+      const termsDefault = this.creditTerms?.[0]?.code ?? '';
       this.invForm.reset({
+        docNo: this.nextNumber(),
+        docDate: this.today(),
+        dueDate: this.addDays(this.today(), 0),
         debtor: '',
-        journalType: 'SALES',
-        agent: '',
-        ref: '',
-        ref2: '',
-        autoNumbering: true,
-        docNo: '',
-        docDate: this.todayYMD(),
-        terms: 'N30',
-        dueDate: this.addDaysYMD(new Date(), 30),
-        description: localStorage.getItem('ar_inv_last_desc') || '',
+        debtorName: '',
+        currency: 'MYR',
+        rate: 1,
+        description: '',
+        status: 'OPEN',
+        subTotal: 0,
+        taxTotal: 0,
         grandTotal: 0,
         outstanding: 0,
-        continueNew: true,
+        journalType: jtDefault,
+        terms: termsDefault,
+        dnType: 'OMIT',
+        isDebitJournal: false,
       });
       while (this.acLinesFA.length) this.acLinesFA.removeAt(0);
       this.addAcLine();
+      this.formMode = 'new';
+      this.submitted = false;
+      this.invForm.markAsPristine();
+      this.invForm.markAsUntouched();
+
+      this.openSuccess((this.formMode === 'new' ? 'Create' : 'Edit') + ' debit note successfully.');
+      this.showForm = true;
+      return;
     }
     this.showForm = false;
-    this.openSuccess(
-      (this.formMode === 'new' ? 'Create' : 'Edit') +
-        ' debit note successfully.'
-    );
+    this.openSuccess((this.formMode === 'new' ? 'Create' : 'Edit') + ' debit note successfully.');
   }
   private valueFromForm(): Invoice {
     const fv = this.invForm.getRawValue();
     // LẤY DÒNG VỚI KIỂU RÕ RÀNG
-    const lines: InvoiceLine[] = this.linesFA.controls.map(
-      (fg) => fg.getRawValue() as InvoiceLine
-    );
+    const lines: InvoiceLine[] = this.linesFA.controls.map((fg) => fg.getRawValue() as InvoiceLine);
     const subTotal = +lines.reduce((s, l) => s + l.amount, 0).toFixed(2);
     const taxTotal = +lines.reduce((s, l) => s + l.taxAmt, 0).toFixed(2);
     const grandTotal = +(subTotal + taxTotal).toFixed(2);
-    const debtorName =
-      this.debtors.find((d) => d.debtorAccount === fv.debtor)?.companyName ||
-      '';
+    const debtorName = this.debtors.find((d) => d.debtorAccount === fv.debtor)?.companyName || '';
     return {
       docNo: fv.docNo,
       docDate: fv.docDate,
@@ -833,8 +830,7 @@ export class ArDebitNotePageComponent {
       const inDate = (!from || dt >= from) && (!to || dt <= to);
       const debtHit = !f.debtor || x.debtor === f.debtor;
       const statusHit = f.status === 'all';
-      const amtHit =
-        (!min || x.grandTotal >= min) && (!max || x.grandTotal <= max);
+      const amtHit = (!min || x.grandTotal >= min) && (!max || x.grandTotal <= max);
       return inDate && debtHit && statusHit && amtHit;
     });
   }
@@ -862,9 +858,7 @@ export class ArDebitNotePageComponent {
         const statusHit = status === 'all';
         return inDate && debtHit && statusHit;
       })
-      .sort((a, b) =>
-        String(a[sortKey] ?? '').localeCompare(String(b[sortKey] ?? ''))
-      );
+      .sort((a, b) => String(a[sortKey] ?? '').localeCompare(String(b[sortKey] ?? '')));
   }
 
   // utils
@@ -938,5 +932,70 @@ export class ArDebitNotePageComponent {
     } else {
       this.select(inv); // vẫn dùng select(...) để nạp history
     }
+  }
+  closeForm() {
+    this.showForm = false;
+    this.submitted = false;
+  }
+  toggleDueShortcuts(event: MouseEvent): void {
+    event.stopPropagation();
+    this.showDueShortcuts = !this.showDueShortcuts;
+  }
+
+  /**
+   * set Due date dựa trên Issue date (docDate) với các option nhanh.
+   */
+  applyDueShortcut(
+    kind: 'IN_7' | 'IN_14' | 'FIRST_NEXT' | 'TWENTIETH_NEXT' | 'END_NEXT' | 'RESET'
+  ): void {
+    const baseYmd: string = this.invForm.value.docDate || this.todayYMD();
+    let newDue: string | null = null;
+
+    switch (kind) {
+      case 'IN_7':
+        newDue = this.addDaysYMD(baseYmd, 7);
+        break;
+      case 'IN_14':
+        newDue = this.addDaysYMD(baseYmd, 14);
+        break;
+      case 'FIRST_NEXT':
+        newDue = this.firstOfNextMonthYMD(baseYmd);
+        break;
+      case 'TWENTIETH_NEXT':
+        newDue = this.twentiethOfNextMonthYMD(baseYmd);
+        break;
+      case 'END_NEXT':
+        newDue = this.endOfNextMonthYMD(baseYmd);
+        break;
+      case 'RESET':
+        // dùng logic terms hiện tại của anh
+        this.recalcDue();
+        break;
+    }
+
+    if (newDue) {
+      this.invForm.get('dueDate')?.setValue(newDue);
+    }
+
+    this.showDueShortcuts = false;
+  }
+  private firstOfNextMonthYMD(ymd: string): string {
+    const [y, m] = ymd.split('-').map(Number);
+    // tháng JS: 0-based, nên m là tháng hiện tại; m + 1 = tháng sau, ngày 1
+    const d = new Date(y, m, 1);
+    return this.toYMD(d);
+  }
+
+  private twentiethOfNextMonthYMD(ymd: string): string {
+    const [y, m] = ymd.split('-').map(Number);
+    const d = new Date(y, m, 20); // 20 của tháng sau
+    return this.toYMD(d);
+  }
+
+  private endOfNextMonthYMD(ymd: string): string {
+    const [y, m] = ymd.split('-').map(Number);
+    // day 0 của (tháng sau + 1) = ngày cuối của tháng sau
+    const d = new Date(y, m + 1, 0);
+    return this.toYMD(d);
   }
 }

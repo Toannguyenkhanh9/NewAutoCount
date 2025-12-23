@@ -1767,3 +1767,284 @@ label.ac-checkbox-row {
   margin: 0;
   margin-right: auto; // quan trọng: đẩy phần còn lại sang phải
 }
+.inv-header-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  column-gap: 16px;
+  row-gap: 12px;
+  margin-bottom: 24px;
+}
+
+.inv-field {
+  display: flex;
+  flex-direction: column;
+  font-size: 13px;
+  font-weight:600;
+}
+
+.inv-field-contact {
+  grid-column: 1 / span 2; /* Contact rộng hơn như hình Xero */
+}
+
+.inv-label {
+  margin-bottom: 4px;
+  color: #374151;
+}
+
+/* select & input dùng ac-form-control (global) nên chỉ sửa thêm chút */
+.inv-field .ac-form-control {
+  width: 100%;
+}
+
+/* Contact select + icon kính lúp */
+.inv-contact-input {
+  display: flex;
+  align-items: stretch;
+  gap: 0;
+}
+
+.inv-contact-input .ac-form-control {
+  border-radius: 3px 0 0 3px;
+}
+
+.inv-contact-search {
+  border: 1px solid #d1d5db;
+  border-left: 0;
+  border-radius: 0 3px 3px 0;
+  padding: 0 10px;
+  background: #f3f4f6;
+  cursor: pointer;
+}
+
+.inv-contact-search:hover {
+  background: #e5e7eb;
+}
+
+/* lỗi nhỏ dưới field */
+.inv-error {
+  margin-top: 4px;
+  font-size: 12px;
+  color: #b91c1c;
+}
+.inv-form {
+  display: flex;
+  flex-direction: column;
+  /* cao gần full màn hình, chừa header/top-nav phía trên */
+  height: calc(100vh - 150px);
+  background: #f5f7fb;
+}
+
+/* ---------- Header trên cùng ---------- */
+
+.inv-header {
+  padding: 16px 32px 8px;
+  border-bottom: 1px solid #e5e7eb;
+  background: #f9fafb;
+}
+
+.inv-title {
+  margin: 0 0 4px;
+  font-size: 24px;
+  font-weight: 600;
+}
+
+.inv-subtitle {
+  margin: 0;
+  font-size: 13px;
+  color: #6b7280;
+}
+
+/* ---------- BODY: là vùng SCROLL duy nhất ---------- */
+
+.inv-body {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden; /* chỉ inner scroll, footer không cuốn đi */
+  background: #ffffff;
+}
+
+/* nội dung bên trong – cho scroll */
+.inv-body-inner {
+  flex: 1 1 auto;
+  overflow-y: auto;
+  padding: 24px 32px 32px;
+}
+
+/* giới hạn & canh giữa nội dung giống Xero */
+.inv-body-inner > * {
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+/* ---------- Header grid (Contact, dates, doc no...) ---------- */
+
+.inv-header-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  column-gap: 16px;
+  row-gap: 12px;
+  margin-bottom: 24px;
+}
+
+.inv-field {
+  display: flex;
+  flex-direction: column;
+  font-size: 13px;
+  font-weight:600;
+}
+
+.inv-field-contact {
+  grid-column: 1 / span 2; /* Contact rộng hơn như hình Xero */
+}
+
+.inv-label {
+  margin-bottom: 4px;
+  color: #374151;
+}
+
+/* select & input dùng ac-form-control (global) nên chỉ sửa thêm chút */
+.inv-field .ac-form-control {
+  width: 100%;
+}
+
+/* Contact select + icon kính lúp */
+.inv-contact-input {
+  display: flex;
+  align-items: stretch;
+  gap: 0;
+}
+
+.inv-contact-input .ac-form-control {
+  border-radius: 3px 0 0 3px;
+}
+
+.inv-contact-search {
+  border: 1px solid #d1d5db;
+  border-left: 0;
+  border-radius: 0 3px 3px 0;
+  padding: 0 10px;
+  background: #f3f4f6;
+  cursor: pointer;
+}
+
+.inv-contact-search:hover {
+  background: #e5e7eb;
+}
+
+/* lỗi nhỏ dưới field */
+.inv-error {
+  margin-top: 4px;
+  font-size: 12px;
+  color: #b91c1c;
+}
+
+/* ---------- TO BOX ---------- */
+
+.inv-to-box {
+  margin-bottom: 24px;
+  padding: 12px 16px;
+  border-radius: 4px;
+  border: 1px solid #e5e7eb;
+  background: #f9fafb;
+}
+
+.inv-to-box .to-title {
+  font-size: 13px;
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.inv-to-box .to-text {
+  width: 100%;
+  border: none;
+  background: transparent;
+  resize: none;
+  font-size: 13px;
+}
+
+/* ---------- Sales A/C lines ---------- */
+
+
+
+/* ---------- FOOTER: Back / Save cố định đáy màn hình ---------- */
+
+.inv-footer {
+  flex-shrink: 0;                 /* không bị co khi body scroll */
+  border-top: 1px solid #e5e7eb;
+  background: #f9fafb;
+  padding: 12px 32px;
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+/* canh footer theo độ rộng nội dung chính */
+.inv-footer > * {
+  max-width: 1100px;
+}
+
+/* ================== RESPONSIVE ================== */
+
+@media (max-width: 900px) {
+  .inv-body-inner {
+    padding: 16px;
+  }
+
+  .inv-body-inner > * {
+    max-width: 100%;
+  }
+
+  .inv-header-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .inv-field-contact {
+    grid-column: 1 / -1;
+  }
+
+  .inv-footer {
+    padding: 10px 16px;
+  }
+}
+.inv-due-shortcut-btn {
+  border: 1px solid #d1d5db;
+  border-left: none;
+  background: #f9fafb;
+  padding: 0 8px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.inv-due-shortcuts {
+  position: absolute;
+  z-index: 20;
+  right: 0;
+  top: 100%;
+  min-width: 190px;
+  background: #ffffff;
+  border: 1px solid #d1d5db;
+  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.12);
+  border-radius: 2px;
+  padding: 4px 0;
+  left: 220px;
+}
+
+.inv-due-shortcuts button {
+  width: 100%;
+  border: 0;
+  background: #ffffff;
+  text-align: left;
+  padding: 6px 10px;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.inv-due-shortcuts button:hover {
+  background: #f3f4f6;
+}
+
+.inv-due-shortcuts .reset {
+  border-top: 1px solid #e5e7eb;
+  margin-top: 4px;
+}
