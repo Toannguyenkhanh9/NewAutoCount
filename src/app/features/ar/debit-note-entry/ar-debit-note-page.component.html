@@ -74,7 +74,28 @@
             </table>
           </div>
         </div>
+      <!-- ============ PAGER ============ -->
+      <div class="account-type-footer">
+        <div class="account-type-rec">Total Records: {{ filtered.length }}</div>
 
+        <div class="account-type-pager">
+          <button class="ac-btn ac-btn-ghost account-type-pg-btn" [disabled]="page === 1" (click)="goFirst()">
+            &laquo;
+          </button>
+          <button class="ac-btn ac-btn-ghost account-type-pg-btn" [disabled]="page === 1" (click)="goPrev()">
+            &lsaquo;
+          </button>
+
+          <span class="account-type-pg-label">Page {{ page }} / {{ totalPages }}</span>
+
+          <button class="ac-btn ac-btn-ghost account-type-pg-btn" [disabled]="page === totalPages" (click)="goNext()">
+            &rsaquo;
+          </button>
+          <button class="ac-btn ac-btn-ghost account-type-pg-btn" [disabled]="page === totalPages" (click)="goLast()">
+            &raquo;
+          </button>
+        </div>
+      </div>
         <!-- Payment history -->
         <div class="ac-card ac-card-no-padding payment-panel"  *ngIf="selected">
           <div class="pp-head">
@@ -121,28 +142,7 @@
         </div>
       </div>
 
-      <!-- ============ PAGER ============ -->
-      <div class="account-type-footer">
-        <div class="account-type-rec">Total Records: {{ filtered.length }}</div>
 
-        <div class="account-type-pager">
-          <button class="ac-btn ac-btn-ghost account-type-pg-btn" [disabled]="page === 1" (click)="goFirst()">
-            &laquo;
-          </button>
-          <button class="ac-btn ac-btn-ghost account-type-pg-btn" [disabled]="page === 1" (click)="goPrev()">
-            &lsaquo;
-          </button>
-
-          <span class="account-type-pg-label">Page {{ page }} / {{ totalPages }}</span>
-
-          <button class="ac-btn ac-btn-ghost account-type-pg-btn" [disabled]="page === totalPages" (click)="goNext()">
-            &rsaquo;
-          </button>
-          <button class="ac-btn ac-btn-ghost account-type-pg-btn" [disabled]="page === totalPages" (click)="goLast()">
-            &raquo;
-          </button>
-        </div>
-      </div>
     </div>
   </ng-container>
 

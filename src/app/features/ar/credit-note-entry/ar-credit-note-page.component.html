@@ -12,9 +12,7 @@
         </div>
 
         <div class="ac-page-toolbar" role="toolbar">
-          <input class="ac-form-control ac-page-search"
-            [(ngModel)]="q"
-            placeholder="Search cn no. / company name..." />
+          <input class="ac-form-control ac-page-search" [(ngModel)]="q" placeholder="Search cn no. / company name..." />
 
           <button type="button" class="ac-btn ac-btn-primary" (click)="openNew()">
             <span class="ico plus"></span>
@@ -27,108 +25,107 @@
           </button>
         </div>
       </div>
+      <div class="list-shell">
+        <!-- LIST GRID -->
+        <div class="ac-card ac-card-no-padding">
+          <div class="ac-tablewrap">
+            <table class="ac-table">
+              <thead>
+                <tr>
+                  <th class="ac-text-left" (click)="setSort('receiptNo')">CN No.</th>
+                  <th class="ac-text-left" (click)="setSort('date')">Date</th>
+                  <th class="ac-text-left" (click)="setSort('debtorName')">Company Name</th>
+                  <th class="ac-text-left">Description</th>
+                  <th class="ac-text-right" (click)="setSort('amount')">Net Total</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let r of paged" (click)="toggleDetailFor(r)" [class.selected]="r === selected">
+                  <td>{{ r.receiptNo }}</td>
+                  <td>{{ r.date }}</td>
+                  <td>{{ r.debtorName }}</td>
+                  <td class="cut">{{ r.description || "-" }}</td>
+                  <td class="ac-text-right">{{ r.amount | number : "1.2-2" }}</td>
+                </tr>
 
-      <!-- LIST GRID -->
-      <div class="ac-card ac-card-no-padding">
+                <tr *ngIf="!paged.length">
+                  <td class="ac-text-center ac-text-muted" colspan="5">No data</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- PAGER -->
+        <div class="account-type-footer">
+          <div class="account-type-rec">Total Records: {{ filtered.length }}</div>
+
+          <div class="account-type-pager">
+            <button class="ac-btn ac-btn-ghost account-type-pg-btn" (click)="first()" [disabled]="page === 1">
+              &laquo;
+            </button>
+            <button class="ac-btn ac-btn-ghost account-type-pg-btn" (click)="prev()" [disabled]="page === 1">
+              &lsaquo;
+            </button>
+            <span class="account-type-pg-label">Page {{ page }} / {{ totalPages }}</span>
+            <button class="ac-btn ac-btn-ghost account-type-pg-btn" (click)="next()" [disabled]="page === totalPages">
+              &rsaquo;
+            </button>
+            <button class="ac-btn ac-btn-ghost account-type-pg-btn" (click)="last()" [disabled]="page === totalPages">
+              &raquo;
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- DETAIL PANE -->
+      <div *ngIf="detailOpen" class="ac-card ac-card-no-padding cn-detail-pane">
+        <div class="cn-detail-header">Invoices / Debit Notes Paid</div>
         <div class="ac-tablewrap">
-          <table class="ac-table">
+          <table class="ac-table ac-table-sm">
+            <colgroup>
+              <col style="width: 8%" />
+              <col style="width: 14%" />
+              <col style="width: 28%" />
+              <col style="width: 16%" />
+              <col style="width: 16%" />
+              <col style="width: 18%" />
+            </colgroup>
             <thead>
               <tr>
-                <th class="ac-text-left" (click)="setSort('receiptNo')">CN No.</th>
-                <th class="ac-text-left" (click)="setSort('date')">Date</th>
-                <th class="ac-text-left" (click)="setSort('debtorName')">Company Name</th>
-                <th class="ac-text-left">Description</th>
-                <th class="ac-text-right" (click)="setSort('amount')">Net Total</th>
+                <th class="ac-text-left">Type</th>
+                <th class="ac-text-left">Date</th>
+                <th class="ac-text-left">No.</th>
+                <th class="ac-text-right">Org. Amt.</th>
+                <th class="ac-text-right">Outstanding</th>
+                <th class="ac-text-right">Paid Amount</th>
               </tr>
             </thead>
             <tbody>
-              <tr *ngFor="let r of paged"
-                  (click)="toggleDetailFor(r)"
-                  [class.selected]="r === selected">
-                <td>{{ r.receiptNo }}</td>
-                <td>{{ r.date }}</td>
-                <td>{{ r.debtorName }}</td>
-                <td class="cut">{{ r.description || "-" }}</td>
-                <td class="ac-text-right">{{ r.amount | number : "1.2-2" }}</td>
+              <tr *ngFor="let d of detailItems">
+                <td>{{ d.type }}</td>
+                <td>{{ d.date }}</td>
+                <td>{{ d.no }}</td>
+                <td class="ac-text-right">{{ fmt(d.orgAmt) }}</td>
+                <td class="ac-text-right">{{ fmt(d.outstanding) }}</td>
+                <td class="ac-text-right">{{ fmt(d.paid) }}</td>
               </tr>
 
-              <tr *ngIf="!paged.length">
-                <td class="ac-text-center ac-text-muted" colspan="5">No data</td>
+              <tr *ngIf="!detailItems.length">
+                <td colspan="6" class="ac-text-center ac-text-muted py-3">
+                  No invoices/debit notes paid for this credit note.
+                </td>
               </tr>
             </tbody>
+
+            <tfoot *ngIf="detailItems.length">
+              <tr>
+                <th colspan="5" class="ac-text-right">Total Paid</th>
+                <th class="ac-text-right">{{ fmt(detailPaidTotal) }}</th>
+              </tr>
+            </tfoot>
           </table>
         </div>
-      </div>
-
-      <!-- PAGER -->
-      <div class="account-type-footer">
-        <div class="account-type-rec">Total Records: {{ filtered.length }}</div>
-
-        <div class="account-type-pager">
-          <button class="ac-btn ac-btn-ghost account-type-pg-btn" (click)="first()" [disabled]="page === 1">
-            &laquo;
-          </button>
-          <button class="ac-btn ac-btn-ghost account-type-pg-btn" (click)="prev()" [disabled]="page === 1">
-            &lsaquo;
-          </button>
-          <span class="account-type-pg-label">Page {{ page }} / {{ totalPages }}</span>
-          <button class="ac-btn ac-btn-ghost account-type-pg-btn" (click)="next()" [disabled]="page === totalPages">
-            &rsaquo;
-          </button>
-          <button class="ac-btn ac-btn-ghost account-type-pg-btn" (click)="last()" [disabled]="page === totalPages">
-            &raquo;
-          </button>
-        </div>
-      </div>
-    </div>
-
-    <!-- DETAIL PANE -->
-    <div *ngIf="detailOpen" class="ac-card ac-card-no-padding cn-detail-pane">
-      <div class="cn-detail-header">Invoices / Debit Notes Paid</div>
-      <div class="ac-tablewrap">
-        <table class="ac-table ac-table-sm">
-          <colgroup>
-            <col style="width: 8%" />
-            <col style="width: 14%" />
-            <col style="width: 28%" />
-            <col style="width: 16%" />
-            <col style="width: 16%" />
-            <col style="width: 18%" />
-          </colgroup>
-          <thead>
-            <tr>
-              <th class="ac-text-left">Type</th>
-              <th class="ac-text-left">Date</th>
-              <th class="ac-text-left">No.</th>
-              <th class="ac-text-right">Org. Amt.</th>
-              <th class="ac-text-right">Outstanding</th>
-              <th class="ac-text-right">Paid Amount</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr *ngFor="let d of detailItems">
-              <td>{{ d.type }}</td>
-              <td>{{ d.date }}</td>
-              <td>{{ d.no }}</td>
-              <td class="ac-text-right">{{ fmt(d.orgAmt) }}</td>
-              <td class="ac-text-right">{{ fmt(d.outstanding) }}</td>
-              <td class="ac-text-right">{{ fmt(d.paid) }}</td>
-            </tr>
-
-            <tr *ngIf="!detailItems.length">
-              <td colspan="6" class="ac-text-center ac-text-muted py-3">
-                No invoices/debit notes paid for this credit note.
-              </td>
-            </tr>
-          </tbody>
-
-          <tfoot *ngIf="detailItems.length">
-            <tr>
-              <th colspan="5" class="ac-text-right">Total Paid</th>
-              <th class="ac-text-right">{{ fmt(detailPaidTotal) }}</th>
-            </tr>
-          </tfoot>
-        </table>
       </div>
     </div>
   </ng-container>
@@ -165,9 +162,7 @@
                   </option>
                 </select>
 
-                <button type="button" class="inv-contact-search"
-                  (click)="openDebtorDropdown()"
-                  title="Search contact"
+                <button type="button" class="inv-contact-search" (click)="openDebtorDropdown()" title="Search contact"
                   aria-label="Search contact">
                   <lucide-icon name="search" [size]="15" color="#111827"></lucide-icon>
                 </button>
@@ -242,14 +237,9 @@
                 <span class="ac-input-prefix-icon">
                   <lucide-icon name="hash" [size]="13" color="#111827"></lucide-icon>
                 </span>
-                <input class="ac-form-control"
-                  formControlName="docNo"
-                  placeholder="&lt;&lt;new&gt;&gt;"
-                  (input)="buildOrNoSuggestions()"
-                  (focus)="buildOrNoSuggestions()"
-                  list="orno-list"
-                  [readonly]="rpForm.value.autoNumbering || formMode !== 'new'"
-                  [class.invalid]="isInvalid('docNo')" />
+                <input class="ac-form-control" formControlName="docNo" placeholder="&lt;&lt;new&gt;&gt;"
+                  (input)="buildOrNoSuggestions()" (focus)="buildOrNoSuggestions()" list="orno-list"
+                  [readonly]="rpForm.value.autoNumbering || formMode !== 'new'" [class.invalid]="isInvalid('docNo')" />
               </div>
 
               <datalist id="orno-list">
@@ -287,9 +277,7 @@
                 <span class="ac-input-prefix-icon">
                   <lucide-icon name="hash" [size]="13" color="#111827"></lucide-icon>
                 </span>
-                <input class="ac-form-control"
-                  formControlName="description"
-                  [readonly]="formMode === 'edit'"
+                <input class="ac-form-control" formControlName="description" [readonly]="formMode === 'edit'"
                   placeholder="Document description" />
               </div>
             </label>
@@ -323,14 +311,11 @@
                       <input class="ac-form-control" formControlName="decs" [readonly]="formMode === 'edit'" />
                     </td>
                     <td class="ac-text-right">
-                      <input class="ac-form-control ac-text-right"
-                        appAmount
-                        formControlName="amount"
-                        (input)="onMethodAmtOrFeeChanged()"
-                        [readonly]="formMode === 'edit'" />
+                      <input class="ac-form-control ac-text-right" appAmount formControlName="amount"
+                        (input)="onMethodAmtOrFeeChanged()" [readonly]="formMode === 'edit'" />
                     </td>
                     <td class="ac-text-center">
-                        <button type="button" class="ac-btn ac-btn-icon-danger" (click)="removeMethod(i)"
+                      <button type="button" class="ac-btn ac-btn-icon-danger" (click)="removeMethod(i)"
                         [disabled]="formMode === 'view'">
                         🗑
                       </button>
@@ -379,13 +364,13 @@
                 <div class="row total">
                   <div class="label">Net Total</div>
                   <div class="value">
-                   {{ netTotal | number : "1.2-2" }}
+                    {{ netTotal | number : "1.2-2" }}
                   </div>
                 </div>
                 <div class="row total">
                   <div class="label">Unapplied Amount</div>
                   <div class="value">
-                   {{ unappliedAmount | number : "1.2-2" }}
+                    {{ unappliedAmount | number : "1.2-2" }}
                   </div>
                 </div>
               </div>
@@ -425,9 +410,8 @@
               </thead>
 
               <tbody>
-                <tr *ngFor="let fg of knockFA.controls; let i = index"
-                    [formGroupName]="i"
-                    [class.overdue-row]="isRowOverdue(i)">
+                <tr *ngFor="let fg of knockFA.controls; let i = index" [formGroupName]="i"
+                  [class.overdue-row]="isRowOverdue(i)">
                   <td>{{ knockFA.at(i).get("type")!.value }}</td>
                   <td>{{ knockFA.at(i).get("date")!.value }}</td>
                   <td>{{ knockFA.at(i).get("no")!.value }}</td>
@@ -438,22 +422,14 @@
                   </td>
 
                   <td class="ac-text-right">
-                    <input class="ac-form-control ac-text-right"
-                      appAmount
-                      [decimals]="2"
-                      [allowNegative]="false"
-                      [formatOnBlurOnly]="true"
-                      formControlName="pay"
-                      [readonly]="formMode === 'edit' || !canAllocate"
-                      (input)="onPayChanged(i)"
-                      (blur)="onPayBlur(i)" />
+                    <input class="ac-form-control ac-text-right" appAmount [decimals]="2" [allowNegative]="false"
+                      [formatOnBlurOnly]="true" formControlName="pay" [readonly]="formMode === 'edit' || !canAllocate"
+                      (input)="onPayChanged(i)" (blur)="onPayBlur(i)" />
                   </td>
 
                   <td class="ac-text-center">
-                    <input type="checkbox"
-                      [checked]="knockFA.at(i).get('sel')?.value"
-                      (change)="onSelChanged(i, $event)"
-                      [disabled]="isSelDisabled(i)" />
+                    <input type="checkbox" [checked]="knockFA.at(i).get('sel')?.value"
+                      (change)="onSelChanged(i, $event)" [disabled]="isSelDisabled(i)" />
                   </td>
                 </tr>
               </tbody>
@@ -466,8 +442,7 @@
           <button class="ac-btn ac-btn-ghost" type="button" (click)="closeForm()">Cancel</button>
 
           <ng-container *ngIf="formMode !== 'edit'">
-            <button class="ac-btn ac-btn-primary" type="button"
-              (click)="askSave()"
+            <button class="ac-btn ac-btn-primary" type="button" (click)="askSave()"
               [disabled]="totalAmount === 0 || rpForm.invalid">
               Save
             </button>
@@ -487,10 +462,8 @@
 
       <div class="ac-dialog-body">
         <div class="ac-page-toolbar" style="padding: 0 0 8px 0; gap: 8px; display: flex">
-          <input class="ac-form-control ac-page-search"
-                 [(ngModel)]="debtorQuery"
-                 (ngModelChange)="filterDebtors()"
-                 placeholder="Search Debtor A/C, Company Name..." />
+          <input class="ac-form-control ac-page-search" [(ngModel)]="debtorQuery" (ngModelChange)="filterDebtors()"
+            placeholder="Search Debtor A/C, Company Name..." />
         </div>
 
         <div class="ac-tablewrap">
@@ -528,7 +501,7 @@
     </div>
   </div>
 
-<!-- ===== Delete confirm ===== -->
+  <!-- ===== Delete confirm ===== -->
   <div class="dialog" *ngIf="showDeleteConfirm">
     <div class="dialog-panel-small">
       <div class="dialog-title">
@@ -536,8 +509,7 @@
         <button class="x" (click)="showDeleteConfirm = false">×</button>
       </div>
       <div class="dialog-body">
-        Are you sure you want to delete <b>{{ selected?.receiptNo }}</b
-        >?
+        Are you sure you want to delete <b>{{ selected?.receiptNo }}</b>?
       </div>
       <div class="dialog-actions">
         <button class="btn" (click)="showDeleteConfirm = false">Cancel</button>
@@ -546,18 +518,10 @@
     </div>
   </div>
   <div class="ac-dialog-backdrop" *ngIf="showSuccess">
-    <div
-      class="ac-card-no-padding ac-dialog-panel-sm ac-dialog-success"
-      role="dialog"
-      aria-modal="true"
-    >
+    <div class="ac-card-no-padding ac-dialog-panel-sm ac-dialog-success" role="dialog" aria-modal="true">
       <div class="ac-dialog-header ac-dialog-success-header">
         <span>Success</span>
-        <button
-          class="ac-dialog-close"
-          (click)="closeSuccess()"
-          aria-label="Close"
-        >
+        <button class="ac-dialog-close" (click)="closeSuccess()" aria-label="Close">
           ×
         </button>
       </div>
@@ -567,11 +531,7 @@
         </p>
       </div>
       <div class="ac-dialog-footer">
-        <button
-          class="ac-btn ac-btn-primary"
-          type="button"
-          (click)="closeSuccess()"
-        >
+        <button class="ac-btn ac-btn-primary" type="button" (click)="closeSuccess()">
           OK
         </button>
       </div>

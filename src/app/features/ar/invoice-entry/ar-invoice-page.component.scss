@@ -1,67 +1,139 @@
 /* Buttons */
 
 /* filter row */
-.filter{padding:10px 12px;display:flex;align-items:center;justify-content:space-between;gap:10px;}
-.filter input{height:34px;width:420px;max-width:100%;border:1px solid #d7deea;border-radius:8px;padding:0 10px;}
-.meta{color:#6b7280;}
+.filter {
+  padding: 10px 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+.filter input {
+  height: 34px;
+  width: 420px;
+  max-width: 100%;
+  border: 1px solid #d7deea;
+  border-radius: 8px;
+  padding: 0 10px;
+}
+.meta {
+  color: #6b7280;
+}
 
-.r{text-align:right;}
-.c{text-align:center;}
-.tag{padding:2px 8px;border-radius:999px;border:1px solid #dbe5f8;background:#f7fbff;color:#0f2c61;font-weight:700;}
-.tag.p{background:#ecfff5;border-color:#b6e7c8;color:#176a3a;}
-.tag.o{background:#fffbed;border-color:#fbe2a2;color:#936b07;}
-.tag.v{background:#fff5f5;border-color:#f2c6c6;color:#b42318;}
+.r {
+  text-align: right;
+}
+.c {
+  text-align: center;
+}
+.tag {
+  padding: 2px 8px;
+  border-radius: 999px;
+  border: 1px solid #dbe5f8;
+  background: #f7fbff;
+  color: #0f2c61;
+  font-weight: 700;
+}
+.tag.p {
+  background: #ecfff5;
+  border-color: #b6e7c8;
+  color: #176a3a;
+}
+.tag.o {
+  background: #fffbed;
+  border-color: #fbe2a2;
+  color: #936b07;
+}
+.tag.v {
+  background: #fff5f5;
+  border-color: #f2c6c6;
+  color: #b42318;
+}
 
 /* header form */
-.hdr .row{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;}
-
-
+.hdr .row {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 10px;
+}
 
 /* small grids */
-.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;}
-.grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;}
+.grid3 {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+}
+.grid4 {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+}
 
 /* preview */
-.preview{margin-top:10px;border:1px solid #e5e7eb;border-radius:8px;padding:10px;}
-.preview h3{margin:0 0 8px;}
-.to-box{
+.preview {
+  margin-top: 10px;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 10px;
+}
+.preview h3 {
+  margin: 0 0 8px;
+}
+.to-box {
   margin: 6px 0 12px;
   padding: 8px 10px;
   border: 1px solid #e5e7eb;
   border-radius: 8px;
   background: #f9fafb;
 }
-.to-title{ font-weight:600; margin-bottom:6px; }
-.to-text{ width:100%; border:0; background:transparent; resize:none; line-height:1.35; }
+.to-title {
+  font-weight: 600;
+  margin-bottom: 6px;
+}
+.to-text {
+  width: 100%;
+  border: 0;
+  background: transparent;
+  resize: none;
+  line-height: 1.35;
+}
 /* Sales A/C grid tidy spacing */
-.sum-row{
+.sum-row {
   display: flex;
-  align-items: baseline;          /* chữ & số thẳng hàng đẹp */
-  justify-content: flex-end;      /* canh phải (giống ảnh) */
+  align-items: baseline; /* chữ & số thẳng hàng đẹp */
+  justify-content: flex-end; /* canh phải (giống ảnh) */
   gap: 12px;
   margin: 6px 0;
 
-  .label{ color:#334155; }
-  .val{
-    min-width: 120px;             /* cột số cố định, không nhảy */
+  .label {
+    color: #334155;
+  }
+  .val {
+    min-width: 120px; /* cột số cố định, không nhảy */
     text-align: right;
     font-weight: 700;
   }
 }
-.inline-field{
-  display:flex;
-  gap:8px;
-  align-items:center;
+.inline-field {
+  display: flex;
+  gap: 8px;
+  align-items: center;
 }
-.inline-field .inp{ flex:1; }
-.btn.icon{
+.inline-field .inp {
+  flex: 1;
+}
+.btn.icon {
   background-color: #959eaf;
-  width:36px;height:36px;padding:0;
-  display:inline-flex;align-items:center;justify-content:center;
-  border-radius:8px;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
 }
 /* List + Payment History layout */
-.list-shell{
+.list-shell {
   display: flex;
   flex-direction: column;
   gap: 10px;
@@ -70,38 +142,47 @@
 }
 
 /* phần lưới chính chiếm hết phần còn lại và cuộn được */
-.main-grid{
+.main-grid {
   flex: 1 1 auto;
   overflow: auto;
   border-radius: 8px;
 }
 
-/* panel Payment History có chiều cao ổn định */
-
 /* Dòng quá hạn (không đè màu selected) */
 tbody tr.overdue:not(.selected) td {
-  background: #ffe4e6;      /* hồng nhạt */
-  color: #7f1d1d;           /* đỏ nâu dễ đọc */
+  background: #ffe4e6; /* hồng nhạt */
+  color: #7f1d1d; /* đỏ nâu dễ đọc */
 }
 tbody tr.overdue:not(.selected) td.r {
   font-weight: 600;
 }
 
 /* (tuỳ chọn) nhấn mạnh outstanding cột số khi quá hạn */
-tbody tr.overdue:not(.selected) td:nth-last-child(2) { /* cột Outstanding nếu là cột áp chót */
+tbody tr.overdue:not(.selected) td:nth-last-child(2) {
+  /* cột Outstanding nếu là cột áp chót */
   color: #b91c1c;
 }
-tr.overdue td {        /* tô cả dòng */
-  color: #b91c1c;      /* đỏ */
+tr.overdue td {
+  /* tô cả dòng */
+  color: #b91c1c; /* đỏ */
   font-weight: 600;
 }
-td.neg {               /* nếu chỉ muốn mỗi ô Outstanding */
+td.neg {
+  /* nếu chỉ muốn mỗi ô Outstanding */
   color: #b91c1c;
   font-weight: 600;
 }
 
-.err { color:#b91c1c; font-size:.85rem; margin-top:4px; }
-.with-search { display:flex; gap:8px; align-items:center; }
+.err {
+  color: #b91c1c;
+  font-size: 0.85rem;
+  margin-top: 4px;
+}
+.with-search {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
 .totals-grid {
   margin: 10px 0 16px;
   display: grid;
@@ -115,14 +196,14 @@ td.neg {               /* nếu chỉ muốn mỗi ô Outstanding */
     color: #475569;
   }
   .value {
-  min-width: 140px;
-  text-align: right;
-  padding: 6px 10px;
-  border-radius: 10px;
-  border: 1px solid #e2e8f0;
-  background: #f8fafc;
-  font-weight: 600;
-  font-variant-numeric: tabular-nums;
+    min-width: 140px;
+    text-align: right;
+    padding: 6px 10px;
+    border-radius: 10px;
+    border: 1px solid #e2e8f0;
+    background: #f8fafc;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
   }
   .value.warn {
     color: #b91c1c;
@@ -133,14 +214,17 @@ td.neg {               /* nếu chỉ muốn mỗi ô Outstanding */
     text-align: right;
   }
 }
+.ac-card-inv {
+  width: 100%;
+  max-width: 100%;
+  /* margin: 8px 0; */
+}
+
+.account-type-footer-inv {
+  /* margin-top: 10px; */
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 12px;
+}
 /* ================== A/R INVOICE FULL PAGE ================== */
-
-
-
-
-
-
-
-
-
-

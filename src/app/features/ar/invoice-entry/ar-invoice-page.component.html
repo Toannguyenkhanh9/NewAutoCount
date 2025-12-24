@@ -35,7 +35,7 @@
       <!-- ============ LIST + HISTORY ============ -->
       <div class="list-shell">
         <!-- Main grid -->
-        <div class="ac-card ac-card-no-padding main-grid">
+        <div class="ac-card-inv ac-card-no-padding">
           <div class="ac-tablewrap">
             <table class="ac-table">
               <thead>
@@ -66,107 +66,87 @@
             </table>
           </div>
         </div>
-
-        <!-- Payment history -->
-        <div class="ac-card ac-card-no-padding payment-panel" *ngIf="selected">
-          <div class="pp-head">
-            <div class="pp-title">
-              Payment History
-              <ng-container *ngIf="selected">
-                &nbsp;—&nbsp;<b>{{ selected.docNo }}</b>
-              </ng-container>
-            </div>
+        <div class="account-type-footer-inv">
+          <div class="account-type-rec">
+            Total Records: {{ filtered.length }}
           </div>
+          <div class="account-type-pager">
+            <button class="ac-btn ac-btn-ghost account-type-pg-btn" [disabled]="page === 1" (click)="page = 1">
+              &laquo;
+            </button>
+            <button class="ac-btn ac-btn-ghost account-type-pg-btn" [disabled]="page === 1" (click)="page = page - 1">
+              &lsaquo;
+            </button>
 
-          <div class="pp-body" *ngIf="selected; else noSel">
-            <div class="ac-tablewrap">
-              <table class="ac-table ac-table-sm">
-                <colgroup>
-                  <col style="width: 12%" />
-                  <col style="width: 20%" />
-                  <col style="width: 42%" />
-                  <col style="width: 13%" />
-                  <col style="width: 13%" />
-                </colgroup>
-                <thead>
-                  <tr>
-                    <th class="ac-text-left" style="width: 90px">Type</th>
-                    <th class="ac-text-left" style="width: 120px">No.</th>
-                    <th class="ac-text-left">Description</th>
-                    <th class="ac-text-left" style="width: 120px">Date</th>
-                    <th class="ac-text-right" style="width: 140px">Amount</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr *ngFor="let p of paymentHistory">
-                    <td>{{ p.type }}</td>
-                    <td>{{ p.no }}</td>
-                    <td class="cut">{{ p.description || '-' }}</td>
-                    <td>{{ p.date }}</td>
-                    <td class="ac-text-right">
-                      {{ p.amount | number : '1.2-2' }}
-                    </td>
-                  </tr>
-                  <tr *ngIf="!paymentHistory.length">
-                    <td colspan="5" class="ac-text-center ac-text-muted">
-                      — No payment —
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
+            <span class="account-type-pg-label">
+              Page {{ page }} / {{ 1 }}
+            </span>
+
+            <button class="ac-btn ac-btn-ghost account-type-pg-btn" [disabled]="page === 1" (click)="page = page + 1">
+              &rsaquo;
+            </button>
+            <button class="ac-btn ac-btn-ghost account-type-pg-btn" [disabled]="page === 1" (click)="page = 1">
+              &raquo;
+            </button>
           </div>
-
-          <ng-template #noSel>
-            <div class="pp-empty">
-              Select an invoice to see its payment history.
-            </div>
-          </ng-template>
         </div>
+        <!-- Payment history -->
       </div>
+      <div class="ac-card ac-card-no-padding cn-detail-pane" *ngIf="selected">
+        <div class="pp-head">
+          <div class="pp-title">
+            Payment History
+            <ng-container *ngIf="selected">
+              &nbsp;—&nbsp;<b>{{ selected.docNo }}</b>
+            </ng-container>
+          </div>
+        </div>
 
-      <!-- ============ PAGER ============ -->
-    <div class="account-type-footer">
-      <div class="account-type-rec">
-        Total Records: {{ filtered.length }}
+        <div class="pp-body" *ngIf="selected; else noSel">
+          <div class="ac-tablewrap">
+            <table class="ac-table ac-table-sm">
+              <colgroup>
+                <col style="width: 12%" />
+                <col style="width: 20%" />
+                <col style="width: 42%" />
+                <col style="width: 13%" />
+                <col style="width: 13%" />
+              </colgroup>
+              <thead>
+                <tr>
+                  <th class="ac-text-left" style="width: 90px">Type</th>
+                  <th class="ac-text-left" style="width: 120px">No.</th>
+                  <th class="ac-text-left">Description</th>
+                  <th class="ac-text-left" style="width: 120px">Date</th>
+                  <th class="ac-text-right" style="width: 140px">Amount</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let p of paymentHistory">
+                  <td>{{ p.type }}</td>
+                  <td>{{ p.no }}</td>
+                  <td class="cut">{{ p.description || '-' }}</td>
+                  <td>{{ p.date }}</td>
+                  <td class="ac-text-right">
+                    {{ p.amount | number : '1.2-2' }}
+                  </td>
+                </tr>
+                <tr *ngIf="!paymentHistory.length">
+                  <td colspan="5" class="ac-text-center ac-text-muted">
+                    — No payment —
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <ng-template #noSel>
+          <div class="pp-empty">
+            Select an invoice to see its payment history.
+          </div>
+        </ng-template>
       </div>
-
-      <div class="account-type-pager">
-        <button
-          class="ac-btn ac-btn-ghost account-type-pg-btn"
-          [disabled]="page === 1"
-          (click)="page = 1"
-        >
-          &laquo;
-        </button>
-        <button
-          class="ac-btn ac-btn-ghost account-type-pg-btn"
-          [disabled]="page === 1"
-          (click)="page = page - 1"
-        >
-          &lsaquo;
-        </button>
-
-        <span class="account-type-pg-label">
-          Page {{ page }} / {{ 1 }}
-        </span>
-
-        <button
-          class="ac-btn ac-btn-ghost account-type-pg-btn"
-          [disabled]="page === 1"
-          (click)="page = page + 1"
-        >
-          &rsaquo;
-        </button>
-        <button
-          class="ac-btn ac-btn-ghost account-type-pg-btn"
-          [disabled]="page === 1"
-          (click)="page = 1"
-        >
-          &raquo;
-        </button>
-      </div>
-    </div>
     </div>
   </ng-container>
   <!-- ================== MODALS ================== -->

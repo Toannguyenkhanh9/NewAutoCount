@@ -73,6 +73,31 @@
             </table>
           </div>
         </div>
+      <div class="account-type-footer">
+        <div class="account-type-rec">
+          Total Records: 3
+        </div>
+
+        <div class="account-type-pager">
+          <button class="ac-btn ac-btn-ghost account-type-pg-btn" [disabled]="page === 1" (click)="page = 1">
+            &laquo;
+          </button>
+          <button class="ac-btn ac-btn-ghost account-type-pg-btn" [disabled]="page === 1" (click)="page = page - 1">
+            &lsaquo;
+          </button>
+
+          <span class="account-type-pg-label">
+            Page {{ page }} / {{ 1 }}
+          </span>
+
+          <button class="ac-btn ac-btn-ghost account-type-pg-btn" [disabled]="page === 1" (click)="page = page + 1">
+            &rsaquo;
+          </button>
+          <button class="ac-btn ac-btn-ghost account-type-pg-btn" [disabled]="page === 1" (click)="page = 1">
+            &raquo;
+          </button>
+        </div>
+      </div>
         <!-- Detail pane -->
         <div class="ac-card ac-card-no-padding payment-panel" *ngIf="selected">
           <div class="pp-head">
@@ -126,31 +151,6 @@
               </tfoot>
             </table>
           </div>
-        </div>
-      </div>
-      <div class="account-type-footer">
-        <div class="account-type-rec">
-          Total Records: 3
-        </div>
-
-        <div class="account-type-pager">
-          <button class="ac-btn ac-btn-ghost account-type-pg-btn" [disabled]="page === 1" (click)="page = 1">
-            &laquo;
-          </button>
-          <button class="ac-btn ac-btn-ghost account-type-pg-btn" [disabled]="page === 1" (click)="page = page - 1">
-            &lsaquo;
-          </button>
-
-          <span class="account-type-pg-label">
-            Page {{ page }} / {{ 1 }}
-          </span>
-
-          <button class="ac-btn ac-btn-ghost account-type-pg-btn" [disabled]="page === 1" (click)="page = page + 1">
-            &rsaquo;
-          </button>
-          <button class="ac-btn ac-btn-ghost account-type-pg-btn" [disabled]="page === 1" (click)="page = 1">
-            &raquo;
-          </button>
         </div>
       </div>
     </div>
