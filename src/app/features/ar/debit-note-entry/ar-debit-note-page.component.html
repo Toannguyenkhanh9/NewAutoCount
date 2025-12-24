@@ -369,10 +369,6 @@
                     [formGroup]="fg"
                   >
                     <td>
-                      <div class="ac-input-prefix-group">
-                        <span class="ac-input-prefix-icon">
-                        </span>
-
                         <input
                           class="ac-form-control"
                           formControlName="accNo"
@@ -381,7 +377,6 @@
                           (input)="prepAccNoSuggestions(i)"
                           [readonly]="formMode === 'view'"
                         />
-                      </div>
 
                       <datalist [id]="'accnos-' + i">
                         <option *ngFor="let s of accNoSugs[i]" [value]="s"></option>
@@ -389,21 +384,14 @@
                     </td>
 
                     <td>
-                      <div class="ac-input-prefix-group">
-                        <span class="ac-input-prefix-icon">
-
-                        </span>
-
                         <input
                           class="ac-form-control"
                           formControlName="lineDesc"
                           [readonly]="formMode === 'view'"
                         />
-                      </div>
                     </td>
 
                     <td class="ac-text-right">
-                      <div class="ac-input-prefix-group">
                         <input
                           class="ac-form-control ac-text-right"
                           appAmount
@@ -412,7 +400,6 @@
                           (input)="recalcTotals()"
                           [readonly]="formMode === 'view'"
                         />
-                      </div>
                     </td>
 
                     <td class="ac-text-center inv-line-remove">
