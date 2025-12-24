@@ -29,227 +29,218 @@
       </div>
 
 
-    <!-- List grid -->
-    <div class="list-shell">
-      <div class="ac-card ac-card-no-padding main-grid">
-        <div class="ac-tablewrap">
-          <table class="ac-table">
-            <thead>
-              <tr>
-                <th class="ac-text-left" (click)="setSort('receiptNo')">OR No</th>
-                <th class="ac-text-left" (click)="setSort('date')">Date</th>
-                <th class="ac-text-left" (click)="setSort('debtorName')">Company Name</th>
-                <th class="ac-text-left">Description</th>
-                <th class="ac-text-right" (click)="setSort('amount')">Amount</th>
-                <th class="ac-text-right" (click)="setSort('paidAmt')">
-                  Paid Amount
-                </th>
-                <th class="ac-text-right" (click)="setSort('outstanding')">
-                  Outstanding
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr *ngFor="let r of paged" (click)="toggleDetailFor(r)" [class.ac-row-selected]="r === selected">
-                <td>{{ r.receiptNo }}</td>
-                <td>{{ r.date }}</td>
-                <td>{{ r.debtorName }}</td>
-                <td class="cut">{{ r.description || '-' }}</td>
-                <td class="ac-text-right">{{ r.amount | number : '1.2-2' }}</td>
-                <td class="ac-text-right">
-                  {{ r.paidAmt | number : '1.2-2' }}
-                </td>
-                <td class="ac-text-right">
-                  {{ r.outstanding | number : '1.2-2' }}
-                </td>
-              </tr>
+      <!-- List grid -->
+      <div class="list-shell">
+        <div class="ac-card ac-card-no-padding main-grid">
+          <div class="ac-tablewrap">
+            <table class="ac-table">
+              <thead>
+                <tr>
+                  <th class="ac-text-left" (click)="setSort('receiptNo')">OR No</th>
+                  <th class="ac-text-left" (click)="setSort('date')">Date</th>
+                  <th class="ac-text-left" (click)="setSort('debtorName')">Company Name</th>
+                  <th class="ac-text-left">Description</th>
+                  <th class="ac-text-right" (click)="setSort('amount')">Amount</th>
+                  <th class="ac-text-right" (click)="setSort('paidAmt')">
+                    Paid Amount
+                  </th>
+                  <th class="ac-text-right" (click)="setSort('outstanding')">
+                    Outstanding
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let r of paged" (click)="toggleDetailFor(r)" [class.ac-row-selected]="r === selected">
+                  <td>{{ r.receiptNo }}</td>
+                  <td>{{ r.date }}</td>
+                  <td>{{ r.debtorName }}</td>
+                  <td class="cut">{{ r.description || '-' }}</td>
+                  <td class="ac-text-right">{{ r.amount | number : '1.2-2' }}</td>
+                  <td class="ac-text-right">
+                    {{ r.paidAmt | number : '1.2-2' }}
+                  </td>
+                  <td class="ac-text-right">
+                    {{ r.outstanding | number : '1.2-2' }}
+                  </td>
+                </tr>
 
-              <tr *ngIf="!paged.length">
-                <td class="ac-text-center ac-text-muted" colspan="7">
-                  No data
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-      <br>
-      <!-- Detail pane -->
-      <div class="ac-card ac-card-no-padding payment-panel" *ngIf="selected">
-        <div class="pp-head">
-          <div class="pp-title">
-            Invoices / Debit Notes Paid
-                          <ng-container *ngIf="selected">
-                &nbsp;—&nbsp;<b>{{ selected.receiptNo }}</b>
-              </ng-container>
+                <tr *ngIf="!paged.length">
+                  <td class="ac-text-center ac-text-muted" colspan="7">
+                    No data
+                  </td>
+                </tr>
+              </tbody>
+            </table>
           </div>
         </div>
-        <div class="pp-body">
-          <table class="ac-table ac-table-sm">
-            <colgroup>
-              <col style="width: 8%" />
-              <col style="width: 14%" />
-              <col style="width: 28%" />
-              <col style="width: 16%" />
-              <col style="width: 16%" />
-              <col style="width: 18%" />
-            </colgroup>
-            <thead>
-              <tr>
-                <th class="ac-text-left" style="width: 70px">Type</th>
-                <th class="ac-text-left" style="width: 110px">Date</th>
-                <th class="ac-text-left">No.</th>
-                <th class="ac-text-right" style="width: 140px">Org. Amt.</th>
-                <th class="ac-text-right" style="width: 140px">Outstanding</th>
-                <th class="ac-text-right" style="width: 140px">Paid Amount</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr *ngFor="let d of detailItems">
-                <td>{{ d.type }}</td>
-                <td>{{ d.date }}</td>
-                <td>{{ d.no }}</td>
-                <td class="ac-text-right">{{ fmt(d.orgAmt) }}</td>
-                <td class="ac-text-right">{{ fmt(d.outstanding) }}</td>
-                <td class="ac-text-right">{{ fmt(d.paid) }}</td>
-              </tr>
-              <tr *ngIf="!detailItems.length">
-                <td colspan="6" class="text-center text-muted py-3">
-                  No invoices/debit notes paid for this credit note.
-                </td>
-              </tr>
-            </tbody>
-            <tfoot *ngIf="detailItems.length">
-              <tr class="sum">
-                <th colspan="5" class="ac-text-right">Total Paid</th>
-                <th class="ac-text-right">{{ fmt(detailPaidTotal) }}</th>
-              </tr>
-            </tfoot>
-          </table>
+        <!-- Detail pane -->
+        <div class="ac-card ac-card-no-padding payment-panel" *ngIf="selected">
+          <div class="pp-head">
+            <div class="pp-title">
+              Invoices / Debit Notes Paid
+              <ng-container *ngIf="selected">
+                &nbsp;—&nbsp;<b>{{ selected.receiptNo }}</b>
+              </ng-container>
+            </div>
+          </div>
+          <div class="pp-body">
+            <table class="ac-table ac-table-sm">
+              <colgroup>
+                <col style="width: 8%" />
+                <col style="width: 14%" />
+                <col style="width: 28%" />
+                <col style="width: 16%" />
+                <col style="width: 16%" />
+                <col style="width: 18%" />
+              </colgroup>
+              <thead>
+                <tr>
+                  <th class="ac-text-left" style="width: 70px">Type</th>
+                  <th class="ac-text-left" style="width: 110px">Date</th>
+                  <th class="ac-text-left">No.</th>
+                  <th class="ac-text-right" style="width: 140px">Org. Amt.</th>
+                  <th class="ac-text-right" style="width: 140px">Outstanding</th>
+                  <th class="ac-text-right" style="width: 140px">Paid Amount</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let d of detailItems">
+                  <td>{{ d.type }}</td>
+                  <td>{{ d.date }}</td>
+                  <td>{{ d.no }}</td>
+                  <td class="ac-text-right">{{ fmt(d.orgAmt) }}</td>
+                  <td class="ac-text-right">{{ fmt(d.outstanding) }}</td>
+                  <td class="ac-text-right">{{ fmt(d.paid) }}</td>
+                </tr>
+                <tr *ngIf="!detailItems.length">
+                  <td colspan="6" class="text-center text-muted py-3">
+                    No invoices/debit notes paid for this credit note.
+                  </td>
+                </tr>
+              </tbody>
+              <tfoot *ngIf="detailItems.length">
+                <tr class="sum">
+                  <th colspan="5" class="ac-text-right">Total Paid</th>
+                  <th class="ac-text-right">{{ fmt(detailPaidTotal) }}</th>
+                </tr>
+              </tfoot>
+            </table>
+          </div>
         </div>
       </div>
-    </div>
-    <div class="account-type-footer">
-      <div class="account-type-rec">
-        Total Records: 3
+      <div class="account-type-footer">
+        <div class="account-type-rec">
+          Total Records: 3
+        </div>
+
+        <div class="account-type-pager">
+          <button class="ac-btn ac-btn-ghost account-type-pg-btn" [disabled]="page === 1" (click)="page = 1">
+            &laquo;
+          </button>
+          <button class="ac-btn ac-btn-ghost account-type-pg-btn" [disabled]="page === 1" (click)="page = page - 1">
+            &lsaquo;
+          </button>
+
+          <span class="account-type-pg-label">
+            Page {{ page }} / {{ 1 }}
+          </span>
+
+          <button class="ac-btn ac-btn-ghost account-type-pg-btn" [disabled]="page === 1" (click)="page = page + 1">
+            &rsaquo;
+          </button>
+          <button class="ac-btn ac-btn-ghost account-type-pg-btn" [disabled]="page === 1" (click)="page = 1">
+            &raquo;
+          </button>
+        </div>
       </div>
-
-      <div class="account-type-pager">
-        <button class="ac-btn ac-btn-ghost account-type-pg-btn" [disabled]="page === 1" (click)="page = 1">
-          &laquo;
-        </button>
-        <button class="ac-btn ac-btn-ghost account-type-pg-btn" [disabled]="page === 1" (click)="page = page - 1">
-          &lsaquo;
-        </button>
-
-        <span class="account-type-pg-label">
-          Page {{ page }} / {{ 1 }}
-        </span>
-
-        <button class="ac-btn ac-btn-ghost account-type-pg-btn" [disabled]="page === 1" (click)="page = page + 1">
-          &rsaquo;
-        </button>
-        <button class="ac-btn ac-btn-ghost account-type-pg-btn" [disabled]="page === 1" (click)="page = 1">
-          &raquo;
-        </button>
-      </div>
-    </div>
     </div>
   </ng-container>
 
   <!-- =============== FORM MODE (FULL PAGE) =============== -->
   <ng-container *ngIf="showForm">
-    <div class="rp-form-shell">
+    <div class="inv-form">
       <!-- page header cho form -->
-      <div class="rp-header">
-        <div class="rp-title">
+      <div class="inv-header">
+        <div class="inv-title">
           {{ formMode === 'edit' ? 'Edit A/R Receive Payment' : 'New A/R Receive Payment' }}
         </div>
-        <div class="rp-subtitle">
+        <div class="inv-subtitle">
           Record customer receipts and knock off outstanding invoices / debit notes.
         </div>
       </div>
 
       <!-- thân form -->
-      <form class="rp-body" [formGroup]="rpForm">
-        <div class="rp-body-scroll">
+      <form class="inv-body" [formGroup]="rpForm">
+        <div class="inv-body-inner">
           <!-- Header fields -->
-<div class="ac-dialog-form-grid-3">
-  <!-- Debtor -->
-  <label class="inv-field">
-    <span class="inv-label">Debtor</span>
-    <div class="inv-contact-input ac-input-prefix-group">
-      <span class="ac-input-prefix-icon">
-        <lucide-icon name="user" [size]="15" color="#111827"></lucide-icon>
-      </span>
+          <div class="inv-header-grid">
+            <!-- Debtor -->
+            <label class="inv-field inv-field-contact">
+              <span class="inv-label">Contact</span>
 
-      <select
-        class="ac-form-control"
-        formControlName="debtor"
-        (change)="onDebtorChanged()"
-      >
-        <option value="">-- Select --</option>
-        <option *ngFor="let d of debtors" [ngValue]="d.debtorAccount">
-          {{ d.debtorAccount }} — {{ d.companyName }}
-        </option>
-      </select>
-    </div>
-  </label>
+              <div class="inv-contact-input ac-input-prefix-group">
+                <!-- icon người -->
+                <span class="ac-input-prefix-icon"><lucide-icon name="user" [size]="15"
+                    color="#111827"></lucide-icon></span>
 
-  <!-- Official Receipt No -->
-  <label class="inv-field">
-    <span class="inv-label">Official Receipt No</span>
-    <div class="inv-contact-input ac-input-prefix-group">
-      <span class="ac-input-prefix-icon">
-        <lucide-icon name="hash" [size]="15" color="#111827"></lucide-icon>
-      </span>
+                <select class="ac-form-control" formControlName="debtor" (change)="onDebtorChanged()">
+                  <option value="">Select debtor...</option>
+                  <option *ngFor="let d of debtors" [ngValue]="d.debtorAccount">
+                    {{ d.debtorAccount }} — {{ d.companyName }}
+                  </option>
+                </select>
 
-      <input
-        class="ac-form-control"
-        formControlName="officialNo"
-        placeholder="&lt;&lt;new&gt;&gt;"
-        (input)="buildOrNoSuggestions()"
-        (focus)="buildOrNoSuggestions()"
-        list="orno-list"
-      />
-      <datalist id="orno-list">
-        <option *ngFor="let v of orNoSuggestions" [value]="v"></option>
-      </datalist>
-    </div>
-  </label>
+                <!-- nút search bên phải -->
+                <button type="button" class="inv-contact-search" (click)="openDebtorDropdown()" title="Search debtors"
+                  aria-label="Search debtors">
+                  <lucide-icon name="search" [size]="15" color="#111827"></lucide-icon>
+                </button>
+              </div>
 
-  <!-- Date -->
-  <label class="inv-field">
-    <span class="inv-label">Date</span>
-    <div class="inv-contact-input ac-input-prefix-group">
-      <span class="ac-input-prefix-icon">
-        <lucide-icon name="calendar" [size]="15" color="#111827"></lucide-icon>
-      </span>
+              <div class="inv-error" *ngIf="isInvalid('debtor')">
+                Please select a debtor.
+              </div>
+            </label>
 
-      <input
-        type="date"
-        class="ac-form-control"
-        formControlName="date"
-      />
-    </div>
-  </label>
+            <!-- Official Receipt No -->
+            <label class="inv-field">
+              <span class="inv-label">Official Receipt No</span>
+              <div class="inv-contact-input ac-input-prefix-group">
+                <span class="ac-input-prefix-icon">
+                  <lucide-icon name="hash" [size]="15" color="#111827"></lucide-icon>
+                </span>
 
-  <!-- Description (wide) -->
-  <label class="inv-field wide">
-    <span class="inv-label">Description</span>
-    <div class="inv-contact-input ac-input-prefix-group">
-      <span class="ac-input-prefix-icon">
-        <lucide-icon name="hash" [size]="15" color="#111827"></lucide-icon>
-      </span>
+                <input class="ac-form-control" formControlName="officialNo" placeholder="&lt;&lt;new&gt;&gt;"
+                  (input)="buildOrNoSuggestions()" (focus)="buildOrNoSuggestions()" list="orno-list" />
+                <datalist id="orno-list">
+                  <option *ngFor="let v of orNoSuggestions" [value]="v"></option>
+                </datalist>
+              </div>
+            </label>
 
-      <input
-        class="ac-form-control"
-        formControlName="description"
-      />
-    </div>
-  </label>
+            <!-- Date -->
+            <label class="inv-field">
+              <span class="inv-label">Date</span>
+              <div class="inv-contact-input ac-input-prefix-group">
+                <span class="ac-input-prefix-icon">
+                  <lucide-icon name="calendar" [size]="15" color="#111827"></lucide-icon>
+                </span>
+
+                <input type="date" class="ac-form-control" formControlName="date" />
+              </div>
+            </label>
 </div>
+            <!-- Description (wide) -->
+            <label class="inv-field wide">
+              <span class="inv-label">Referrence</span>
+              <div class="inv-contact-input ac-input-prefix-group">
+                <span class="ac-input-prefix-icon">
+                  <lucide-icon name="hash" [size]="15" color="#111827"></lucide-icon>
+                </span>
 
+                <input class="ac-form-control" formControlName="description" />
+              </div>
+            </label>
 
           <br />
 
@@ -264,7 +255,7 @@
                     <th class="r">Payment Amount</th>
                     <th class="r">Charge Fee</th>
                     <th>Payment By</th>
-                    <th class="c">Is RCHQ</th>
+                    <th class="c" style="width: 50px;">Is RCHQ</th>
                     <th>RCHQ Date</th>
                     <th class="col-del"></th>
                   </tr>
@@ -348,6 +339,7 @@
                     {{ totalAmount | number : '1.2-2' }}
                   </div>
                 </div>
+                <div class="ac-amount-summary-divider-main"></div>
                 <div class="row total">
                   <div class="label">Unapplied Amount</div>
                   <div class="value">
@@ -376,33 +368,33 @@
               </button>
             </div>
 
-            <table class="ac-table table bordered">
+            <table class="ac-table-addnew inv-lines-table">
               <thead>
                 <tr>
-                  <th (click)="sortKnock('type')" style="cursor: pointer;color: black;">
+                  <th class="ac-text-left" (click)="sortKnock('type')" style="cursor: pointer;color: black;">
                     Type
                     <span *ngIf="knockSortBy === 'type'">
                       {{ knockSortDir === 'asc' ? '▲' : '▼' }}
                     </span>
                   </th>
-                  <th (click)="sortKnock('date')" style="cursor: pointer;color: black;">
+                  <th class="ac-text-left" (click)="sortKnock('date')" style="cursor: pointer;color: black;">
                     Date
                     <span *ngIf="knockSortBy === 'date'">
                       {{ knockSortDir === 'asc' ? '▲' : '▼' }}
                     </span>
                   </th>
-                  <th>No.</th>
-                  <th class="r" (click)="sortKnock('orgAmt')" style="cursor: pointer;color: black;">
+                  <th class="ac-text-left">No.</th>
+                  <th class="ac-text-right" (click)="sortKnock('orgAmt')" style="cursor: pointer;color: black;">
                     Org. Amt.
                     <span *ngIf="knockSortBy === 'orgAmt'">
                       {{ knockSortDir === 'asc' ? '▲' : '▼' }}
                     </span>
                   </th>
-                  <th class="r" style="color: black;">Outstanding</th>
-                  <th class="r" style="color: black;">Discount Due</th>
-                  <th class="c withdisc" style="color: black;">With Dis.</th>
-                  <th class="r" style="color: black;">Disc. Amount</th>
-                  <th class="r" style="color: black;">Pay</th>
+                  <th class="ac-text-right" style="color: black;">Outstanding</th>
+                  <th class="ac-text-left" style="color: black;">Discount Due</th>
+                  <th class="ac-text-center" style="color: black;">With Dis.</th>
+                  <th class="ac-text-right" style="color: black;">Disc. Amount</th>
+                  <th class="ac-text-right" style="color: black;">Pay</th>
                   <th class="c" style="color: black;"></th>
                 </tr>
               </thead>
@@ -418,13 +410,13 @@
                   <td>
                     {{ knockFA.at(i).get('no')!.value }}
                   </td>
-                  <td class="r">
+                  <td class="ac-text-right">
                     {{
                     knockFA.at(i).get('orgAmt')!.value
                     | number : '1.2-2'
                     }}
                   </td>
-                  <td class="r" [ngClass]="{
+                  <td class="ac-text-right" [ngClass]="{
                       'out-gt0':
                         (+knockFA.at(i).get('outstanding')!.value || 0) > 0
                     }">
@@ -439,12 +431,12 @@
                     }}
                   </td>
 
-                  <td class="c withdisc">
+                  <td class="ac-text-center">
                     <input type="checkbox" formControlName="withDisc" (change)="onWithDiscChanged(i)"
                       [disabled]="isSelDisabled(i)" />
                   </td>
 
-                  <td class="r">
+                  <td class="ac-text-right">
                     <input appAmount [decimals]="2" [allowNegative]="false" [formatOnBlurOnly]="true"
                       formControlName="discAmt" [readonly]="
                         !fg.value.withDisc ||
@@ -453,7 +445,7 @@
                       " (blur)="onDiscBlur(i)" />
                   </td>
 
-                  <td class="r">
+                  <td class="ac-text-right">
                     <input appAmount [decimals]="2" [allowNegative]="false" [formatOnBlurOnly]="true"
                       formControlName="pay" [readonly]="
                         formMode === 'edit' ||
@@ -483,11 +475,11 @@
                 rpForm.invalid ||
                 totalAmount === 0
               ">
-                          {{
-            formMode === 'new'
-            ? 'Create'
-            : 'Save'
-            }}
+              {{
+              formMode === 'new'
+              ? 'Create'
+              : 'Save'
+              }}
             </button>
           </ng-container>
         </div>
@@ -559,6 +551,48 @@
         <button type="button" class="ac-btn ac-btn-primary" (click)="doConfirmSave()">
           OK
         </button>
+      </div>
+    </div>
+  </div>
+    <div class="dialog" *ngIf="showDebtorPicker">
+    <div class="dialog-panel ac-card-no-padding ac-dialog-panel-lg">
+      <div class="ac-dialog-header">
+        <span>Select Debtor</span>
+        <button class="ac-dialog-close" type="button" (click)="showDebtorPicker = false">
+          ×
+        </button>
+      </div>
+      <div class="ac-dialog-body">
+        <div class="ac-page-toolbar" style="padding: 0 0 8px 0; gap: 8px; display: flex">
+          <input class="ac-form-control ac-page-search" [(ngModel)]="debtorQuery" (ngModelChange)="filterDebtors()"
+            placeholder="Search Debtor A/C, Company Name..." />
+        </div>
+        <div class="ac-tablewrap">
+          <table class="ac-table ac-table-sm">
+            <thead>
+              <tr>
+                <th>Debtor A/C</th>
+                <th>Company Name</th>
+                <th>Bill Address</th>
+                <th>Phone</th>
+                <th style="width: 90px"></th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let d of debtorFiltered" (dblclick)="pickDebtor(d)">
+                <td>{{ d.debtorAccount }}</td>
+                <td>{{ d.companyName }}</td>
+                <td class="cut">{{ d.billAddress }}</td>
+                <td>{{ d.phone }}</td>
+                <td>
+                  <button type="button" class="ac-btn ac-btn-primary" (click)="pickDebtor(d)">
+                    Select
+                  </button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   </div>

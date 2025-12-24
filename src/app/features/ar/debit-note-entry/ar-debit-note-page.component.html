@@ -173,7 +173,7 @@
           <div class="inv-header-grid">
             <!-- Debtor -->
             <label class="inv-field inv-field-contact">
-              <span class="inv-label">Debtor</span>
+              <span class="inv-label">Contact</span>
 
               <div class="inv-contact-input ac-input-prefix-group">
                 <span class="ac-input-prefix-icon">
@@ -229,15 +229,12 @@
                 </ng-container>
               </div>
             </label>
-
-            <!-- Reference -->
+                        <!-- Is Debit Journal -->
             <label class="inv-field">
-              <span class="inv-label">Reference</span>
-              <div class="ac-input-prefix-group">
-                <span class="ac-input-prefix-icon">
-                  <lucide-icon name="hash" [size]="15" color="#111827"></lucide-icon>
-                </span>
-                <input class="ac-form-control" formControlName="ref2" [readonly]="formMode === 'view'" />
+              <span class="inv-label">Debit journal</span>
+              <div class="inv-checkline">
+                <input type="checkbox" formControlName="isDebitJournal" [disabled]="formMode === 'view'" />
+                <span>Is Debit Journal</span>
               </div>
             </label>
 
@@ -325,31 +322,19 @@
                 </select>
               </div>
             </label>
-            <!-- Is Debit Journal -->
-            <label class="inv-field">
-              <span class="inv-label">Debit journal</span>
-              <div class="inv-checkline">
-                <input type="checkbox" formControlName="isDebitJournal" [disabled]="formMode === 'view'" />
-                <span>Is Debit Journal</span>
-              </div>
-            </label>
 
-            <!-- Description (wide) -->
-            <label class="inv-field inv-field-wide">
-              <span class="inv-label">Description</span>
+            </div>
+            <!-- Reference -->
+            <label class="inv-field wide">
+              <span class="inv-label">Reference</span>
               <div class="ac-input-prefix-group">
                 <span class="ac-input-prefix-icon">
                   <lucide-icon name="hash" [size]="15" color="#111827"></lucide-icon>
                 </span>
-                <input
-                  class="ac-form-control"
-                  formControlName="description"
-                  [readonly]="formMode === 'view'"
-                  placeholder="Document description"
-                />
+                <input class="ac-form-control" formControlName="ref2" [readonly]="formMode === 'view'" />
               </div>
             </label>
-          </div>
+
 
           <br />
 
@@ -386,7 +371,6 @@
                     <td>
                       <div class="ac-input-prefix-group">
                         <span class="ac-input-prefix-icon">
-                          <lucide-icon name="hash" [size]="15" color="#111827"></lucide-icon>
                         </span>
 
                         <input
@@ -407,7 +391,7 @@
                     <td>
                       <div class="ac-input-prefix-group">
                         <span class="ac-input-prefix-icon">
-                          <lucide-icon name="hash" [size]="15" color="#111827"></lucide-icon>
+
                         </span>
 
                         <input
@@ -420,8 +404,6 @@
 
                     <td class="ac-text-right">
                       <div class="ac-input-prefix-group">
-                        <span class="ac-input-prefix-icon ac-input-prefix-dot"></span>
-
                         <input
                           class="ac-form-control ac-text-right"
                           appAmount

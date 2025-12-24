@@ -728,6 +728,7 @@ export class ArInvoicePageComponent implements OnInit {
       journalType: jtDefault,
       terms: termsDefault,
     });
+    this.showDueShortcuts = false;
     this.acLinesFA.clear();
     this.addAcLine();
     this.showForm = true;

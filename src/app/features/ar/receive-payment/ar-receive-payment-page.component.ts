@@ -65,13 +65,13 @@ type PaidLine = {
     FormsModule,
     ReactiveFormsModule,
     AmountInputDirective,
-  LucideIconsModule,
+    LucideIconsModule,
   ],
   templateUrl: './ar-receive-payment-page.component.html',
   styleUrls: ['./ar-receive-payment-page.component.scss'],
 })
 export class ArReceivePaymentPageComponent {
-    showAddRowMenu = false;
+  showAddRowMenu = false;
   // ====== master ======
   currencies: Array<'MYR' | 'USD' | 'SGD'> = ['MYR', 'USD', 'SGD'];
 
@@ -91,15 +91,11 @@ export class ArReceivePaymentPageComponent {
     }, // ví dụ
   ];
   private chargeFeeOf(methodValue: string): number {
-    return (
-      this.paymentMethods.find((m) => m.value === methodValue)?.chargeFee ?? 0
-    );
+    return this.paymentMethods.find((m) => m.value === methodValue)?.chargeFee ?? 0;
   }
   // helper: lấy text Payment By cho 1 method
   private payByOf(methodValue: string): string {
-    return (
-      this.paymentMethods.find((m) => m.value === methodValue)?.payBy || ''
-    );
+    return this.paymentMethods.find((m) => m.value === methodValue)?.payBy || '';
   }
   onMethodChanged(i: number) {
     const fg = this.methodsFA.at(i) as FormGroup;
@@ -116,13 +112,8 @@ export class ArReceivePaymentPageComponent {
     // Đổi method => xoá hết phân bổ bên dưới
     this.knockFA.controls.forEach((row: any) => {
       const org = +row.get('orgAmt')!.value || 0;
-      const disc = row.get('withDisc')!.value
-        ? +row.get('discAmt')!.value || 0
-        : 0;
-      row.patchValue(
-        { pay: 0, outstanding: +(org - disc).toFixed(2) },
-        { emitEvent: false }
-      );
+      const disc = row.get('withDisc')!.value ? +row.get('discAmt')!.value || 0 : 0;
+      row.patchValue({ pay: 0, outstanding: +(org - disc).toFixed(2) }, { emitEvent: false });
     });
 
     this.recalcTotals(); // tính lại Amount/Unapplied
@@ -316,8 +307,7 @@ export class ArReceivePaymentPageComponent {
     return this.filtered.slice(s, s + this.pageSize);
   }
   setSort(k: keyof ReceivePaymentRow) {
-    if (this.sortBy === k)
-      this.sortDir = this.sortDir === 'asc' ? 'desc' : 'asc';
+    if (this.sortBy === k) this.sortDir = this.sortDir === 'asc' ? 'desc' : 'asc';
     else {
       this.sortBy = k;
       this.sortDir = 'asc';
@@ -409,7 +399,7 @@ export class ArReceivePaymentPageComponent {
     this.wireMethodRow(fg); // <— gắn watcher
     this.recalcTotals();
   }
-    addRows(count: number) {
+  addRows(count: number) {
     if (this.formMode === 'edit') {
       return;
     }
@@ -427,7 +417,7 @@ export class ArReceivePaymentPageComponent {
     return this.fb.group({
       type: [r.type],
       date: [r.date],
-      discountdue: [r.discountDue],
+      discountdue: [(r as any).discountDue ?? (r as any).discountdue ?? ''],
       no: [r.no],
       orgAmt: [r.orgAmt],
       outstanding: [r.outstanding],
@@ -465,6 +455,8 @@ export class ArReceivePaymentPageComponent {
     }
     this.loadKnockRows(code);
     this.recalcTotals();
+    const d = (this.debtors ?? []).find((x) => x.debtorAccount === code);
+    if (d) this.onDebtorPicked(d as DebtorRow);
   }
 
   // ===== allocation helpers =====
@@ -618,10 +610,7 @@ export class ArReceivePaymentPageComponent {
       const newPay = Math.min(pay0, cap);
       const outstanding = +(org - Math.min(disc, org) - newPay).toFixed(2);
 
-      fg.patchValue(
-        { pay: +newPay.toFixed(2), outstanding },
-        { emitEvent: false }
-      );
+      fg.patchValue({ pay: +newPay.toFixed(2), outstanding }, { emitEvent: false });
     } else {
       // TẮT With Dis.  -> discount không được áp vào outstanding nữa
       // Nếu pay đang được tick (coi là tick khi pay > 0),
@@ -656,10 +645,7 @@ export class ArReceivePaymentPageComponent {
     this.knockFA.controls.forEach((fg: any) => {
       const org = +fg.value.orgAmt || 0;
       const disc = fg.value.withDisc ? +fg.value.discAmt || 0 : 0;
-      fg.patchValue(
-        { pay: 0, outstanding: +(org - disc).toFixed(2) },
-        { emitEvent: false }
-      );
+      fg.patchValue({ pay: 0, outstanding: +(org - disc).toFixed(2) }, { emitEvent: false });
     });
 
     // phân bổ tuần tự
@@ -718,9 +704,7 @@ export class ArReceivePaymentPageComponent {
       // methods
       while (this.methodsFA.length) this.methodsFA.removeAt(0);
       const methods: any[] =
-        Array.isArray(p.methods) && p.methods.length
-          ? p.methods
-          : [this.createMethodRow().value];
+        Array.isArray(p.methods) && p.methods.length ? p.methods : [this.createMethodRow().value];
 
       methods.forEach((m) => {
         const fg = this.createMethodRow();
@@ -823,9 +807,7 @@ export class ArReceivePaymentPageComponent {
 
     const v = this.rpForm.getRawValue();
     const debtor = this.debtors.find((d) => d.debtorAccount === v.debtor);
-    const receiptNo = v.officialNo?.trim()
-      ? v.officialNo.trim()
-      : this.nextRunningNo();
+    const receiptNo = v.officialNo?.trim() ? v.officialNo.trim() : this.nextRunningNo();
 
     localStorage.setItem('arp_last_desc', v.description || '');
 
@@ -964,16 +946,10 @@ export class ArReceivePaymentPageComponent {
 
     // nếu discount >= org thì pay = 0, outstanding = 0 (NHƯNG KHÔNG sửa discAmt)
     if (effDisc >= org - 1e-6) {
-      fg.patchValue(
-        { pay: 0, outstanding: 0, sel: true },
-        { emitEvent: false }
-      );
+      fg.patchValue({ pay: 0, outstanding: 0, sel: true }, { emitEvent: false });
     } else {
       const outstanding = +(org - effDisc - pay).toFixed(2);
-      fg.patchValue(
-        { pay: +pay.toFixed(2), outstanding },
-        { emitEvent: false }
-      );
+      fg.patchValue({ pay: +pay.toFixed(2), outstanding }, { emitEvent: false });
     }
     this.autoTickSelWhenDisc(i);
     this.recalcTotals();
@@ -1028,9 +1004,7 @@ export class ArReceivePaymentPageComponent {
 
   buildOrNoSuggestions() {
     // text đang gõ
-    const raw = String(
-      this.rpForm.get('officialNo')?.value || ''
-    ).toUpperCase();
+    const raw = String(this.rpForm.get('officialNo')?.value || '').toUpperCase();
 
     // prefix luôn là OR- (hoặc bạn cho đổi nếu muốn)
     const prefix = 'OR-';
@@ -1050,10 +1024,7 @@ export class ArReceivePaymentPageComponent {
     );
 
     // Thêm vài số đã tồn tại (gần đây) ở danh sách ngoài để tiện chọn
-    const recentlyUsed = [...new Set(this.rows.map((r) => r.receiptNo))].slice(
-      0,
-      5
-    );
+    const recentlyUsed = [...new Set(this.rows.map((r) => r.receiptNo))].slice(0, 5);
 
     // Hợp nhất + loại trùng
     const set = new Set<string>([...generated, ...recentlyUsed]);
@@ -1141,9 +1112,7 @@ export class ArReceivePaymentPageComponent {
     return this.isZero(this.unappliedAmount) && this.isZero(out);
   }
   get hasAnyChequeMethod(): boolean {
-    return this.methodsFA.controls.some((fg) =>
-      this.isChequeMethod(fg as FormGroup)
-    );
+    return this.methodsFA.controls.some((fg) => this.isChequeMethod(fg as FormGroup));
   }
   /** Xoá toàn bộ phân bổ ở Knock Off sau khi Amount thay đổi */
   private clearAllocationsAfterAmountChange(): void {
@@ -1192,9 +1161,7 @@ export class ArReceivePaymentPageComponent {
       p = +(p - reduce).toFixed(2);
 
       const org = +fg.get('orgAmt')!.value || 0;
-      const disc = fg.get('withDisc')!.value
-        ? +fg.get('discAmt')!.value || 0
-        : 0;
+      const disc = fg.get('withDisc')!.value ? +fg.get('discAmt')!.value || 0 : 0;
       const outstanding = +(org - disc - p).toFixed(2);
 
       fg.patchValue({ pay: p, outstanding }, { emitEvent: false });
@@ -1291,13 +1258,10 @@ export class ArReceivePaymentPageComponent {
     }
     this.selected = r;
     this.detailItems = this.paidByCN.get(r.receiptNo) ?? [];
-    this.detailPaidTotal = this.detailItems.reduce(
-      (s, it) => s + (it.paid || 0),
-      0
-    );
+    this.detailPaidTotal = this.detailItems.reduce((s, it) => s + (it.paid || 0), 0);
     this.detailOpen = true;
   }
-    toggleAddRowMenu() {
+  toggleAddRowMenu() {
     if (this.formMode === 'edit') {
       return;
     }
@@ -1307,4 +1271,56 @@ export class ArReceivePaymentPageComponent {
   closeAddRowMenu() {
     this.showAddRowMenu = false;
   }
+  showDebtorPicker = false;
+  debtorQuery = '';
+  debtorFiltered: DebtorRow[] = [];
+  showDueShortcuts = false;
+  openDebtorDropdown() {
+    this.debtorQuery = '';
+    this.debtorFiltered = [...(this.debtors ?? [])];
+    this.showDebtorPicker = true;
+  }
+  filterDebtors() {
+    const q = (this.debtorQuery || '').toLowerCase().trim();
+    const src = this.debtors ?? [];
+    this.debtorFiltered = !q
+      ? [...src]
+      : src.filter(
+          (d) =>
+            (d.debtorAccount || '').toLowerCase().includes(q) ||
+            (d.companyName || '').toLowerCase().includes(q) ||
+            (d.billAddress || '').toLowerCase().includes(q) ||
+            (d.phone || '').toLowerCase().includes(q)
+        );
+  }
+pickDebtor(d: DebtorRow) {
+  const code = d?.debtorAccount || '';
+  const ctrl = this.rpForm?.get('debtor');
+  if (ctrl) {
+    ctrl.setValue(code, { emitEvent: true });
+    ctrl.markAsDirty();
+    ctrl.markAsTouched();
+  } else {
+    this.rpForm.patchValue({ debtor: code });
+  }
+
+  // đóng popup
+  this.showDebtorPicker = false;
+
+  // gọi lại logic giống như user chọn trong dropdown (change)
+  this.onDebtorChanged();
+}
+onDebtorPicked(d: DebtorRow) {
+  // helper: sync debtor value + các field liên quan (nếu cần)
+  // NOTE: không gọi onDebtorChanged() ở đây để tránh loop
+  this.rpForm.patchValue(
+    { debtor: d?.debtorAccount || '' },
+    { emitEvent: false }
+  );
+}
+  isInvalid(name: string): boolean {
+    const c = this.rpForm?.get(name);
+    return !!(c && c.invalid && (c.touched || this.submitted));
+  }
+  submitted = false;
 }

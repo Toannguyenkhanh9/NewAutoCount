@@ -193,8 +193,8 @@ input.no-ph[type="date"]:valid::-webkit-datetime-edit {
   background: #fff1f2;   /* hồng nhạt (tùy bạn) */
   color: #b91c1c;
 }
-.knock-table td.out-gt0 {/* xóa nền vàng cũ nếu còn */
-  color: #2563eb;                     /* blue-600 */                /* tùy chọn: đậm hơn chút cho dễ nhìn */
+.out-gt0 {/* xóa nền vàng cũ nếu còn */
+  color: #2563eb !important;                   /* blue-600 */                /* tùy chọn: đậm hơn chút cho dễ nhìn */
 }
 /* vỏ full-page cho Receive Payment */
 .rp-form-shell {

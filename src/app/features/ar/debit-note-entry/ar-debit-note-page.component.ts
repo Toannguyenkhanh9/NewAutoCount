@@ -664,6 +664,7 @@ export class ArDebitNotePageComponent {
     this.acLinesFA.clear();
     this.addAcLine();
     this.showForm = true;
+    this.showDueShortcuts = false;
   }
   viewInvoice() {
     if (!this.selected) return;
