@@ -10,6 +10,7 @@ import {
   AbstractControl,
 } from '@angular/forms';
 import { AmountInputDirective } from '../../../_share/directives';
+import { LucideIconsModule } from '../../../_share/lucide-icons';
 import { JournalType } from '../../../_share/models/general-maintenance';
 import { DebtorRow } from '../../../_share/models/ar';
 type Status = 'OPEN' | 'POSTED' | 'VOID';
@@ -56,6 +57,7 @@ type PaidLine = {
     CommonModule,
     FormsModule,
     ReactiveFormsModule,
+    LucideIconsModule,
     AmountInputDirective,
   ],
   templateUrl: './ar-credit-note-page.component.html',
@@ -367,6 +369,17 @@ export class ArCreditNotePageComponent {
   get canAllocate() {
     return this.totalAmount > 0;
   }
+
+  // Add rows dropdown (Debit A/C)
+  showAddRowMenu = false;
+  toggleAddRowMenu() { this.showAddRowMenu = !this.showAddRowMenu; }
+  closeAddRowMenu() { this.showAddRowMenu = false; }
+  addRows(n: number) {
+    const count = Math.max(1, Number(n) || 1);
+    for (let i = 0; i < count; i++) this.addMethod();
+    this.recalcTotals();
+  }
+
 
   constructor(private fb: FormBuilder) {
     this.rpForm = this.fb.group({
@@ -1081,6 +1094,27 @@ isSelDisabled(i: number): boolean {
     this.debtorFiltered = [...(this.debtors ?? [])];
     this.showDebtorPicker = true;
   }
+
+  filterDebtors() {
+    const q = (this.debtorQuery || '').toLowerCase().trim();
+    const src = this.debtors ?? [];
+    this.debtorFiltered = !q
+      ? [...src]
+      : src.filter(
+          (d) =>
+            (d.debtorAccount || '').toLowerCase().includes(q) ||
+            (d.companyName || '').toLowerCase().includes(q) ||
+            (d.billAddress || '').toLowerCase().includes(q) ||
+            (d.phone || '').toLowerCase().includes(q)
+        );
+  }
+
+  pickDebtor(d: DebtorRow) {
+    this.rpForm.patchValue({ debtor: d.debtorAccount });
+    this.showDebtorPicker = false;
+    this.onDebtorChanged();
+  }
+
   submitted = false;
   isInvalid(name: string): boolean {
     const c = this.rpForm?.get(name);

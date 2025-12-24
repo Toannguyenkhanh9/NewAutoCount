@@ -700,13 +700,13 @@ textarea.inp {
 
 /* text helpers */
 .ac-text-right {
-  text-align: right;
+  text-align: right !important;
 }
 .ac-text-left {
-  text-align: left;
+  text-align: left !important;
 }
 .ac-text-center {
-  text-align: center;
+  text-align: center !important;
 }
 .ac-text-muted {
   color: $ac-text-muted;
