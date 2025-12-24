@@ -1,1156 +1,997 @@
 import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import {
-  FormsModule,
-  ReactiveFormsModule,
-  FormBuilder,
-  FormGroup,
   FormArray,
+  FormBuilder,
+  FormControl,
+  FormGroup,
+  ReactiveFormsModule,
   Validators,
   AbstractControl,
+  ValidatorFn,
 } from '@angular/forms';
+import { FormsModule } from '@angular/forms';
 import { AmountInputDirective } from '../../../_share/directives';
 import { JournalType } from '../../../_share/models/general-maintenance';
 import { DebtorRow } from '../../../_share/models/ar';
+import { LucideIconsModule } from '../../../_share/lucide-icons';
 type Status = 'OPEN' | 'POSTED' | 'VOID';
 
-interface KnockRow {
-  type: 'PB' | 'PD';
-  date: string;
-  no: string;
-  orgAmt: number;
-  outstanding: number;
-  pay: number;
-  sel?: boolean;
+interface ItemRef {
+  code: string;
+  name: string;
+  uom: string;
+  price: number;
+  tax: 'SR' | 'ZR';
 }
-interface ReceivePaymentRow {
-  receiptNo: string;
-  date: string;
+
+interface InvoiceLine {
+  item: string;
+  description: string;
+  uom: string;
+  qty: number;
+  unitPrice: number;
+  tax: 'SR' | 'ZR';
+  amount: number;
+  taxAmt: number;
+  total: number;
+}
+
+interface Invoice {
+  docNo: string;
+  docDate: string;
+  dueDate: string;
   debtor: string;
   debtorName: string;
+  currency: 'MYR' | 'USD' | 'SGD';
+  rate: number;
   description?: string;
-  amount: number;
-  paidAmt: number;
+  agent?: string;
+  lines: InvoiceLine[];
+  subTotal: number;
+  taxTotal: number;
+  grandTotal: number;
   outstanding: number;
-  payload?: any;
 }
-type PayMethod = {
-  value: string;
-  label: string;
-  payBy: string;
-  chargeFee?: number;
-};
-type PaidLine = {
-  type: 'PB' | 'PD';
-  date: string;
+type Option = { code: string; name: string };
+type PaymentLine = {
+  type: 'RP' | 'CN' | 'JV';
   no: string;
-  orgAmt: number;
-  outstanding: number;
-  paid: number;
+  description?: string;
+  date: string;
+  amount: number;
 };
 
 @Component({
   selector: 'app-ap-credit-note-page',
   standalone: true,
-  imports: [CommonModule, FormsModule, ReactiveFormsModule,AmountInputDirective,],
+  imports: [CommonModule, FormsModule, ReactiveFormsModule,AmountInputDirective,LucideIconsModule,],
   templateUrl: './ap-credit-note-page.component.html',
   styleUrls: ['./ap-credit-note-page.component.scss']
 })
 export class ApCreditNotePageComponent {
- dnTypes: Array<'RETURN' | 'UNDERC'> = ['RETURN', 'UNDERC'];
-  journalTypes: JournalType[] = [
-    {
-      typeCode: 'BANK-B',
-      description: 'BANK RECEIPTS AND PAYMENT',
-      description2ND: '',
-      entrytypeId: 0,
-    },
-    {
-      typeCode: 'CASH-B',
-      description: 'CASH RECEIPTS AND PAYMENT',
-      description2ND: '',
-      entrytypeId: 0,
-    },
-    {
-      typeCode: 'GENERAL-J',
-      description: 'GENERAL JOURNAL',
-      description2ND: '',
-      entrytypeId: 0,
-    },
-    {
-      typeCode: 'SALE-J',
-      description: 'SALES JOURNAL',
-      description2ND: '',
-      entrytypeId: 0,
-    },
-    {
-      typeCode: 'PURCHASE-J',
-      description: 'PURCHASE JOURNAL',
-      description2ND: '',
-      entrytypeId: 0,
-    },
-  ];
-  // ====== master ======
-  currencies: Array<'MYR' | 'USD' | 'SGD'> = ['MYR', 'USD', 'SGD'];
-
-  // helper: lấy text Payment By cho 1 method
-
-  debtors: DebtorRow[] = [
-    {
-      debtorAccount: '300-B001',
-      companyName: 'BEST PHONE SDN BHD',
-      type: '',
-      phone: '09356952663',
-      currency: '',
-      creditTerm: '',
-      creditLimit: 0,
-      active: true,
-      groupCompany: true,
-      registrationNo: '',
-      billAddress: '175 KLCC Maylaysia',
-      fax: '',
-      email: '',
-      website: '',
-      deliveryAddress: '',
-      deliveryPostCode: '',
-    },
-    {
-      debtorAccount: '300-C001',
-      companyName: 'IPHONE SDN BHD',
-      type: '',
-      phone: '09356952663',
-      currency: '',
-      creditTerm: '',
-      creditLimit: 0,
-      active: true,
-      groupCompany: true,
-      registrationNo: '',
-      billAddress: '175 KLCC Maylaysia',
-      fax: '',
-      email: '',
-      website: '',
-      deliveryAddress: '',
-      deliveryPostCode: '',
-    },
-    {
-      debtorAccount: '300-D001',
-      companyName: 'FLC PHONE SDN BHD',
-      type: '',
-      phone: '09356952663',
-      currency: '',
-      creditTerm: '',
-      creditLimit: 0,
-      active: true,
-      groupCompany: true,
-      registrationNo: '',
-      billAddress: '175 KLCC Maylaysia',
-      fax: '',
-      email: '',
-      website: '',
-      deliveryAddress: '',
-      deliveryPostCode: '',
-    },
-    {
-      debtorAccount: '300-E001',
-      companyName: 'NVL BHD',
-      type: '',
-      phone: '09356952663',
-      currency: '',
-      creditTerm: '',
-      creditLimit: 0,
-      active: true,
-      groupCompany: true,
-      registrationNo: '',
-      billAddress: '',
-      fax: '',
-      email: '',
-      website: '',
-      deliveryAddress: '',
-      deliveryPostCode: '',
-    },
-    {
-      debtorAccount: '300-F001',
-      companyName: 'NOV Group',
-      type: '',
-      phone: '09356952663',
-      currency: '',
-      creditTerm: '',
-      creditLimit: 0,
-      active: true,
-      groupCompany: true,
-      registrationNo: '',
-      billAddress: '175 KLCC Maylaysia',
-      fax: '',
-      email: '',
-      website: '',
-      deliveryAddress: '',
-      deliveryPostCode: '',
-    },
-  ];
-
-  openDocsByDebtor = new Map<string, KnockRow[]>([
-    [
-      '300-B001',
-      [
-        {
-          type: 'PB',
-          date: '2025-10-10',
-          no: 'DN-0801',
-          orgAmt: 500,
-          outstanding: 500,
-          pay: 0,
-        },
-        {
-          type: 'PB',
-          date: '2025-11-18',
-          no: 'DN-0801',
-          orgAmt: 600,
-          outstanding: 600,
-          pay: 0,
-        },
-        {
-          type: 'PB',
-          date: '2025-10-19',
-          no: 'DN-0801',
-          orgAmt: 700,
-          outstanding: 700,
-          pay: 0,
-        },
-        {
-          type: 'PB',
-          date: '2025-10-20',
-          no: 'DN-0801',
-          orgAmt: 800,
-          outstanding: 800,
-          pay: 0,
-        },
-      ],
-    ],
-    [
-      '300-C001',
-      [
-        {
-          type: 'PB',
-          date: '2025-10-20',
-          no: 'INV-0007',
-          orgAmt: 706.49,
-          outstanding: 706.49,
-          pay: 0,
-        },
-        {
-          type: 'PB',
-          date: '2025-10-30',
-          no: 'INV-0009',
-          orgAmt: 2119.47,
-          outstanding: 2119.47,
-          pay: 0,
-        },
-      ],
-    ],
-    [
-      '300-D001',
-      [
-        {
-          type: 'PB',
-          date: '2025-08-21',
-          no: 'INV-0010',
-          orgAmt: 1059.73,
-          outstanding: 1059.73,
-          pay: 0,
-        },
-      ],
-    ],
-  ]);
-
-  // ====== list ======
-  rows: ReceivePaymentRow[] = [
-    {
-      receiptNo: 'CN-000002',
-      date: '2025-10-30',
-      debtor: '300-B001',
-      debtorName: 'CARE PHONE SDN BHD',
-      description: 'GOODS RETURN',
-      amount: 230.00,
-      paidAmt: 706.49,
-      outstanding: 100,
-    },
-    {
-      receiptNo: 'CN-000001',
-      date: '2025-08-20',
-      debtor: '300-D001',
-      debtorName: 'BEST PHONE SDN BHD',
-      description: 'GOODS RETURN',
-      amount: 250.00,
-      paidAmt: 706.49,
-      outstanding: 100,
-    },
-  ];
-
-  q = '';
-  sortBy: keyof ReceivePaymentRow = 'date';
-  sortDir: 'asc' | 'desc' = 'desc';
-  page = 1;
-  pageSize = 10;
-  get filtered() {
-    const k = this.q.trim().toLowerCase();
-    let arr = !k
-      ? this.rows
-      : this.rows.filter(
-          (r) =>
-            r.receiptNo.toLowerCase().includes(k) ||
-            r.debtor.toLowerCase().includes(k) ||
-            r.debtorName.toLowerCase().includes(k) ||
-            (r.description || '').toLowerCase().includes(k)
-        );
-    arr = [...arr].sort((a, b) => {
-      const va = String(a[this.sortBy] ?? '').toLowerCase();
-      const vb = String(b[this.sortBy] ?? '').toLowerCase();
-      if (va < vb) return this.sortDir === 'asc' ? -1 : 1;
-      if (va > vb) return this.sortDir === 'asc' ? 1 : -1;
-      return 0;
-    });
-    return arr;
-  }
-  get totalPages() {
-    return Math.max(1, Math.ceil(this.filtered.length / this.pageSize));
-  }
-  get paged() {
-    const s = (this.page - 1) * this.pageSize;
-    return this.filtered.slice(s, s + this.pageSize);
-  }
-  setSort(k: keyof ReceivePaymentRow) {
-    if (this.sortBy === k)
-      this.sortDir = this.sortDir === 'asc' ? 'desc' : 'asc';
-    else {
-      this.sortBy = k;
-      this.sortDir = 'asc';
-    }
-  }
-  selected?: ReceivePaymentRow;
-  select(r: ReceivePaymentRow) {
-    this.selected = r;
-  }
-  first() {
-    this.page = 1;
-  }
-  prev() {
-    this.page = Math.max(1, this.page - 1);
-  }
-  next() {
-    this.page = Math.min(this.totalPages, this.page + 1);
-  }
-  last() {
-    this.page = this.totalPages;
-  }
-
-  // ====== form ======
-  showForm = false;
-  showDeleteConfirm = false;
-  formMode: 'new' | 'edit' | 'view' = 'new';
-
-  rpForm: FormGroup;
-  get methodsFA(): FormArray {
-    return this.rpForm.get('methods') as FormArray;
-  }
-  get knockFA(): FormArray {
-    return this.rpForm.get('knockOff') as FormArray;
-  }
-
-  totalAmount = 0;
-  netTotal = 0;
-  unappliedAmount = 0;
-  get canAllocate() {
-    return this.totalAmount > 0;
-  }
-
-  constructor(private fb: FormBuilder) {
-    this.rpForm = this.fb.group({
-      debtor: ['', Validators.required],
-      journalType: ['SALES'],
-      dnType: ['RETURN', Validators.required],
-      isDebitJournal: [false],
-      agent: [''],
-      ref: [''],
-      ref2: [''],
-      autoNumbering: [true], // điều khiển Invoice No
-      docNo: [''],
-      docDate: [this.todayYMD()],
-      description: [''],
-      // lines + totals
-      lines: this.fb.array([]),
-      grandTotal: [0],
-      outstanding: [0],
-      methods: this.fb.array([]),
-      knockOff: this.fb.array([]),
-      continueNew: [true],
-    });
-    this.addMethod();
-    this.recalcTotals();
-  }
-
-  private createMethodRow(): FormGroup {
-    return this.fb.group({
-      debitAc: [this.nextAccNo()],
-      decs: [''],
-      amount: [0],
-    });
-  }
-  private nextAccNo(): string {
-    return this.fmtAcc(this.currentMaxSuffix() + 1);
-  }
-  private accPrefix = '600-';
-  private accPad = 4; // => 0001, 0002,...
-  private fmtAcc(n: number): string {
-    return `${this.accPrefix}${String(n).padStart(this.accPad, '0')}`;
-  }
-  private suffixOf(s: string): number {
-    const m = s?.match(/^600-(\d{1,})$/);
-    return m ? parseInt(m[1], 10) : -1;
-  }
-  private currentMaxSuffix(): number {
-    const arr = (this.methodsFA?.controls ?? []) as FormGroup[];
-    let max = 0;
-    for (const fg of arr) {
-      const v = String(fg.get('debitAc')?.value || '');
-      const n = this.suffixOf(v);
-      if (n > max) max = n;
-    }
-    return max;
-  }
-  addMethod() {
-    const fg = this.createMethodRow();
-    this.methodsFA.push(fg);
-    this.wireMethodRow(fg); // <— gắn watcher
-    this.recalcTotals();
-  }
-  removeMethod(i: number) {
-    this.methodsFA.removeAt(i);
-    this.recalcTotals();
-    this.normalizeAllocationsToTotal();
-  }
-  private normalizeAllocationsToTotal(): void {
-    const allowed = +this.totalAmount.toFixed(2);
-
-    // ❌ cũ
-    // let paySum = this.knockFA.controls.map(fg => +fg.get('pay')!.value || 0).reduce((a,b)=>a+b,0);
-
-    // ✅ mới
-    let paySum = (this.knockFA.getRawValue() as Array<{ pay: number }>).reduce(
-      (s, r) => s + (+r.pay || 0),
-      0
-    );
-    paySum = +paySum.toFixed(2);
-
-    if (paySum <= allowed) return;
-
-    let over = +(paySum - allowed).toFixed(2);
-    for (let i = this.knockFA.length - 1; i >= 0 && over > 0; i--) {
-      const fg = this.knockFA.at(i) as FormGroup;
-      let p = +fg.get('pay')!.value || 0;
-      if (p <= 0) continue;
-
-      const reduce = Math.min(p, over);
-      const p0 = +(p - reduce).toFixed(2);
-      const org = +fg.get('orgAmt')!.value || 0;
-      const outstanding = +(org - p0).toFixed(2);
-
-      fg.patchValue(
-        { sel: p0 > 0, pay: p0, outstanding },
-        { emitEvent: false }
-      );
-      over = +(over - reduce).toFixed(2);
-    }
-    this.recalcTotals();
-  }
-
-  private createKnockRow(r: KnockRow): FormGroup {
-    return this.fb.group({
-      type: [r.type],
-      date: [r.date],
-      no: [r.no],
-      orgAmt: [r.orgAmt],
-      outstanding: [r.outstanding],
-      pay: [r.pay],
-      sel: [!!r.sel],
-    });
-  }
-  private loadKnockRows(debtor: string) {
-    this.knockFA.clear();
-    (this.openDocsByDebtor.get(debtor) || []).forEach((x) =>
-      this.knockFA.push(
-        this.createKnockRow({
-          ...x,
-          sel: (x.pay ?? 0) > 0,
-        })
-      )
-    );
-    this.updateAllLocks();
-  }
-  onSelChanged(i: number, ev: Event) {
-    const checked = !!(ev.target as HTMLInputElement)?.checked;
-    const fg = this.knockFA.at(i) as FormGroup;
-    fg.patchValue({ sel: checked }, { emitEvent: false });
-    // dùng lại logic cũ của bạn
-    this.toggleAlloc(i, ev);
-  }
-  onDebtorChanged() {
-    const code = this.rpForm.value.debtor as string;
-    if (!code) {
-      this.knockFA.clear();
-      this.recalcTotals();
-      return;
-    }
-    this.loadKnockRows(code);
-    this.recalcTotals();
-  }
-
-  // ===== allocation helpers =====
-  recalcTotals() {
-    const mRows = this.methodsFA.getRawValue() as Array<{ amount: number }>;
-    const kRows = this.knockFA.getRawValue() as Array<{ pay: number }>;
-
-    const mSum = mRows.reduce((s, r) => s + (+r.amount || 0), 0);
-    const paySum = kRows.reduce((s, r) => s + (+r.pay || 0), 0);
-
-    this.totalAmount = +mSum.toFixed(2);
-    this.netTotal = +paySum.toFixed(2);
-    this.unappliedAmount = +(this.totalAmount - this.netTotal).toFixed(2);
-  }
-
-  private remainingForAllocation(excludeIndex = -1) {
-    const total = this.totalAmount;
-    const others = this.knockFA.controls
-      .map((fg, idx) => (idx === excludeIndex ? 0 : +fg.value.pay || 0))
-      .reduce((a, b) => a + b, 0);
-    return +(total - others).toFixed(2);
-  }
-
-  /** Bật/tắt control trên từng dòng */
-private updateLocksForRow(i: number) {
-  const fg = this.knockFA.at(i) as FormGroup;
-  const payCtl = fg.get('pay')!;
-  const selCtl = fg.get('sel')!;
-
-  // Edit mode: khóa hoàn toàn
-  if (this.formMode === 'edit') {
-    payCtl.disable({ emitEvent: false });
-    selCtl.disable({ emitEvent: false });
-    return;
-  }
-
-  // New mode: chỉ bật khi có tiền để allocate
-  if (!this.canAllocate) {
-    payCtl.disable({ emitEvent: false });
-    selCtl.disable({ emitEvent: false });
-    return;
-  }
-
-  payCtl.enable({ emitEvent: false });
-  selCtl.enable({ emitEvent: false });
-}
-  private disableKnockTableAll() {
-    this.knockFA.controls.forEach((g) => {
-      g.get('pay')!.disable({ emitEvent: false });
-      g.get('sel')!.disable({ emitEvent: false });
-    });
-  }
-  private updateAllLocks() {
-    this.knockFA.controls.forEach((_fg, i) => this.updateLocksForRow(i));
-  }
-
-  /** Từ checkbox Sel/Pay */
-  toggleAlloc(i: number, ev: Event) {
-      if (this.isSelDisabled(i)) return;  // <— guard
-    const checked = !!(ev.target as HTMLInputElement)?.checked;
-    const fg = this.knockFA.at(i) as FormGroup;
-    const org = +fg.get('orgAmt')!.value || 0;
-
-    if (!checked) {
-      const out = +org.toFixed(2);
-      fg.patchValue(
-        { sel: false, pay: 0, outstanding: out },
-        { emitEvent: false }
-      );
-      this.updateLocksForRow(i);
-      this.recalcTotals();
-      return;
-    }
-
-    const remain = this.remainingForAllocation(i);
-    const cap = Math.max(0, org);
-    const pay = Math.min(cap, remain);
-    const out = +(org - pay).toFixed(2);
-
-    fg.patchValue({ sel: true, pay, outstanding: out }, { emitEvent: false });
-    this.updateLocksForRow(i);
-    this.recalcTotals();
-  }
-
-  /** Khi thay Pay hoặc Disc */
-  onPayChanged(i: number) {
-    const fg = this.knockFA.at(i) as FormGroup;
-    const org = +fg.get('orgAmt')!.value || 0;
-    let pay = +fg.get('pay')!.value || 0;
-    pay = Math.max(0, Math.min(pay, org));
-    const outstanding = +(org - pay).toFixed(2);
-    fg.patchValue(
-      { sel: pay > 0, pay: +pay.toFixed(2), outstanding },
-      { emitEvent: false }
-    );
-    this.recalcTotals();
-  }
-  autoAllocate() {
-    const baseTotal = this.totalAmount;
-    let remaining = +baseTotal.toFixed(2);
-
-    // reset trước
-    this.knockFA.controls.forEach((c: any) => {
-      const org = +c.value.orgAmt || 0;
-      c.patchValue(
-        { sel: false, pay: 0, outstanding: +org.toFixed(2) },
-        { emitEvent: false }
-      );
-    });
-
-    // phân bổ
-    this.knockFA.controls.forEach((c: any) => {
-      if (remaining <= 0) return;
-      const org = +c.value.orgAmt || 0;
-      const pay = Math.min(org, remaining);
-      const outstanding = +(org - pay).toFixed(2);
-      c.patchValue(
-        { sel: pay > 0, pay: +pay.toFixed(2), outstanding },
-        { emitEvent: false }
-      );
-      remaining = +(remaining - pay).toFixed(2);
-    });
-
-    this.recalcTotals();
-  }
-
-  openNew() {
-    this.formMode = 'new';
-    this.resetFormForNew();
-    this.rpForm.enable({ emitEvent: false });
-    this.showForm = true;
-  }
-  private settledAtOpen = false;
-  openEdit() {
-    if (!this.selected) return;
-    this.formMode = 'edit';
-    this.resetFormForNew(); // clear trước
-    this.showSuccess = false; // <-- thêm dòng này
-    const s = this.selected;
-    const p = s.payload;
-
-    if (p) {
-      // header
-      this.rpForm.patchValue(
-        {
-          debtor: p.debtor ?? s.debtor,
-          journalType: p.journalType,
-          date: p.date ?? s.date,
-          description: p.description ?? s.description ?? '',
-          dnType: p.dnType,
-          isDebitJournal: p.isDebitJournal,
-          ref: p.ref,
-          ref2: p.ref2,
-          docNo: p.docNo,
-          docDate: p.docDate,
-        },
-        { emitEvent: false }
-      );
-
-      // methods
-      while (this.methodsFA.length) this.methodsFA.removeAt(0);
-      const methods: any[] =
-        Array.isArray(p.methods) && p.methods.length
-          ? p.methods
-          : [this.createMethodRow().value];
-
-      methods.forEach((m) => {
-        const fg = this.createMethodRow();
-        fg.patchValue(
-          {
-            decs: m.decs,
-            debitAc: m.debitAc ?? '',
-            amount: +m.amount || 0,
-          },
-          { emitEvent: false }
-        );
-        this.methodsFA.push(fg);
-        this.wireMethodRow(fg);
-      });
-
-      // knock-off
-      while (this.knockFA.length) this.knockFA.removeAt(0);
-      (p.knockOff || []).forEach((k: any) => {
-        const fg = this.createKnockRow({
-          type: k.type,
-          date: k.date,
-          no: k.no,
-          orgAmt: +k.orgAmt || 0,
-          outstanding: +k.outstanding || 0,
-          pay: +k.pay || 0,
-          sel: !!k.sel,
-        });
-        this.knockFA.push(fg);
-      });
-    } else {
-      // không có payload: nạp header cơ bản + openDocs
-      this.rpForm.patchValue(
-        {
-          debtor: s.debtor,
-          officialNo: s.receiptNo,
-          date: s.date,
-          currency: 'MYR',
-          description: s.description || '',
-        },
-        { emitEvent: false }
-      );
-      this.loadKnockRows(s.debtor);
-    }
-
-    this.recalcTotals();
-    this.enableOnlyRchqWhenEdit(); // khóa toàn bộ, chỉ bật Is RCHQ/RCHQ Date nếu Cheque
-    this.disableKnockTableAll();
-    this.showForm = true;
-  }
-
-  closeForm() {
-    this.showForm = false;
-  }
-  private today() {
-    return new Date().toISOString().slice(0, 10);
-  }
-  private resetFormForNew() {
-    const jtDefault = this.journalTypes?.[0]?.typeCode ?? '';
-    this.rpForm.reset({
-      docNo: '',
-      docDate: this.today(),
-      debtor: '',
-      debtorName: '',
-      currency: 'MYR',
-      rate: 1,
-      description: '',
-      status: 'OPEN',
-      subTotal: 0,
-      taxTotal: 0,
-      grandTotal: 0,
-      outstanding: 0,
-      journalType: jtDefault,
-      dnType: 'RETURN',
-    });
-    while (this.methodsFA.length) this.methodsFA.removeAt(0);
-    this.addMethod();
-    this.knockFA.clear();
-    this.totalAmount = 0;
-    this.unappliedAmount = 0;
-    this.updateAllLocks();
-  }
-  save() {
-    if (this.rpForm.invalid) {
-      this.rpForm.markAllAsTouched();
-      return;
-    }
-
-    const v = this.rpForm.getRawValue();
-    const debtor = this.debtors.find((d) => d.debtorAccount === v.debtor);
-    const receiptNo = v.docNo?.trim() ? v.docNo.trim() : this.nextRunningNo();
-
-    localStorage.setItem('arp_last_desc', v.description || '');
-
-    const row = {
-      receiptNo,
-      date: v.docDate,
-      debtor: v.debtor,
-      dnType: v.dnType,
-      journalType: v.journalType,
-      debtorName: debtor?.companyName || v.debtor,
-      ref: v.ref,
-      ref2: v.ref2,
-      description: v.description,
-      amount: this.netTotal,
-      paidAmt: this.totalAmount,
-      outstanding: this.unappliedAmount,
-      payload: {
-        ...v,
-        methods: this.methodsFA.getRawValue(),
-        knockOff: this.knockFA.getRawValue(),
-      },
-    };
-
-    if (this.formMode === 'edit' && this.selected) {
-      const idx = this.rows.indexOf(this.selected);
-      if (idx >= 0) this.rows[idx] = row as any;
-      this.selected = this.rows[idx];
-      this.showForm = false;
-      // KHÔNG đóng form – hiện success
-      this.openSuccess(`Updated receipt ${receiptNo} successfully.`);
-      return;
-    }
-
-    // New
-    this.rows.unshift(row as any);
-    this.showForm = false;
-    // KHÔNG đóng form – hiện success
-    this.openSuccess(`Saved receipt ${receiptNo} successfully.`);
-  }
-
-  askDelete() {
-    if (!this.selected) return;
-    this.showDeleteConfirm = true;
-  }
-  doDelete() {
-    if (!this.selected) return;
-    this.rows = this.rows.filter((x) => x !== this.selected);
-    this.selected = undefined;
-    this.showDeleteConfirm = false;
-  }
-
-  // ===== utils =====
-  private nextRunningNo() {
-    const n = Math.floor(Math.random() * 90000) + 10000;
-    return `CN-${n}`;
-  }
-  private todayYMD() {
-    const d = new Date();
-    const y = d.getFullYear();
-    const m = String(d.getMonth() + 1).padStart(2, '0');
-    const dd = String(d.getDate()).padStart(2, '0');
-    return `${y}-${m}-${dd}`;
-  }
-  knockSortBy: 'type' | 'date' | 'orgAmt' = 'date';
-  knockSortDir: 'asc' | 'desc' = 'asc';
-
-  sortKnock(by: 'type' | 'date' | 'orgAmt') {
-    // đổi chiều khi bấm lại
-    if (this.knockSortBy === by) {
-      this.knockSortDir = this.knockSortDir === 'asc' ? 'desc' : 'asc';
-    } else {
-      this.knockSortBy = by;
-      this.knockSortDir = 'asc';
-    }
-
-    // lấy mảng value hiện tại, sort rồi build lại FormArray
-    const rows = this.knockFA.controls.map((fg) => fg.getRawValue());
-
-    rows.sort((a: any, b: any) => {
-      let va: any = a[by];
-      let vb: any = b[by];
-      if (by === 'date') {
-        va = new Date(a.date).getTime();
-        vb = new Date(b.date).getTime();
-      } else if (by === 'orgAmt') {
-        va = +a.orgAmt || 0;
-        vb = +b.orgAmt || 0;
-      } else {
-        va = String(a.type);
-        vb = String(b.type);
-      }
-      const cmp = va < vb ? -1 : va > vb ? 1 : 0;
-      return this.knockSortDir === 'asc' ? cmp : -cmp;
-    });
-
-    this.knockFA.clear();
-    rows.forEach((r: any) => this.knockFA.push(this.createKnockRow(r)));
-    // không đổi tổng, nhưng cứ tính lại cho chắc
-    this.recalcTotals();
-  }
-
-  private toNum(v: any): number {
-    return +String(v ?? 0).replace(/,/g, '');
-  }
-
-  formatRow(i: number) {
-    const fg = this.knockFA.at(i) as FormGroup;
-    const org = this.toNum(fg.get('orgAmt')!.value);
-    const withDisc = !!fg.get('withDisc')!.value;
-
-    let disc = withDisc ? this.toNum(fg.get('discAmt')!.value) : 0;
-    disc = Math.max(0, Math.min(disc, org));
-
-    let pay = this.toNum(fg.get('pay')!.value);
-    const maxPay = Math.max(0, +(org - disc).toFixed(2));
-    pay = Math.max(0, Math.min(pay, maxPay));
-
-    const outstanding = +(org - disc - pay).toFixed(2);
-
-    fg.patchValue(
-      {
-        discAmt: withDisc ? disc.toFixed(2) : '0.00',
-        pay: pay.toFixed(2),
-        outstanding,
-      },
-      { emitEvent: false }
-    );
-
-    this.recalcTotals();
-  }
-  /** Gọi khi blur ở Disc. Amount của dòng i */
-  onDiscBlur(i: number) {
-    const fg = this.knockFA.at(i) as FormGroup;
-    const org = +fg.get('orgAmt')!.value || 0;
-    const effDisc = 0;
-
-    // giới hạn Pay theo phần còn lại sau discount
-    let pay = +fg.get('pay')!.value || 0;
-    pay = Math.max(0, Math.min(pay, org - effDisc));
-
-    // nếu discount >= org thì pay = 0, outstanding = 0 (NHƯNG KHÔNG sửa discAmt)
-    if (effDisc >= org - 1e-6) {
-      fg.patchValue(
-        { pay: 0, outstanding: 0, sel: true },
-        { emitEvent: false }
-      );
-    } else {
-      const outstanding = +(org - effDisc - pay).toFixed(2);
-      fg.patchValue(
-        { pay: +pay.toFixed(2), outstanding },
-        { emitEvent: false }
-      );
-    }
-    this.autoTickSelWhenDisc(i);
-    this.recalcTotals();
-  }
-
-  onPayBlur(i: number) {
-    const fg = this.knockFA.at(i) as FormGroup;
-    const org = +fg.get('orgAmt')!.value || 0;
-    let pay = +fg.get('pay')!.value || 0;
-    if (pay < 0) pay = 0;
-    if (pay > org) pay = org;
-    const outstanding = +(org - pay).toFixed(2);
-    fg.patchValue(
-      { sel: pay > 0, pay: +pay.toFixed(2), outstanding },
-      { emitEvent: false }
-    );
-    this.recalcTotals();
-  }
-
-  private autoTickSelWhenDisc(i: number) {
-    const fg = this.knockFA.at(i) as FormGroup;
-    const withDisc = !!fg.get('withDisc')!.value;
-    const disc = +fg.get('discAmt')!.value || 0;
-
-    // Không tự tick nếu chưa bật With Dis. hoặc discount = 0
-    if (!withDisc || disc <= 0) return;
-
-    // (phần dưới nếu bạn muốn vừa tick vừa phân bổ Pay theo số còn lại)
-    const org = +fg.get('orgAmt')!.value || 0;
-    const effDisc = 0; // sẽ =0 nếu With Dis. = false
-    const remain = this.remainingForAllocation(i);
-    const cap = Math.max(0, org - effDisc);
-    const pay = Math.min(cap, remain);
-    const outstanding = +(org - effDisc - pay).toFixed(2);
-    fg.patchValue({ pay, outstanding }, { emitEvent: false });
-  }
-
-  // ===== Autocomplete for OR number =====
-  orNoSuggestions: string[] = [];
-
-  buildOrNoSuggestions() {
-    // text đang gõ
-    const raw = String(
-      this.rpForm.get('officialNo')?.value || ''
-    ).toUpperCase();
-
-    // prefix luôn là OR- (hoặc bạn cho đổi nếu muốn)
-    const prefix = 'CN-';
-
-    // Lấy phần số đã gõ (nếu chưa gõ, dùng gợi ý từ số kế tiếp)
-    const typedDigits = raw.replace(/\D/g, '');
-    const nextBase = this.nextRunningNo().replace(/^CN-/, ''); // ví dụ "10321"
-
-    // base là 5 chữ số: ưu tiên theo người dùng, rỗng thì lấy next
-    const base = (typedDigits || nextBase).padEnd(5, '0').slice(0, 5);
-    const start = Math.max(0, Number(base)); // số bắt đầu
-
-    // 10 gợi ý liên tiếp: OR-xxxxx, OR-xxxxx+1, ...
-    const generated = Array.from(
-      { length: 10 },
-      (_, i) => `${prefix}${(start + i).toString().padStart(5, '0')}`
-    );
-
-    // Thêm vài số đã tồn tại (gần đây) ở danh sách ngoài để tiện chọn
-    const recentlyUsed = [...new Set(this.rows.map((r) => r.receiptNo))].slice(
-      0,
-      5
-    );
-
-    // Hợp nhất + loại trùng
-    const set = new Set<string>([...generated, ...recentlyUsed]);
-    this.orNoSuggestions = [...set];
-  }
-  // so sánh theo ngày (bỏ phần giờ)
-  isOverdue(dateStr?: string): boolean {
-    if (!dateStr) return false;
-    const d = new Date(dateStr);
-    const today = new Date();
-    d.setHours(0, 0, 0, 0);
-    today.setHours(0, 0, 0, 0);
-    return d.getTime() < today.getTime();
-  }
-
-  // Dùng cột Date + còn outstanding > 0 thì coi là quá hạn
-  // (Nếu muốn tô đỏ chỉ theo Date, bỏ điều kiện outstanding > 0)
-  isRowOverdue(i: number): boolean {
-    const fg = this.knockFA.at(i) as FormGroup;
-    const docDate = fg.get('date')?.value as string;
-    return this.isOverdue(docDate);
-  }
-  /** Edit mode: khóa toàn bộ form, chỉ bật Is RCHQ & RCHQ Date cho các dòng Cheque */
-  private enableOnlyRchqWhenEdit(): void {
-    this.rpForm.disable({ emitEvent: false }); // khóa tất cả
-  }
-  showSuccess = false;
-  successMsg = '';
-
-  private openSuccess(msg: string) {
-    this.successMsg = msg;
-    this.showSuccess = true;
-  }
-  closeSuccess() {
-    this.showSuccess = false;
-  }
-  // ===== confirm save modal =====
-  showSaveConfirm = false;
-  confirmMsg = '';
-
-  askSave() {
-    var unappliedAmount = '';
-    if (this.unappliedAmount !== 0) {
-      unappliedAmount = 'Unapplied Amount is ' + this.unappliedAmount + ". ";
-    }
-    this.confirmMsg = unappliedAmount + (
-      this.formMode ===  'edit'
-        ? 'Are you sure you want to update this Credit Note?'
-        : 'Are you sure you want to save this Credit Note?');
-    this.showSaveConfirm = true;
-  }
-  doConfirmSave() {
-    this.showSaveConfirm = false;
-    this.save(); // gọi hàm save() bạn đã có; sẽ hiện Success như trước
-  }
-  cancelConfirmSave() {
-    this.showSaveConfirm = false;
-  }
-  private isZero(n: number): boolean {
-    return Math.abs(+n) < 1e-6;
-  }
-
-isSelDisabled(i: number): boolean {
-  if (this.formMode === 'edit') return true; // luôn readonly khi Edit
-  if (!this.canAllocate) return true;        // không có tiền để allocate
-  return false;
-}
-  private methodNet(fg: FormGroup): number {
-    const amt = this.toNum(fg.get('amount')?.value);
-    return Math.max(0, +amt.toFixed(2));
-  }
-  onMethodAmtOrFeeChanged() {
-    this.recalcTotals(); // Amount = sum(amount) - sum(chargeFee)
-  }
-  private wireMethodRow(fg: FormGroup) {
-    fg.get('amount')?.valueChanges.subscribe(() => {
-      this.resetAllAllocations(); // <— xoá phân bổ khi đổi Payment Amount
-    });
-  }
-  /** Xoá tất cả phân bổ Pay; giữ nguyên Disc. Amount, chỉ trừ disc nếu With Dis. đang bật */
-  private resetAllAllocations(): void {
-    this.knockFA.controls.forEach((c) => {
-      const fg = c as FormGroup;
-      const org = +fg.get('orgAmt')!.value || 0;
-      fg.patchValue(
-        { sel: false, pay: 0, outstanding: +org.toFixed(2) },
-        { emitEvent: false }
-      );
-    });
-    this.recalcTotals();
-  }
-  showDebtorPicker = false;
-  debtorQuery = '';
-  debtorFiltered: DebtorRow[] = [];
-  openDebtorDropdown() {
-    this.debtorQuery = '';
-    this.debtorFiltered = [...(this.debtors ?? [])];
-    this.showDebtorPicker = true;
-  }
-  submitted = false;
-  isInvalid(name: string): boolean {
-    const c = this.rpForm?.get(name);
-    return !!(c && c.invalid && (c.touched || this.submitted));
-  }
-  get selectedDebtor(): DebtorRow | undefined {
-    const code = this.rpForm?.value?.debtor;
-    return (this.debtors ?? []).find((d) => d.debtorAccount === code) as
-      | DebtorRow
-      | undefined;
-  }
-  get debtorToText(): string {
-    const d = this.selectedDebtor;
-    if (!d) return '';
-    return [d.companyName, d.billAddress, d.phone].filter(Boolean).join('\n');
-  }
-  detailOpen = false;
-  detailItems: PaidLine[] = [];
-  detailPaidTotal = 0;
-
-  // Demo mapping: CN No. -> các dòng đã knock off
-  paidByCN = new Map<string, PaidLine[]>([
-    [
-      'CN-000002',
-      [
-        {
-          type: 'PB',
-          date: '2025-06-11',
-          no: 'INV 0802',
-          orgAmt: 300,
-          outstanding: 70,
-          paid: 230.0,
-        },
-      ],
-    ],
-    [
-      'CN-000001',
-      [
-        {
-          type: 'PB',
-          date: '2025-10-20',
-          no: 'INV-0007',
-          orgAmt: 700.00,
-          outstanding: 600.00,
-          paid: 100.0,
-        },
-        {
-          type: 'PB',
-          date: '2025-10-30',
-          no: 'INV-0009',
-          orgAmt: 150.00,
-          outstanding: 0.00,
-          paid: 150.0,
-        },
-      ],
-    ],
-  ]);
-
-  // Hỗ trợ định dạng số
-  fmt(n: number) {
-    return (Number(n) || 0).toFixed(2);
-  }
-
-  // Thay hàm chọn hàng (nếu bạn đã có select()) thì đổi (click) trong HTML sang dùng hàm này
-  toggleDetailFor(r: ReceivePaymentRow) {
-    if (this.selected === r && this.detailOpen) {
-      this.detailOpen = false; // click lại để collapse
-      return;
-    }
-    this.selected = r;
-    this.detailItems = this.paidByCN.get(r.receiptNo) ?? [];
-    this.detailPaidTotal = this.detailItems.reduce(
-      (s, it) => s + (it.paid || 0),
-      0
-    );
-    this.detailOpen = true;
-  }
-}
+  dnTypes: Array<'OMIT' | 'UNDERC'> = ['OMIT', 'UNDERC'];
+   debtors: DebtorRow[] = [
+     {
+       debtorAccount: '300-B001',
+       companyName: 'BEST PHONE SDN BHD',
+       type: '',
+       phone: '09356952663',
+       currency: '',
+       creditTerm: '',
+       creditLimit: 0,
+       active: true,
+       groupCompany: true,
+       registrationNo: '',
+       billAddress: '175 KLCC Maylaysia',
+       fax: '',
+       email: '',
+       website: '',
+       deliveryAddress: '',
+       deliveryPostCode: '',
+     },
+     {
+       debtorAccount: '300-C001',
+       companyName: 'IPHONE SDN BHD',
+       type: '',
+       phone: '09356952663',
+       currency: '',
+       creditTerm: '',
+       creditLimit: 0,
+       active: true,
+       groupCompany: true,
+       registrationNo: '',
+       billAddress: '175 KLCC Maylaysia',
+       fax: '',
+       email: '',
+       website: '',
+       deliveryAddress: '',
+       deliveryPostCode: '',
+     },
+     {
+       debtorAccount: '300-D001',
+       companyName: 'FLC PHONE SDN BHD',
+       type: '',
+       phone: '09356952663',
+       currency: '',
+       creditTerm: '',
+       creditLimit: 0,
+       active: true,
+       groupCompany: true,
+       registrationNo: '',
+       billAddress: '175 KLCC Maylaysia',
+       fax: '',
+       email: '',
+       website: '',
+       deliveryAddress: '',
+       deliveryPostCode: '',
+     },
+     {
+       debtorAccount: '300-E001',
+       companyName: 'NVL BHD',
+       type: '',
+       phone: '09356952663',
+       currency: '',
+       creditTerm: '',
+       creditLimit: 0,
+       active: true,
+       groupCompany: true,
+       registrationNo: '',
+       billAddress: '',
+       fax: '',
+       email: '',
+       website: '',
+       deliveryAddress: '',
+       deliveryPostCode: '',
+     },
+     {
+       debtorAccount: '300-F001',
+       companyName: 'NOV Group',
+       type: '',
+       phone: '09356952663',
+       currency: '',
+       creditTerm: '',
+       creditLimit: 0,
+       active: true,
+       groupCompany: true,
+       registrationNo: '',
+       billAddress: '175 KLCC Maylaysia',
+       fax: '',
+       email: '',
+       website: '',
+       deliveryAddress: '',
+       deliveryPostCode: '',
+     },
+   ];
+   creditTerms: Option[] = [
+     { code: 'N0', name: 'C.O.D' },
+     { code: 'N30', name: '5% 7, Net 30 days' },
+     { code: 'N45', name: 'Net 45 days' },
+     { code: 'N60', name: 'Net 60 days' },
+     { code: 'N90', name: 'Net 90 days' },
+     { code: 'N30', name: 'Net 31th Next Month' },
+   ];
+   journalTypes: JournalType[] = [
+     {
+       typeCode: 'BANK-B',
+       description: 'BANK RECEIPTS AND PAYMENT',
+       description2ND: '',
+       entrytypeId: 0,
+     },
+     {
+       typeCode: 'CASH-B',
+       description: 'CASH RECEIPTS AND PAYMENT',
+       description2ND: '',
+       entrytypeId: 0,
+     },
+     {
+       typeCode: 'GENERAL-J',
+       description: 'GENERAL JOURNAL',
+       description2ND: '',
+       entrytypeId: 0,
+     },
+     {
+       typeCode: 'SALE-J',
+       description: 'SALES JOURNAL',
+       description2ND: '',
+       entrytypeId: 0,
+     },
+     {
+       typeCode: 'PURCHASE-J',
+       description: 'PURCHASE JOURNAL',
+       description2ND: '',
+       entrytypeId: 0,
+     },
+   ];
+   items: ItemRef[] = [
+     {
+       code: 'IPH-14P-256',
+       name: 'iPhone 14 Pro 256GB',
+       uom: 'UNIT',
+       price: 4999,
+       tax: 'SR',
+     },
+     {
+       code: 'S24U-512',
+       name: 'Galaxy S24 Ultra 512GB',
+       uom: 'UNIT',
+       price: 3999,
+       tax: 'SR',
+     },
+     {
+       code: 'A54-128',
+       name: 'Samsung A54 128GB',
+       uom: 'UNIT',
+       price: 899,
+       tax: 'SR',
+     },
+     {
+       code: 'CASE-01',
+       name: 'Protective Case',
+       uom: 'UNIT',
+       price: 49,
+       tax: 'ZR',
+     },
+   ];
+   showDebtorPicker = false;
+   debtorQuery = '';
+   debtorFiltered: DebtorRow[] = [];
+   showDueShortcuts = false;
+   showAddRowMenu = false;
+   openDebtorDropdown() {
+     this.debtorQuery = '';
+     this.debtorFiltered = [...(this.debtors ?? [])];
+     this.showDebtorPicker = true;
+   }
+   filterDebtors() {
+     const q = (this.debtorQuery || '').toLowerCase().trim();
+     const src = this.debtors ?? [];
+     this.debtorFiltered = !q
+       ? [...src]
+       : src.filter(
+           (d) =>
+             (d.debtorAccount || '').toLowerCase().includes(q) ||
+             (d.companyName || '').toLowerCase().includes(q) ||
+             (d.billAddress || '').toLowerCase().includes(q) ||
+             (d.phone || '').toLowerCase().includes(q)
+         );
+   }
+   pickDebtor(d: DebtorRow) {
+     this.invForm.patchValue({ debtor: d.debtorAccount });
+     this.onDebtorPicked(d); // đã có sẵn – set agent/terms/due date nếu cần
+     this.showDebtorPicker = false;
+   }
+
+   // Khi đổi select debtor
+   onDebtorChanged() {
+     const code = this.invForm.value.debtor;
+     const d = (this.debtors ?? []).find((x) => x.debtorAccount === code);
+     if (d) this.onDebtorPicked(d as DebtorRow);
+   }
+   ngOnInit() {
+     if (this.acLinesFA.length === 0) this.addAcLine();
+   }
+   trackByIndex(index: number, _item: any): number {
+     return index;
+   }
+   // Debtor đang chọn + text To:
+   get selectedDebtor(): DebtorRow | undefined {
+     const code = this.invForm?.value?.debtor;
+     return (this.debtors ?? []).find((d) => d.debtorAccount === code) as DebtorRow | undefined;
+   }
+   get debtorToText(): string {
+     const d = this.selectedDebtor;
+     if (!d) return '';
+     return [d.companyName, d.billAddress, d.phone].filter(Boolean).join('\n');
+   }
+   // ===== sample invoices =====
+   invoices: Invoice[] = [
+     this.mkInvoice(
+       'DN-0001',
+       '10/9/2025',
+       '300-B001',
+       [
+         { item: 'IPH-14P-256', qty: 1 },
+         { item: 'CASE-01', qty: 2 },
+       ],
+       '2025-12-07'
+     ),
+     this.mkInvoice('DN-0002', '8/6/2025', '300-C001', [{ item: 'S24U-512', qty: 1 }], '2025-11-07'),
+     this.mkInvoice('DN-0003', '10/7/2025', '300-D001', [{ item: 'A54-128', qty: 3 }], '2025-10-07'),
+   ];
+
+   constructor(private fb: FormBuilder) {
+     this.buildForms();
+     const dnPaid = this.mkInvoice(
+       'DN-0004', // số chứng từ mẫu
+       '10/15/2025', // ngày chứng từ
+       '300-B001', // debtor
+       [{ item: 'CASE-01', qty: 10 }], // dòng chi tiết
+       '2025-12-15' // due date
+     );
+     dnPaid.outstanding = 0; // đã thanh toán đủ
+     this.invoices.push(dnPaid);
+   }
+
+   private mkInvoice(
+     docNo: string,
+     date: string,
+     debtor: string,
+     lines: Array<{ item: string; qty: number }>,
+     dueDate: string
+   ): Invoice {
+     const debtorName = this.debtors.find((d) => d.debtorAccount === debtor)?.companyName || debtor;
+     const docDate = date;
+     const dets: InvoiceLine[] = lines.map((l) => {
+       const itm = this.items.find((i) => i.code === l.item)!;
+       const amount = +(l.qty * itm.price).toFixed(2);
+       const taxAmt = +(amount * (itm.tax === 'SR' ? 0.06 : 0)).toFixed(2);
+       const total = +(amount + taxAmt).toFixed(2);
+       return {
+         item: itm.code,
+         description: itm.name,
+         uom: itm.uom,
+         qty: l.qty,
+         unitPrice: itm.price,
+         tax: itm.tax,
+         amount,
+         taxAmt,
+         total,
+       };
+     });
+     const subTotal = +dets.reduce((s, x) => s + x.amount, 0).toFixed(2);
+     const taxTotal = +dets.reduce((s, x) => s + x.taxAmt, 0).toFixed(2);
+     const grandTotal = +(subTotal + taxTotal).toFixed(2);
+     return {
+       docNo,
+       docDate,
+       dueDate,
+       debtor,
+       debtorName,
+       currency: 'MYR',
+       rate: 1,
+       description: 'SALE',
+       agent: '',
+       lines: dets,
+       subTotal,
+       taxTotal,
+       grandTotal,
+       outstanding: grandTotal,
+     };
+   }
+   private addDays(dateISO: string, d: number) {
+     const dt = new Date(dateISO);
+     dt.setDate(dt.getDate() + d);
+     return dt.toISOString().slice(0, 10);
+   }
+   private toYMD(d: Date): string {
+     const y = d.getFullYear();
+     const m = String(d.getMonth() + 1).padStart(2, '0');
+     const day = String(d.getDate()).padStart(2, '0');
+     return `${y}-${m}-${day}`;
+   }
+   private todayYMD(): string {
+     return this.toYMD(new Date());
+   }
+   private addDaysYMD(date: Date | string, days: number): string {
+     const d = typeof date === 'string' ? new Date(date) : new Date(date);
+     d.setDate(d.getDate() + days);
+     return this.toYMD(d);
+   }
+
+   // ===== list state =====
+   selected?: Invoice;
+   q = '';
+   sortBy: keyof Invoice = 'docDate';
+   sortDir: 'asc' | 'desc' = 'desc';
+   page = 1;
+   pageSize = 8;
+
+   // ===== forms/dialogs =====
+   showForm = false;
+   formMode: 'new' | 'edit' | 'view' = 'new';
+   invForm!: FormGroup;
+   get linesFA(): FormArray<FormGroup> {
+     return this.invForm.get('lines') as FormArray<FormGroup>;
+   }
+
+   showFind = false;
+   findForm!: FormGroup;
+   findResults: Invoice[] = [];
+   showPrint = false;
+   printForm!: FormGroup;
+   showPreview = false;
+
+   buildForms() {
+     this.invForm = this.fb.group({
+       // header
+       debtor: ['', Validators.required],
+       journalType: ['SALES'],
+       dnType: ['OMIT', Validators.required],
+       isDebitJournal: [false],
+       agent: [''],
+       ref: [''],
+       ref2: [''],
+       autoNumbering: [true], // điều khiển Invoice No
+       docNo: ['', Validators.required],
+       docDate: [this.todayYMD()],
+       terms: ['N30'],
+       dueDate: [this.addDaysYMD(new Date(), 30)],
+       description: [''],
+
+       // lines + totals
+       lines: this.fb.array([]),
+       grandTotal: [0],
+       outstanding: [0],
+       continueNew: [true],
+     });
+     if (this.acLinesFA.length === 0) this.addAcLine();
+     this.findForm = this.fb.group({
+       from: [''],
+       to: [''],
+       debtor: [''],
+       status: ['all' as 'all' | Status],
+       min: [''],
+       max: [''],
+     });
+
+     this.printForm = this.fb.group({
+       from: [''],
+       to: [''],
+       debtor: [''],
+       status: ['all' as 'all' | Status],
+       sort: ['docDate' as keyof Invoice],
+     });
+   }
+   addAcLine() {
+     this.acLinesFA.push(this.createLine());
+     this.accNoSugs.push([]);
+   }
+   addRows(count: number) {
+     if (this.formMode === 'view') {
+       return;
+     }
+     for (let i = 0; i < count; i++) {
+       this.addAcLine();
+     }
+   }
+
+   toggleAddRowMenu() {
+     if (this.formMode === 'view') {
+       return;
+     }
+     this.showAddRowMenu = !this.showAddRowMenu;
+   }
+
+   closeAddRowMenu() {
+     this.showAddRowMenu = false;
+   }
+   recalcLine(i: number) {
+     // nếu cần auto điền mô tả từ accNo thì xử lý ở đây
+     this.recalcTotals();
+   }
+   get acLinesFA(): FormArray {
+     return this.invForm.get('lines') as FormArray;
+   }
+   private createLine(): FormGroup {
+     return this.fb.group({
+       accNo: [this.nextAccNo()],
+       toAccRate: [1], //
+       lineDesc: [''], //
+       amount: [0], //
+     });
+   }
+   private accPrefix = '500-';
+   private accPad = 4; // => 0001, 0002,...
+   accNoSugs: string[][] = []; // mảng gợi ý theo từng dòng
+   private fmtAcc(n: number): string {
+     return `${this.accPrefix}${String(n).padStart(this.accPad, '0')}`;
+   }
+
+   // lấy suffix số từ accNo hiện có (không hợp lệ => -1)
+   private suffixOf(s: string): number {
+     const m = s?.match(/^500-(\d{1,})$/);
+     return m ? parseInt(m[1], 10) : -1;
+   }
+
+   // tìm suffix lớn nhất trên tất cả dòng hiện có
+   private currentMaxSuffix(): number {
+     const arr = (this.acLinesFA?.controls ?? []) as FormGroup[];
+     let max = 0;
+     for (const fg of arr) {
+       const v = String(fg.get('accNo')?.value || '');
+       const n = this.suffixOf(v);
+       if (n > max) max = n;
+     }
+     return max;
+   }
+
+   // gợi ý cho dòng i (ví dụ 10 số kế tiếp)
+   prepAccNoSuggestions(i: number) {
+     const start = this.currentMaxSuffix() + 1; // số tiếp theo
+     const count = 10; // số lượng gợi ý
+     const list = Array.from({ length: count }, (_, k) => this.fmtAcc(start + k));
+     this.accNoSugs[i] = list;
+   }
+
+   // sinh mã kế tiếp để auto-fill khi thêm dòng
+   private nextAccNo(): string {
+     return this.fmtAcc(this.currentMaxSuffix() + 1);
+   }
+   get acLineGroups(): FormGroup[] {
+     return this.acLinesFA.controls as FormGroup[];
+   }
+   removeAcLine(i: number) {
+     this.acLinesFA.removeAt(i);
+     this.accNoSugs.splice(i, 1);
+     this.recalcTotals();
+   }
+
+   // debtor change -> fill name/agent/terms
+   onDebtorPicked(d: DebtorRow) {
+     this.invForm.patchValue({
+       debtor: d.debtorAccount || '',
+       terms: d.creditTerm || this.invForm.value.terms,
+     });
+     this.recalcDue();
+   }
+   openAccountLookup(i: number) {
+     /* mở dialog chọn tài khoản kế toán cho dòng i */
+   }
+
+   // ======= Lưu chứng từ =======
+   nextRunningNo(): string {
+     // TODO: gọi API lấy số chạy tự động; tạm thời mock
+     const n = Math.floor(Math.random() * 9000) + 1000;
+     return `I-${n.toString().padStart(6, '0')}`;
+   }
+   // auto/manual doc no
+   toggleManualDocNo() {
+     const auto = !this.invForm.value.autoNumbering;
+     this.invForm.patchValue({ autoNumbering: auto });
+     if (auto) this.invForm.patchValue({ docNo: '' }); // trả về <<new>>
+   }
+   // ======= Debtor lookup stubs (để compile; sau này nối với dialog/service của bạn) =======
+   lookupDebtor() {
+     /* gõ để lọc/lookup – tự nối service nếu cần */
+   }
+   openDebtorList() {
+     /* mở dialog chọn debtor */
+   }
+   // due date calc
+   recalcDue() {
+     const terms = this.invForm.value.terms || 'N0';
+     const days = Number(String(terms).replace(/\D/g, '') || 0);
+     const d = this.invForm.value.docDate || this.todayYMD();
+     this.invForm.patchValue({ dueDate: this.addDaysYMD(d, days) }, { emitEvent: false });
+   }
+
+   // totals
+   recalcTotals() {
+     const sum = this.acLinesFA.controls
+       .map((fg) => +((fg as FormGroup).value.amount || 0))
+       .reduce((a, b) => a + b, 0);
+     this.invForm.patchValue({ grandTotal: sum, outstanding: sum }, { emitEvent: false });
+   }
+   private today() {
+     return new Date().toISOString().slice(0, 10);
+   }
+
+   // ===== list helpers =====
+   get filtered() {
+     const q = this.q.trim().toLowerCase();
+     let list = !q
+       ? this.invoices
+       : this.invoices.filter(
+           (i) =>
+             i.docNo.toLowerCase().includes(q) ||
+             i.debtor.toLowerCase().includes(q) ||
+             i.debtorName.toLowerCase().includes(q) ||
+             i.description?.toLowerCase().includes(q)
+         );
+     list = [...list].sort((a, b) => {
+       const va = String(a[this.sortBy] ?? '').toLowerCase();
+       const vb = String(b[this.sortBy] ?? '').toLowerCase();
+       if (va < vb) return this.sortDir === 'asc' ? -1 : 1;
+       if (va > vb) return this.sortDir === 'asc' ? 1 : -1;
+       return 0;
+     });
+     return list;
+   }
+   get totalPages() {
+     return Math.max(1, Math.ceil(this.filtered.length / this.pageSize));
+   }
+   get paged() {
+     const s = (this.page - 1) * this.pageSize;
+     return this.filtered.slice(s, s + this.pageSize);
+   }
+   setSort(k: keyof Invoice) {
+     if (this.sortBy === k) this.sortDir = this.sortDir === 'asc' ? 'desc' : 'asc';
+     else {
+       this.sortBy = k;
+       this.sortDir = 'asc';
+     }
+   }
+   select(inv: Invoice) {
+     this.selected = inv;
+     this.loadPaymentHistory(inv);
+   }
+
+   // ==== Pager methods (thay cho Math.* trong template) ====
+   goFirst() {
+     this.page = 1;
+   }
+   goPrev() {
+     this.page = Math.max(1, this.page - 1);
+   }
+   goNext() {
+     this.page = Math.min(this.totalPages, this.page + 1);
+   }
+   goLast() {
+     this.page = this.totalPages;
+   }
+
+   // ===== CRUD =====
+   newInvoice() {
+     this.formMode = 'new';
+     const jtDefault = this.journalTypes?.[0]?.typeCode ?? '';
+     const termsDefault = this.creditTerms?.[0]?.code ?? '';
+     this.invForm.reset({
+       docNo: this.nextNumber(),
+       docDate: this.today(),
+       dueDate: this.addDays(this.today(), 0),
+       debtor: '',
+       debtorName: '',
+       currency: 'MYR',
+       rate: 1,
+       description: '',
+       status: 'OPEN',
+       subTotal: 0,
+       taxTotal: 0,
+       grandTotal: 0,
+       outstanding: 0,
+       journalType: jtDefault,
+       terms: termsDefault,
+       dnType: 'OMIT',
+       isDebitJournal: false,
+     });
+     this.acLinesFA.clear();
+     this.addAcLine();
+     this.showForm = true;
+     this.showDueShortcuts = false;
+   }
+   viewInvoice() {
+     if (!this.selected) return;
+     this.formMode = 'view';
+     this.patchInvoice(this.selected);
+     this.showForm = true;
+   }
+   editInvoice() {
+     if (!this.selected) return;
+     this.formMode = 'edit';
+     this.patchInvoice(this.selected);
+     this.showForm = true;
+   }
+   deleteInvoice() {
+     if (!this.selected) return;
+     this.openDeleteInvoiceConfirm();
+   }
+
+   private patchInvoice(inv: Invoice) {
+     this.invForm.patchValue({
+       docNo: inv.docNo,
+       docDate: inv.docDate,
+       dueDate: inv.dueDate,
+       debtor: inv.debtor,
+       debtorName: inv.debtorName,
+       currency: inv.currency,
+       rate: inv.rate,
+       description: inv.description,
+       agent: inv.agent,
+       subTotal: inv.subTotal,
+       taxTotal: inv.taxTotal,
+       grandTotal: inv.grandTotal,
+       outstanding: inv.grandTotal,
+     });
+     this.acLinesFA.clear();
+     // map tạm: mô tả lấy description, số tiền lấy total (hoặc amount tùy bạn)
+     inv.lines.forEach((l) => {
+       const fg = this.createLine();
+       fg.patchValue({
+         accNo: '', // chưa có account -> để trống cho user chọn
+         toAccRate: 1,
+         lineDesc: l.description || '',
+         amount: l.total ?? l.amount ?? 0,
+       });
+       this.acLinesFA.push(fg);
+     });
+   }
+   submitted = false;
+
+   /** Doc No validator:
+    *  - Cho phép rỗng (để auto)
+    *  - Nếu có giá trị: chỉ cho [A–Z,a–z,0–9,-,_ ,/]
+    *  - Không được trùng với invoice đã có
+    */
+   docNoValidator: ValidatorFn = (ctrl: AbstractControl) => {
+     const v = (ctrl.value ?? '').trim();
+     if (!v) return null; // rỗng = dùng auto, hợp lệ
+     if (!/^[A-Za-z0-9\-_\/]+$/.test(v)) return { pattern: true };
+     const dup = this.invoices.some((x) => (x.docNo || '').toLowerCase() === v.toLowerCase());
+     return dup ? { duplicate: true } : null;
+   };
+
+   isInvalid(name: string): boolean {
+     const c = this.invForm?.get(name);
+     return !!(c && c.invalid && (c.touched || this.submitted));
+   }
+   saveInvoice() {
+     this.submitted = true;
+     if (this.invForm.invalid) return; // chặn Save nếu form lỗi
+     localStorage.setItem('ar_inv_last_desc', this.invForm.value.description || '');
+     const v = this.invForm.getRawValue();
+     const docNo = v.autoNumbering && !v.docNo ? this.nextRunningNo() : v.docNo;
+
+     const payload = { ...v, docNo };
+     // TODO: call API create invoice
+
+     if (v.continueNew) {
+       // reset form cho chứng từ mới
+       const jtDefault = this.journalTypes?.[0]?.typeCode ?? '';
+       const termsDefault = this.creditTerms?.[0]?.code ?? '';
+       this.invForm.reset({
+         docNo: this.nextNumber(),
+         docDate: this.today(),
+         dueDate: this.addDays(this.today(), 0),
+         debtor: '',
+         debtorName: '',
+         currency: 'MYR',
+         rate: 1,
+         description: '',
+         status: 'OPEN',
+         subTotal: 0,
+         taxTotal: 0,
+         grandTotal: 0,
+         outstanding: 0,
+         journalType: jtDefault,
+         terms: termsDefault,
+         dnType: 'OMIT',
+         isDebitJournal: false,
+       });
+       while (this.acLinesFA.length) this.acLinesFA.removeAt(0);
+       this.addAcLine();
+       this.formMode = 'new';
+       this.submitted = false;
+       this.invForm.markAsPristine();
+       this.invForm.markAsUntouched();
+
+       this.openSuccess((this.formMode === 'new' ? 'Create' : 'Edit') + ' debit note successfully.');
+       this.showForm = true;
+       return;
+     }
+     this.showForm = false;
+     this.openSuccess((this.formMode === 'new' ? 'Create' : 'Edit') + ' debit note successfully.');
+   }
+   private valueFromForm(): Invoice {
+     const fv = this.invForm.getRawValue();
+     // LẤY DÒNG VỚI KIỂU RÕ RÀNG
+     const lines: InvoiceLine[] = this.linesFA.controls.map((fg) => fg.getRawValue() as InvoiceLine);
+     const subTotal = +lines.reduce((s, l) => s + l.amount, 0).toFixed(2);
+     const taxTotal = +lines.reduce((s, l) => s + l.taxAmt, 0).toFixed(2);
+     const grandTotal = +(subTotal + taxTotal).toFixed(2);
+     const debtorName = this.debtors.find((d) => d.debtorAccount === fv.debtor)?.companyName || '';
+     return {
+       docNo: fv.docNo,
+       docDate: fv.docDate,
+       dueDate: fv.dueDate,
+       debtor: fv.debtor,
+       debtorName,
+       currency: fv.currency,
+       rate: fv.rate,
+       description: fv.description,
+       agent: fv.agent,
+       lines,
+       subTotal,
+       taxTotal,
+       grandTotal,
+       outstanding: grandTotal,
+     };
+   }
+
+   refresh() {
+     this.q = '';
+     this.page = 1;
+     this.sortBy = 'docDate';
+     this.sortDir = 'desc';
+   }
+
+   removeLine(i: number) {
+     this.linesFA.removeAt(i);
+     this.recalcTotals();
+   }
+   // ===== find =====
+   openFind() {
+     this.showFind = true;
+     this.findResults = [];
+   }
+   runFind() {
+     const f = this.findForm.value;
+     const from = f.from ? new Date(f.from as string) : undefined;
+     const to = f.to ? new Date(f.to as string) : undefined;
+     const min = f.min ? +f.min! : undefined;
+     const max = f.max ? +f.max! : undefined;
+     this.findResults = this.invoices.filter((x) => {
+       const dt = new Date(x.docDate);
+       const inDate = (!from || dt >= from) && (!to || dt <= to);
+       const debtHit = !f.debtor || x.debtor === f.debtor;
+       const statusHit = f.status === 'all';
+       const amtHit = (!min || x.grandTotal >= min) && (!max || x.grandTotal <= max);
+       return inDate && debtHit && statusHit && amtHit;
+     });
+   }
+   pickFromFind(inv: Invoice) {
+     this.selected = inv;
+     this.showFind = false;
+   }
+
+   // ===== print listing =====
+   openPrint() {
+     this.showPrint = true;
+     this.showPreview = false;
+   }
+   buildListing(): Invoice[] {
+     const f = this.printForm.value;
+     const from = f.from ? new Date(f.from as string) : undefined;
+     const to = f.to ? new Date(f.to as string) : undefined;
+     const status = f.status as 'all' | Status;
+     const sortKey = (f.sort ?? 'docDate') as keyof Invoice;
+     return this.invoices
+       .filter((x) => {
+         const dt = new Date(x.docDate);
+         const inDate = (!from || dt >= from) && (!to || dt <= to);
+         const debtHit = !f.debtor || x.debtor === f.debtor;
+         const statusHit = status === 'all';
+         return inDate && debtHit && statusHit;
+       })
+       .sort((a, b) => String(a[sortKey] ?? '').localeCompare(String(b[sortKey] ?? '')));
+   }
+
+   // utils
+   private nextNumber() {
+     const seq = (this.invoices.length + 1).toString().padStart(4, '0');
+     return `DN-${seq}`;
+   }
+   // ==== Delete confirm state ====
+   showDeleteInvoiceConfirm = false;
+
+   openDeleteInvoiceConfirm(inv?: Invoice) {
+     if (inv) this.selected = inv;
+     this.showDeleteInvoiceConfirm = true;
+   }
+
+   closeDeleteInvoiceConfirm() {
+     this.showDeleteInvoiceConfirm = false;
+   }
+
+   confirmDeleteInvoice() {
+     if (!this.selected) return;
+     this.invoices = this.invoices.filter((x) => x !== this.selected);
+     this.selected = undefined;
+     this.showDeleteInvoiceConfirm = false;
+     this.openSuccess(`Debit Note deleted successfully.`);
+   }
+   showSuccess = false;
+   successMsg = '';
+   openSuccess(msg: string) {
+     this.successMsg = msg;
+     this.showSuccess = true;
+   }
+   closeSuccess() {
+     this.showSuccess = false;
+   }
+   paymentHistory: PaymentLine[] = [];
+   private loadPaymentHistory(inv: Invoice) {
+     const total = +(inv.grandTotal ?? 0);
+     const out = +(inv.outstanding ?? total);
+     const paid = +(total - out).toFixed(2);
+
+     // 1) Chưa thanh toán: không hiển thị dòng nào
+     if (paid <= 0) {
+       this.paymentHistory = [];
+       return;
+     }
+
+     // 2) Đã thanh toán (hết hoặc một phần): 1 dòng RP
+     const rpNo = `OR-${inv.docNo.replace(/\D/g, '').padStart(4, '0')}`;
+     const payDate = new Date(inv.docDate).toLocaleDateString();
+
+     this.paymentHistory = [
+       {
+         type: 'RP',
+         no: rpNo,
+         description: 'Official receipt',
+         date: payDate,
+         amount: paid, // full = total, partial = total - outstanding
+       },
+     ];
+   }
+   isOverdue(inv: Invoice): boolean {
+     if (!inv) return false;
+     const today = new Date().toISOString().slice(0, 10);
+     return inv.outstanding > 0 && (inv.dueDate ?? '') < today;
+   }
+   toggleSelect(inv: Invoice) {
+     if (this.selected === inv) {
+       this.selected = undefined;
+       this.paymentHistory = [];
+     } else {
+       this.select(inv); // vẫn dùng select(...) để nạp history
+     }
+   }
+   closeForm() {
+     this.showForm = false;
+     this.submitted = false;
+   }
+   toggleDueShortcuts(event: MouseEvent): void {
+     event.stopPropagation();
+     this.showDueShortcuts = !this.showDueShortcuts;
+   }
+
+   /**
+    * set Due date dựa trên Issue date (docDate) với các option nhanh.
+    */
+   applyDueShortcut(
+     kind: 'IN_7' | 'IN_14' | 'FIRST_NEXT' | 'TWENTIETH_NEXT' | 'END_NEXT' | 'RESET'
+   ): void {
+     const baseYmd: string = this.invForm.value.docDate || this.todayYMD();
+     let newDue: string | null = null;
+
+     switch (kind) {
+       case 'IN_7':
+         newDue = this.addDaysYMD(baseYmd, 7);
+         break;
+       case 'IN_14':
+         newDue = this.addDaysYMD(baseYmd, 14);
+         break;
+       case 'FIRST_NEXT':
+         newDue = this.firstOfNextMonthYMD(baseYmd);
+         break;
+       case 'TWENTIETH_NEXT':
+         newDue = this.twentiethOfNextMonthYMD(baseYmd);
+         break;
+       case 'END_NEXT':
+         newDue = this.endOfNextMonthYMD(baseYmd);
+         break;
+       case 'RESET':
+         // dùng logic terms hiện tại của anh
+         this.recalcDue();
+         break;
+     }
+
+     if (newDue) {
+       this.invForm.get('dueDate')?.setValue(newDue);
+     }
+
+     this.showDueShortcuts = false;
+   }
+   private firstOfNextMonthYMD(ymd: string): string {
+     const [y, m] = ymd.split('-').map(Number);
+     // tháng JS: 0-based, nên m là tháng hiện tại; m + 1 = tháng sau, ngày 1
+     const d = new Date(y, m, 1);
+     return this.toYMD(d);
+   }
+
+   private twentiethOfNextMonthYMD(ymd: string): string {
+     const [y, m] = ymd.split('-').map(Number);
+     const d = new Date(y, m, 20); // 20 của tháng sau
+     return this.toYMD(d);
+   }
+
+   private endOfNextMonthYMD(ymd: string): string {
+     const [y, m] = ymd.split('-').map(Number);
+     // day 0 của (tháng sau + 1) = ngày cuối của tháng sau
+     const d = new Date(y, m + 1, 0);
+     return this.toYMD(d);
+   }
+ }
+
