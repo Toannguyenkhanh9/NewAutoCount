@@ -100,7 +100,7 @@ export class CreditorMaintenanceComponent {
        {
          debtorAccount: '400-N00A',
          companyName: 'Normal Debtor A',
-         type: '123456789',
+         type: 'MANUF',
          phone: '012-3456789',
          currency: 'MYR',
          creditTerm: '30D',
@@ -120,7 +120,7 @@ export class CreditorMaintenanceComponent {
        {
          debtorAccount: '400-GABB',
          companyName: 'General Trading Berhad',
-         type: '12354863',
+         type: 'MANUF',
          phone: '03-2222222',
          currency: 'USD',
          creditTerm: '30D',

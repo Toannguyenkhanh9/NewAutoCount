@@ -6,7 +6,7 @@
         <div>
           <div class="ac-page-title">Creditor Maintenance</div>
           <div class="ac-page-subtitle">
-            Maintain customer (creditor) master data, addresses and credit settings.
+            Maintain creditor master data, addresses and credit settings.
           </div>
         </div>
 
@@ -27,10 +27,10 @@
           <thead>
             <tr>
               <th class="ac-text-left" (click)="setSort('debtorAccount')">Code</th>
-              <th class="ac-text-left">Customer Name</th>
-              <th class="ac-text-left">Company/SSM ID</th>
+              <th class="ac-text-left">Creditor Name</th>
+              <th class="ac-text-left">Creditor Type</th>
               <th class="ac-text-left">Phone</th>
-              <th class="ac-text-left">Customer's TIN</th>
+              <th class="ac-text-left">Group Company</th>
               <th class="ac-text-left">Active</th>
             </tr>
           </thead>
@@ -40,7 +40,7 @@
               <td>{{ r.companyName }}</td>
               <td>{{ r.type }}</td>
               <td>{{ r.phone }}</td>
-              <td>{{ r.customerTin }}</td>
+              <td><input type="checkbox" [checked]="r.active" disabled /></td>
               <td><input type="checkbox" [checked]="r.active" disabled /></td>
             </tr>
 
@@ -162,7 +162,7 @@
 
                   <label [class.field-error]="isFieldInvalid('name')">
                     <span>
-                      Customer Name <span class="required-tag">(required)</span>
+                      Creditor Name <span class="required-tag">(required)</span>
                     </span>
                     <input placeholder="e.g. A business or person's name" formControlName="name" />
                     <div class="field-error-row">
@@ -190,7 +190,7 @@
                   <label class="field-with-action" [class.field-error]="isFieldInvalid('tinNo')">
                     <div class="field-label-row">
                       <span class="field-label">
-                        Customer’s TIN <span class="required-tag">(required)</span>
+                        Creditor’s TIN <span class="required-tag">(required)</span>
                       </span>
                       <button type="button" class="link" (click)="openTinLookup()">
                         Search TIN
@@ -200,12 +200,12 @@
                     <input formControlName="tinNo" placeholder="e.g. 123456789" />
                     <div class="field-error-row">
                       <span class="field-error-icon" *ngIf="isFieldInvalid('tinNo')">!</span>
-                      <span *ngIf="isFieldInvalid('tinNo')">Enter a customer TIN</span>
+                      <span *ngIf="isFieldInvalid('tinNo')">Enter a creditor TIN</span>
                     </div>
                   </label>
 
                   <label>
-                    <span>Customer’s SST Registration No.</span>
+                    <span>Creditor’s SST Registration No.</span>
                     <input formControlName="sstRegNo" />
                   </label>
 

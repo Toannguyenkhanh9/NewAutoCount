@@ -214,7 +214,7 @@
             <label class="inv-field">
               <span class="inv-label">&nbsp;</span>
               <div class="inv-checkline">
-                <input type="checkbox" formControlName="isDebitJournal" [disabled]="formMode === 'edit'" />
+                <input type="checkbox" formControlName="isDebitJournal" />
                 <span>Is Credit Journal</span>
               </div>
             </label>
@@ -225,7 +225,7 @@
                 <span class="ac-input-prefix-icon">
                   <lucide-icon name="hash" [size]="13" color="#111827"></lucide-icon>
                 </span>
-                <select class="ac-form-control" formControlName="journalType" [disabled]="formMode === 'edit'">
+                <select class="ac-form-control" formControlName="journalType">
                   <option *ngFor="let j of journalTypes" [ngValue]="j.typeCode">
                     {{ j.typeCode }}
                   </option>
@@ -240,7 +240,7 @@
                 <span class="ac-input-prefix-icon">
                   <lucide-icon name="hash" [size]="13" color="#111827"></lucide-icon>
                 </span>
-                <select class="ac-form-control" formControlName="dnType" [disabled]="formMode === 'edit'">
+                <select class="ac-form-control" formControlName="dnType" >
                   <option *ngFor="let t of dnTypes" [ngValue]="t">{{ t }}</option>
                 </select>
               </div>
@@ -253,7 +253,7 @@
                 <span class="ac-input-prefix-icon">
                   <lucide-icon name="hash" [size]="13" color="#111827"></lucide-icon>
                 </span>
-                <input class="ac-form-control" formControlName="ref" [readonly]="formMode === 'edit'" />
+                <input class="ac-form-control" formControlName="ref"  />
               </div>
             </label>
 
@@ -264,7 +264,7 @@
                 <span class="ac-input-prefix-icon">
                   <lucide-icon name="hash" [size]="13" color="#111827"></lucide-icon>
                 </span>
-                <input class="ac-form-control" formControlName="ref2" [readonly]="formMode === 'edit'" />
+                <input class="ac-form-control" formControlName="ref2"  />
               </div>
             </label>
 
@@ -277,7 +277,7 @@
                 <span class="ac-input-prefix-icon">
                   <lucide-icon name="calendar" [size]="15" color="#111827"></lucide-icon>
                 </span>
-                <input type="date" class="ac-form-control" formControlName="docDate" [readonly]="formMode === 'edit'" />
+                <input type="date" class="ac-form-control" formControlName="docDate" />
               </div>
             </label>
                         <label class="inv-field wide">
@@ -315,14 +315,14 @@
                 <tbody>
                   <tr *ngFor="let _ of methodsFA.controls; let i = index" [formGroupName]="i">
                     <td>
-                      <input class="ac-form-control" formControlName="debitAc" [readonly]="formMode === 'edit'" />
+                      <input class="ac-form-control" formControlName="debitAc" />
                     </td>
                     <td>
-                      <input class="ac-form-control" formControlName="decs" [readonly]="formMode === 'edit'" />
+                      <input class="ac-form-control" formControlName="decs" />
                     </td>
                     <td class="ac-text-right">
                       <input class="ac-form-control ac-text-right" appAmount formControlName="amount"
-                        (input)="onMethodAmtOrFeeChanged()" [readonly]="formMode === 'edit'" />
+                        (input)="onMethodAmtOrFeeChanged()"  />
                     </td>
                     <td class="ac-text-center">
                       <button type="button" class="ac-btn ac-btn-icon-danger" (click)="removeMethod(i)"
@@ -392,12 +392,12 @@
             <div class="knock-titlebar">
               <div class="title sm knock-title">Knock Off Invoices / Debit Notes</div>
               <button class="ac-btn ac-btn-primary" type="button" (click)="autoAllocate()"
-                [disabled]="!canAllocate || formMode === 'edit'">
+                [disabled]="!canAllocate">
                 Auto allocate
               </button>
             </div>
 
-            <table class="ac-table-addnew inv-lines-table" [class.dim]="!canAllocate || formMode === 'edit'">
+            <table class="ac-table-addnew inv-lines-table" [class.dim]="!canAllocate">
               <thead>
                 <tr>
                   <th class="ac-text-left" (click)="sortKnock('type')" style="cursor: pointer;color: black;">
@@ -433,7 +433,7 @@
 
                   <td class="ac-text-right">
                     <input class="ac-form-control ac-text-right" appAmount [decimals]="2" [allowNegative]="false"
-                      [formatOnBlurOnly]="true" formControlName="pay" [readonly]="formMode === 'edit' || !canAllocate"
+                      [formatOnBlurOnly]="true" formControlName="pay" [readonly]="!canAllocate"
                       (input)="onPayChanged(i)" (blur)="onPayBlur(i)" />
                   </td>
 
@@ -551,18 +551,18 @@
       </div>
     </div>
   </div>
-  <div class="dialog" *ngIf="showSaveConfirm">
-    <div class="dialog-panel-small">
-      <div class="dialog-title">
+  <div class="ac-dialog-backdrop" *ngIf="showSaveConfirm">
+        <div class="ac-card-no-padding ac-dialog-panel-sm" role="dialog" aria-modal="true" style="min-width: 360px">
+      <div class="ac-dialog-header">
         Confirm
-        <button class="x" (click)="cancelConfirmSave()">×</button>
+        <button class="ac-dialog-close" (click)="cancelConfirmSave()">×</button>
       </div>
-      <div class="dialog-body">
+      <div class="ac-dialog-body">
         {{ confirmMsg }}
       </div>
-      <div class="dialog-actions">
-        <button class="btn cancel" (click)="cancelConfirmSave()">Cancel</button>
-        <button class="btn primary" (click)="doConfirmSave()">OK</button>
+      <div class="ac-dialog-footer">
+        <button class="ac-btn ac-btn-ghost" (click)="cancelConfirmSave()">Cancel</button>
+        <button class="ac-btn ac-btn-danger" (click)="doConfirmSave()">OK</button>
       </div>
     </div>
   </div>
