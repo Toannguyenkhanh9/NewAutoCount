@@ -1,483 +1,445 @@
-<div class="page">
-  <!-- Title + Toolbar -->
-  <div class="titlebar">
-    <h1>Creditor Maintenance</h1>
-    <div class="toolbar" role="toolbar" aria-label="Debtor actions">
-      <input
-        class="search1"
-        type="text"
-        placeholder="Search code / company name ..."
-        [(ngModel)]="q"
-      />
-      <button class="btn primary" (click)="newDebtor()">
-        <span class="ico plus"></span> New
-      </button>
-      <button class="btn" [disabled]="!selected" (click)="editDebtor()">
-        <span class="ico edit"></span> Edit
-      </button>
-      <button
-        class="btn danger"
-        [disabled]="!selected"
-        (click)="onDeleteDebtor()"
-      >
-        <span class="ico trash"></span> Delete
-      </button>
+<div class="ac-page">
+  <!-- ================= LIST MODE ================= -->
+  <ng-container *ngIf="!showForm">
+    <div class="ac-card">
+      <div class="ac-page-header">
+        <div>
+          <div class="ac-page-title">Creditor Maintenance</div>
+          <div class="ac-page-subtitle">
+            Maintain customer (creditor) master data, addresses and credit settings.
+          </div>
+        </div>
+
+        <div class="ac-page-toolbar">
+          <input class="ac-form-control ac-page-search" type="text" placeholder="Search code / company name..."
+            [(ngModel)]="q" />
+
+          <button class="ac-btn ac-btn-primary" (click)="newDebtor()">New</button>
+          <button class="ac-btn" [disabled]="!selected" (click)="editDebtor()">Edit</button>
+          <button class="ac-btn ac-btn-danger" [disabled]="!selected" (click)="onDeleteDebtor()">Delete</button>
+        </div>
+      </div>
     </div>
-  </div>
 
-  <!-- Grid -->
-  <div class="gridwrap">
-    <table>
-      <thead>
-        <tr>
-          <th (click)="setSort('code')">Code</th>
-          <th (click)="setSort('name')">Company Name</th>
-          <th (click)="setSort('type')">Creditor Type</th>
-          <th>Phone 1</th>
-          <th>Group Company</th>
-          <th>Active</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr
-          *ngFor="let r of filteredRows(); let i = index"
-          (click)="select(r)"
-          [class.selected]="selected === r"
-        >
-          <td>{{ r.code }}</td>
-          <td>{{ r.name }}</td>
-          <td>{{ r.type }}</td>
-          <td>
-            {{ r.phone }}
-          </td>
-          <td>
-            <input type="checkbox" [checked]="r.groupCompany" disabled />
-          </td>
-          <td>
-            <input type="checkbox" [checked]="r.active" disabled />
-          </td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
+    <div class="ac-card ac-card-no-padding">
+      <div class="ac-tablewrap">
+        <table class="ac-table">
+          <thead>
+            <tr>
+              <th class="ac-text-left" (click)="setSort('debtorAccount')">Code</th>
+              <th class="ac-text-left">Customer Name</th>
+              <th class="ac-text-left">Company/SSM ID</th>
+              <th class="ac-text-left">Phone</th>
+              <th class="ac-text-left">Customer's TIN</th>
+              <th class="ac-text-left">Active</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let r of filteredRows()" (click)="select(r)" [class.ac-row-selected]="selected === r">
+              <td>{{ r.debtorAccount }}</td>
+              <td>{{ r.companyName }}</td>
+              <td>{{ r.type }}</td>
+              <td>{{ r.phone }}</td>
+              <td>{{ r.customerTin }}</td>
+              <td><input type="checkbox" [checked]="r.active" disabled /></td>
+            </tr>
 
-  <!-- Pager -->
-  <div class="pager">
-    <div class="nav">
-      <button class="pg" (click)="first()">&laquo;</button>
-      <button class="pg" (click)="prev()">&lsaquo;</button>
-      <span class="pginfo">Page {{ page }} / {{ totalPages }}</span>
-      <button class="pg" (click)="next()">&rsaquo;</button>
-      <button class="pg" (click)="last()">&raquo;</button>
-    </div>
-  </div>
-
-  <!-- =============== CREATE / EDIT / VIEW Creditor ============== -->
-  <div class="dialog" *ngIf="showForm">
-    <div class="dialog-panel" style="width: min(1100px, 96vw)">
-      <div class="dialog-title">
-        {{
-          formMode === "new"
-            ? "Create Creditor"
-            : formMode === "edit"
-            ? "Edit Creditor"
-            : "View Creditor"
-        }}
-        <button class="x" (click)="showForm = false">✕</button>
+            <tr *ngIf="!filteredRows().length">
+              <td colspan="6" class="ac-text-center ac-text-muted">No data</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+          <div class="account-type-footer">
+      <div class="account-type-rec">
+        Total Records: 3
       </div>
 
-      <form [formGroup]="creditorForm" class="dialog-body">
-        <div class="gbox">
-          <div class="gbox-title">Profile</div>
-          <div class="gbox-body grid3">
-            <label
-              >Control Account
-              <select formControlName="controlAccount">
-                <option *ngFor="let c of controlAccounts" [ngValue]="c.code">
-                  {{ c.code }}
-                </option>
-              </select>
-            </label>
+      <div class="account-type-pager">
+        <button
+          class="ac-btn ac-btn-ghost account-type-pg-btn"
+          [disabled]="page === 1"
+          (click)="page = 1"
+        >
+          &laquo;
+        </button>
+        <button
+          class="ac-btn ac-btn-ghost account-type-pg-btn"
+          [disabled]="page === 1"
+          (click)="page = page - 1"
+        >
+          &lsaquo;
+        </button>
 
-            <label>
-               Creditor Type
-                <select formControlName="type" [disabled]="formMode === 'view'">
-                  <option *ngFor="let t of creditorTypes" [ngValue]="t.code">
-                    {{ t.name }}
-                  </option>
-                </select>
-            </label>
+        <span class="account-type-pg-label">
+          Page {{ page }} / 1
+        </span>
 
-            <label
-              >Company Name
-              <input formControlName="name" [readonly]="formMode === 'view'" />
-            </label>
-
-            <label
-              >Registration No.
-              <input
-                formControlName="registrationNo"
-                [readonly]="formMode === 'view'"
-              />
-            </label>
-
-            <label
-              > Creditor Account
-              <div style="display: flex; gap: 6px;width: 100%;">
-                <input   style="width: 100%;" formControlName="code" [readonly]="formMode !== 'new'" />
-                <button
-                  class="btn primary"
-                  type="button"
-                  (click)="autoGenerateCode()"
-                  [disabled]="formMode !== 'new'"
-                >
-                  ＋
-                </button>
-              </div>
-            </label>
-              <label
-                >Currency
-                <select formControlName="currency">
-                  <option *ngFor="let c of currencies" [ngValue]="c.code">
-                    {{ c.code }}
-                  </option>
-                </select>
-              </label>
-            <div class="checks-inline">
-              <label class="chk">
-                <input
-                  type="checkbox"
-                  formControlName="groupCompany"
-                  [disabled]="formMode === 'view'"
-                />
-                <span>Group Company</span>
-              </label>
-
-              <label class="chk">
-                <input type="checkbox" formControlName="active" />
-                <span>Active</span>
-              </label>
-            </div>
-          </div>
-        </div>
-        <!-- GENERAL + OTHERS (merged; no tabs) -->
-        <div class="form-section">
-          <div class="gbox">
-            <div class="gbox-title">Address & Contact</div>
-            <!-- General -->
-            <div class="gbox-body grid3">
-              <label class="wide"
-                >Billing Address
-                <textarea
-                  rows="1"
-                  formControlName="billAddress"
-                  [readonly]="formMode === 'view'"
-                ></textarea>
-              </label>
-
-              <label
-                >Phone<input
-                  formControlName="phone"
-                  [readonly]="formMode === 'view'"
-              /></label>
-              <label
-                >Fax<input
-                  formControlName="fax"
-                  [readonly]="formMode === 'view'"
-              /></label>
-              <label
-                >Post Code<input
-                  formControlName="postCode"
-                  [readonly]="formMode === 'view'"
-              /></label>
-              <label
-                >Email Address<input
-                  formControlName="email"
-                  [readonly]="formMode === 'view'"
-              /></label>
-
-              <label
-                >Website<input
-                  formControlName="website"
-                  [readonly]="formMode === 'view'"
-              /></label>
-
-            </div>
-          </div>
-          <!-- Statement / Aging / Credit -->
-          <div class="gbox">
-            <div class="gbox-title">Statement / Aging / Credit</div>
-            <div class="gbox-body grid3 three-cols">
-              <div class="col">
-                <div class="lbl">Statement Type</div>
-                <div class="radio-box">
-                  <div class="radio-grid">
-                    <label class="radio-inline"
-                      ><input
-                        type="radio"
-                        formControlName="statementType"
-                        value="OpenItem"
-                      /><span>Open Item</span></label
-                    >
-                    <label class="radio-inline"
-                      ><input
-                        type="radio"
-                        formControlName="statementType"
-                        value="BalanceForward"
-                      /><span>Balance Forward</span></label
-                    >
-                    <label class="radio-inline"
-                      ><input
-                        type="radio"
-                        formControlName="statementType"
-                        value="NoStatement"
-                      /><span>No Statement</span></label
-                    >
-                  </div>
-                </div>
-              </div>
-
-              <div class="col">
-                <div class="lbl">Aging On</div>
-                <div class="radio-box">
-                  <div class="radio-grid">
-                    <label class="radio-inline"
-                      ><input
-                        type="radio"
-                        formControlName="agingOn"
-                        value="InvoiceDate"
-                      /><span>Invoice Date</span></label
-                    >
-                    <label class="radio-inline"
-                      ><input
-                        type="radio"
-                        formControlName="agingOn"
-                        value="DueDate"
-                      /><span>Due Date</span></label
-                    >
-                  </div>
-                </div>
-              </div>
-
-              <div class="col">
-                <label
-                  >Credit Term
-                  <select formControlName="creditTerm">
-                    <option *ngFor="let ct of creditTerms" [ngValue]="ct.code">
-                      {{ ct.name }}
-                    </option>
-                  </select>
-                </label>
-                <button
-                  class="btn primary"
-                  type="button"
-                  (click)="openCreditControl()"
-                >
-                  Credit Control
-                </button>
-              </div>
-            </div>
-          </div>
-          <div class="gbox">
-            <div class="gbox-title">Other</div>
-            <div class="gbox-body">
-              <div class="grid3">
-                <label
-                  >Sales Tax Exemption No.<input
-                    formControlName="taxExemptionNo"
-                    [readonly]="formMode === 'view'"
-                /></label>
-                <label
-                  >Expired Date
-                  <input
-                    class="inp"
-                    type="date"
-                    formControlName="taxExemptionExpiry"
-                    [disabled]="formMode === 'view'"
-                  />
-                </label>
-                <label
-                  >Discount Percent
-                  <input
-                    type="number"
-                    step="0.01"
-                    formControlName="discountPercent"
-                    [readonly]="formMode === 'view'"
-                  />
-                </label>
-                <label
-                  >GST
-                  <select formControlName="gstType">
-                    <option *ngFor="let t of taxTypes" [ngValue]="t.code">
-                      {{ t.name }}
-                    </option>
-                  </select>
-                </label>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div class="dialog-actions">
-          <button type="button" class="btn cancel" (click)="showForm = false">
-            Cancel
-          </button>
-          <button
-            *ngIf="formMode !== 'view'"
-            type="button"
-            class="btn primary"
-            (click)="saveDebtor()"
-          >
-            Save
-          </button>
-        </div>
-      </form>
-    </div>
-  </div>
-
-  <!-- =================== CREDIT CONTROL POPUP =================== -->
-  <div class="dialog" *ngIf="showCredit">
-    <div
-      class="dialog-panel-small"
-      role="dialog"
-      aria-modal="true"
-      style="width: min(720px, 96vw)"
-    >
-      <div class="dialog-title">
-        Creditor Credit Control
-        <button class="x" (click)="showCredit = false" aria-label="Close">
-          ×
+        <button
+          class="ac-btn ac-btn-ghost account-type-pg-btn"
+          [disabled]="page === 1"
+          (click)="page = page + 1"
+        >
+          &rsaquo;
+        </button>
+        <button
+          class="ac-btn ac-btn-ghost account-type-pg-btn"
+          [disabled]="page === 1"
+          (click)="page = 1"
+        >
+          &raquo;
         </button>
       </div>
+    </div>
+    </div>
+  </ng-container>
+  <!-- ================= FORM MODE ================= -->
+  <ng-container *ngIf="showForm">
+    <div class="debtor-form">
+      <!-- Header -->
+      <div class="form-header">
+        <div class="popup-title">
+          {{
+          formMode === 'new'
+          ? 'New Creditor'
+          : formMode === 'edit'
+          ? 'Edit Creditor'
+          : 'View Creditor'
+          }}
+        </div>
+        <p>Maintain creditor profile, contact, and business information.</p>
+      </div>
 
-      <div class="dialog-body">
-        <!-- HÀNG 1: 3 Ô Credit Limit / Overdue Limit / Scope -->
-        <form [formGroup]="creditForm" class="cc-grid">
-          <label class="cell">
-            Credit Limit
-            <input
-              type="text"
-              appAmount
-              [decimals]="2"
-              formControlName="creditLimit"
-            />
-          </label>
+      <!-- BODY: side tabs + content -->
+      <form [formGroup]="debtorForm" class="form-body" #formScroll>
+        <div class="debtor-layout">
+          <!-- ==== SIDE TABS ==== -->
+          <nav class="debtor-tabs">
+            <button type="button" class="debtor-tab" [class.active]="activeSection === 'contact'"
+              [class.has-error]="sectionHasError('contact')" (click)="scrollToSection('contact')">
+              <span class="debtor-tab-label">Contact details</span>
+              <span class="debtor-tab-error" *ngIf="sectionHasError('contact')">!</span>
+            </button>
 
-          <label class="cell">
-            Credit Term's Overdue Limit
-            <input
-              type="text"
-              appAmount
-              [decimals]="2"
-              formControlName="overdueLimit"
-            />
-          </label>
+            <button type="button" class="debtor-tab" [class.active]="activeSection === 'primary'"
+              [class.has-error]="sectionHasError('primary')" (click)="scrollToSection('primary')">
+              <span class="debtor-tab-label">Addresses</span>
+              <span class="debtor-tab-error" *ngIf="sectionHasError('primary')">!</span>
+            </button>
 
-          <label class="cell">
-            Credit Control
-            <select formControlName="scope">
-              <option value="ALL">All Documents</option>
-              <option value="BYDOC">By Document</option>
-            </select>
-          </label>
-        </form>
+            <button type="button" class="debtor-tab" [class.has-error]="sectionHasError('additional')"
+              [class.active]="activeSection === 'additional'" (click)="scrollToSection('additional')">
+              <span class="debtor-tab-label">Others contact</span>
+              <span class="debtor-tab-error" *ngIf="sectionHasError('additional')">!</span>
+            </button>
 
-        <!-- HÀNG 2: 3 RADIO – MỖI CÁI 1 DÒNG -->
-        <div class="cc-modes" [formGroup]="creditForm">
-          <!-- 1) All Disabled -->
-          <label class="radio-inline">
-            <input type="radio" formControlName="mode" value="DISABLED" />
-            <span>All Disabled</span>
-          </label>
+            <button type="button" class="debtor-tab" [class.has-error]="sectionHasError('business')"
+              [class.active]="activeSection === 'business'" (click)="scrollToSection('business')">
+              <span class="debtor-tab-label">Credit Term Control</span>
+              <span class="debtor-tab-error" *ngIf="sectionHasError('business')">!</span>
+            </button>
+          </nav>
 
-          <!-- 2) Controlled by credit term -->
-          <div
-            class="mode-row"
-            [class.dimmed]="creditForm.value.mode !== 'BY_TERM'"
-          >
-            <label class="radio-inline">
-              <input type="radio" formControlName="mode" value="BY_TERM" />
-              <span>Controlled by credit term</span>
-            </label>
 
-            <div class="mode-body grid2">
-              <label>
-                If exceed credit limit
-                <select formControlName="exceedCreditAction">
-                  <option value="ALLOW">No Block</option>
-                  <option value="BLOCK">Block</option>
-                  <option value="NEEDPWD">Need Password</option>
-                </select>
-              </label>
-              <label>
-                If exceed overdue limit
-                <select formControlName="exceedOverdueAction">
-                  <option value="ALLOW">No Block</option>
-                  <option value="BLOCK">Block</option>
-                  <option value="NEEDPWD">Need Password</option>
-                </select>
-              </label>
-            </div>
-          </div>
+          <!-- ==== MAIN CONTENT ==== -->
+          <div class="debtor-main">
+            <div class="debtor-main-inner">
+              <!-- TAB: CONTACT DETAILS -->
+              <section #contactSection>
+                <h3>Contact details</h3>
+                <div class="form-grid">
+                  <label [class.field-error]="isFieldInvalid('code')">
+                    <span>
+                      Creditor Code <span class="required-tag">(required)</span>
+                    </span>
+                    <input formControlName="code" placeholder="300-xxx" />
 
-          <!-- 3) Suspend -->
-          <div
-            class="mode-row"
-            [class.dimmed]="creditForm.value.mode !== 'SUSPEND'"
-          >
-            <label class="radio-inline">
-              <input type="radio" formControlName="mode" value="SUSPEND" />
-              <span>Suspend</span>
-            </label>
+                    <div class="field-error-row">
+                      <span class="field-error-icon" *ngIf="isFieldInvalid('code')">!</span>
+                      <span *ngIf="isFieldInvalid('code')">Enter a creditor code</span>
+                    </div>
+                  </label>
 
-            <div class="mode-body">
-              <label
-                >Suspend Reason
-                <input formControlName="suspendReason" />
-              </label>
+                  <label [class.field-error]="isFieldInvalid('name')">
+                    <span>
+                      Customer Name <span class="required-tag">(required)</span>
+                    </span>
+                    <input placeholder="e.g. A business or person's name" formControlName="name" />
+                    <div class="field-error-row">
+                      <span class="field-error-icon" *ngIf="isFieldInvalid('name')">!</span>
+                      <span *ngIf="isFieldInvalid('name')">Enter a customer name</span>
+                    </div>
+                  </label>
+
+                  <label>
+                    <span>Company/SSM ID</span>
+                    <input formControlName="registrationNo" />
+                  </label>
+
+                  <label [class.field-error]="isFieldInvalid('individualId')">
+                    <span>
+                      Individual ID / Passport No <span class="required-tag">(required)</span>
+                    </span>
+                    <input formControlName="individualId" />
+                    <div class="field-error-row">
+                      <span class="field-error-icon" *ngIf="isFieldInvalid('individualId')">!</span>
+                      <span *ngIf="isFieldInvalid('individualId')">Enter an individual ID / passport no</span>
+                    </div>
+                  </label>
+
+                  <label class="field-with-action" [class.field-error]="isFieldInvalid('tinNo')">
+                    <div class="field-label-row">
+                      <span class="field-label">
+                        Customer’s TIN <span class="required-tag">(required)</span>
+                      </span>
+                      <button type="button" class="link" (click)="openTinLookup()">
+                        Search TIN
+                      </button>
+                    </div>
+
+                    <input formControlName="tinNo" placeholder="e.g. 123456789" />
+                    <div class="field-error-row">
+                      <span class="field-error-icon" *ngIf="isFieldInvalid('tinNo')">!</span>
+                      <span *ngIf="isFieldInvalid('tinNo')">Enter a customer TIN</span>
+                    </div>
+                  </label>
+
+                  <label>
+                    <span>Customer’s SST Registration No.</span>
+                    <input formControlName="sstRegNo" />
+                  </label>
+
+                  <!-- CURRENCY DROPDOWN XERO-STYLE -->
+                  <label class="currency-field">
+                    <span>Currency</span>
+
+                    <!-- nút mở dropdown -->
+                    <div class="currency-trigger" (click)="toggleCurrencyPanel()">
+                      <div class="currency-trigger-main">
+                        <span class="currency-trigger-label">
+                          <!-- tên + (default) -->
+                          <ng-container *ngIf="selectedCurrency; else noCurrency">
+                            {{ selectedCurrency?.name || selectedCurrency?.code }}
+                            <span *ngIf="selectedCurrency?.isDefault">
+                              (default)
+                            </span>
+                          </ng-container>
+
+                          <ng-template #noCurrency>
+                            Select currency
+                          </ng-template>
+                        </span>
+
+                        <span class="currency-trigger-code" *ngIf="selectedCurrency?.code">
+                          {{ selectedCurrency?.code }}
+                        </span>
+                      </div>
+
+                      <span class="currency-arrow">▾</span>
+                    </div>
+
+                    <!-- PANEL DROPDOWN -->
+                    <div class="currency-panel" *ngIf="showCurrencyPanel" (click)="$event.stopPropagation()">
+                      <!-- SEARCH BOX -->
+                      <div class="currency-search-row">
+                        <span class="currency-search-icon">🔍</span>
+                        <input type="text" [(ngModel)]="currencySearch" (input)="filterCurrencies()"
+                          placeholder="Search currency" />
+                      </div>
+
+                      <!-- MY CURRENCIES -->
+                      <div class="currency-group" *ngIf="myCurrencies?.length">
+                        <div class="currency-group-title">My currencies</div>
+
+                        <button type="button" class="currency-row" *ngFor="let c of myCurrencies"
+                          (click)="selectCurrency(c)">
+                          <span class="currency-name">
+                            {{ c.name || c.code }}
+                            <span *ngIf="c.isDefault">(default)</span>
+                          </span>
+                          <span class="currency-code">{{ c.code }}</span>
+                        </button>
+                      </div>
+
+                      <!-- ALL CURRENCIES -->
+                      <div class="currency-group">
+                        <div class="currency-group-title">All currencies</div>
+
+                        <button type="button" class="currency-row" *ngFor="let c of filteredCurrencies"
+                          (click)="selectCurrency(c)">
+                          <span class="currency-name">{{ c.name || c.code }}</span>
+                          <span class="currency-code">{{ c.code }}</span>
+                        </button>
+                      </div>
+                    </div>
+                  </label>
+
+                </div>
+              </section>
+
+              <!-- TAB: PRIMARY PERSON -->
+              <section #primarySection>
+                <h3>Addresses</h3>
+                <div class="form-grid">
+                  <label class="full" [class.field-error]="isFieldInvalid('billAddress')">
+                    <span>
+                      Billing Address <span class="required-tag">(required)</span>
+                    </span>
+                    <textarea formControlName="billAddress"></textarea>
+                    <div class="field-error-row">
+                      <span class="field-error-icon" *ngIf="isFieldInvalid('billAddress')">!</span>
+                      <span *ngIf="isFieldInvalid('billAddress')">Enter a billing address</span>
+                    </div>
+
+                  </label>
+                  <label [class.field-error]="isFieldInvalid('phone')">
+                    <span>
+                      Phone <span class="required-tag">(required)</span>
+                    </span>
+                    <input formControlName="phone" />
+                    <div class="field-error-row">
+                      <span class="field-error-icon" *ngIf="isFieldInvalid('phone')">!</span>
+                      <span *ngIf="isFieldInvalid('phone')">Enter a phone number</span>
+                    </div>
+                  </label>
+
+                  <label [class.field-error]="isFieldInvalid('fax')">
+                    <span>
+                      Fax <span class="required-tag">(required)</span>
+                    </span>
+                    <input formControlName="fax" />
+                    <div class="field-error-row">
+                      <span class="field-error-icon" *ngIf="isFieldInvalid('fax')">!</span>
+                      <span *ngIf="isFieldInvalid('fax')">Enter a fax number</span>
+                    </div>
+
+                  </label>
+
+                  <!-- Post Code -->
+                  <label [class.field-error]="isFieldInvalid('postCode')">
+                    <span>
+                      Post Code <span class="required-tag">(required)</span>
+                    </span>
+                    <input formControlName="postCode" />
+                    <div class="field-error-row">
+                      <span class="field-error-icon" *ngIf="isFieldInvalid('postCode')">!</span>
+                      <span *ngIf="isFieldInvalid('postCode')">Enter a post code</span>
+                    </div>
+                  </label>
+                </div>
+              </section>
+
+              <!-- TAB: ADDITIONAL PEOPLE -->
+              <section #additionalSection>
+                <h3>Others contact</h3>
+                <div class="form-grid">
+                  <label class="field-with-action">
+                    <div class="field-label-row">
+                      <span class="field-label">Delivery Address</span>
+                      <button type="button" class="link" (click)="copyBillingToDelivery()">
+                        Copy
+                      </button>
+                    </div>
+
+                    <textarea formControlName="deliveryAddress"></textarea>
+                  </label>
+
+                  <label>
+                    <span>Post Code</span>
+                    <input formControlName="deliveryPostCode" />
+                  </label>
+
+                  <label class="field-with-leading-icon">
+                    <span>Email</span>
+                    <div class="icon-input-row">
+                      <span class="icon-box">
+                        ✉
+                      </span>
+                      <input type="email" formControlName="email" class="icon-input-control"
+                        placeholder="name@email.com" />
+                    </div>
+                  </label>
+
+                  <label>
+                    <span>Website</span>
+                    <input formControlName="website" />
+                  </label>
+                </div>
+              </section>
+
+              <!-- TAB: BUSINESS INFORMATION -->
+              <!-- TAB: BUSINESS INFORMATION -->
+              <section #businessSection>
+                <h3>Credit Term Control</h3>
+                <div class="form-grid">
+                  <!-- Credit Term -->
+                  <label class="field-with-action">
+                    <div class="field-label-row">
+                      <span class="field-label">Credit Term</span>
+                    </div>
+
+                    <select formControlName="creditTerm">
+                      <option *ngFor="let ct of creditTerms" [ngValue]="ct.code">
+                        {{ ct.name }}
+                      </option>
+                    </select>
+                  </label>
+
+                  <!-- Actual Term: chỉ hiện ở Edit -->
+                  <label *ngIf="formMode === 'edit'">
+                    <span>Actual Term</span>
+                    <input type="number" formControlName="actualTerm" min="0" step="1" />
+                  </label>
+
+                  <!-- Credit limit amount -->
+                  <label>
+                    <span>Credit limit amount</span>
+                    <input type="number" formControlName="creditLimitAmount" min="0" step="0.01" />
+                  </label>
+
+                  <!-- Checkbox: Block new invoices... -->
+                  <div class="credit-limit-row" >
+                    <label class="ac-checkbox-row credit-limit-block" >
+                      <input type="checkbox" formControlName="blockInvoicesWhenLimitReached"
+                       />
+                      <span>Block new invoices when credit limit is reached</span>
+                    </label>
+                  </div>
+
+                  <!-- Sales Tax Exemption No -->
+                  <label>
+                    <span>Sales Tax Exemption No.</span>
+                    <input formControlName="taxExemptionNo" />
+                  </label>
+
+                  <!-- Expired Date -->
+                  <label>
+                    <span>Expired Date</span>
+                    <input type="date" formControlName="taxExemptionExpiry" />
+                  </label>
+                </div>
+              </section>
+
             </div>
           </div>
         </div>
+      </form>
+
+      <!-- FOOTER STICKY -->
+      <div class="form-footer">
+        <button class="btn cancel" type="button" (click)="closeForm()">
+          Cancel
+        </button>
+        <button class="btn primary" type="button" (click)="saveDebtor()" [disabled]="debtorForm.invalid">
+                      {{
+            formMode === 'new'
+            ? 'Create'
+            : 'Save'
+            }}
+        </button>
       </div>
-
-      <div class="dialog-actions">
-        <button class="btn cancel" (click)="showCredit = false">Cancel</button>
-        <button class="btn primary" (click)="saveCreditControl()">OK</button>
-      </div>
     </div>
-  </div>
-</div>
-<!-- Confirm delete contact -->
-<div class="dialog" *ngIf="showContactDeleteConfirm">
-  <div class="dialog-panel-small" role="dialog" aria-modal="true">
-    <div class="dialog-title">
-      Delete Contact
-      <button
-        class="x"
-        (click)="closeContactDeleteConfirm()"
-        aria-label="Close"
-      >
-        ×
-      </button>
-    </div>
-
-    <div class="dialog-body">
-      <p>
-        Are you sure you want to delete
-        <b>{{ selectedContact?.name || "this contact" }}</b
-        >?
-      </p>
-    </div>
-
-    <div class="dialog-actions">
-      <button class="btn cancel" (click)="closeContactDeleteConfirm()">Cancel</button>
-      <button class="btn danger" (click)="confirmDeleteContact()">
-        Delete
-      </button>
-    </div>
-  </div>
-</div>
-
-<!-- Success popup -->
+  </ng-container>
   <div class="ac-dialog-backdrop" *ngIf="showSuccess">
     <div
       class="ac-card-no-padding ac-dialog-panel-sm ac-dialog-success"
@@ -510,87 +472,11 @@
       </div>
     </div>
   </div>
-<!-- ===================== BRANCH EDITOR POPUP ===================== -->
-<div class="dialog" *ngIf="showBranchEditor">
-  <div class="dialog-panel-small" style="width: min(720px, 96vw)">
-    <div class="dialog-title">
-      {{ branchEditIndex === -1 ? "Add Branch" : "Edit Branch" }}
-      <button class="x" (click)="closeBranchEditor()">×</button>
-    </div>
-
-    <form class="dialog-body" [formGroup]="branchForm">
-      <div class="grid2">
-        <label>Branch Code<input formControlName="code" /></label>
-        <label>Branch Name<input formControlName="name" /></label>
-      </div>
-
-      <label class="wide"
-        >Address
-        <textarea rows="3" formControlName="address"></textarea>
-      </label>
-
-      <div class="grid3">
-        <label>Post Code<input formControlName="postCode" /></label>
-        <label>Attention<input formControlName="attention" /></label>
-        <label>Email Address<input formControlName="email" /></label>
-
-        <label>Phone 1<input formControlName="phone1" /></label>
-        <label>Phone 2<input formControlName="phone2" /></label>
-        <label>Fax 1<input formControlName="fax1" /></label>
-        <label>Fax 2<input formControlName="fax2" /></label>
-        <label
-          >Area
-          <select formControlName="area">
-            <option *ngFor="let a of areas" [ngValue]="a.code">
-              {{ a.name }}
-            </option>
-          </select>
-        </label>
-      </div>
-    </form>
-
-    <div class="dialog-actions">
-      <button class="btn cancel" (click)="closeBranchEditor()">Cancel</button>
-      <button
-        class="btn primary"
-        (click)="saveBranchEditor()"
-        [disabled]="!branchForm.valid"
-      >
-        OK
-      </button>
-    </div>
-  </div>
-</div>
-
-<!-- ===================== CONFIRM DELETE BRANCH ===================== -->
-<div class="dialog" *ngIf="showBranchDeleteConfirm">
-  <div class="dialog-panel-small" role="dialog" aria-modal="true">
-    <div class="dialog-title">
-      Delete Branch
-      <button class="x" (click)="closeBranchDeleteConfirm()" aria-label="Close">
-        ×
-      </button>
-    </div>
-
-    <div class="dialog-body">
-      <p>
-        Are you sure you want to delete
-        <b>{{ selectedBranch?.code || "this branch" }}</b
-        >?
-      </p>
-    </div>
-
-    <div class="dialog-actions">
-      <button class="btn cancel" (click)="closeBranchDeleteConfirm()">Cancel</button>
-      <button class="btn danger" (click)="confirmDeleteBranch()">Delete</button>
-    </div>
-  </div>
-</div>
-<div class="dialog" *ngIf="showDeleteDebtorConfirm">
-  <div class="dialog-panel-small" role="dialog" aria-modal="true">
-    <div class="dialog-title">
+<div class="ac-dialog-backdrop" *ngIf="showDeleteDebtorConfirm">
+  <div class="ac-card-no-padding ac-dialog-panel-sm" role="dialog" aria-modal="true">
+    <div class="ac-dialog-header">
       Delete Creditor &nbsp;<button
-        class="x"
+        class="ac-dialog-close"
         (click)="closeDeleteDebtorConfirm()"
         aria-label="Close"
       >
@@ -598,17 +484,20 @@
       </button>
     </div>
 
-    <div class="dialog-body">
+    <div class="ac-dialog-body">
       <p>
         Are you sure you want to delete
-        <b>{{ selected?.code }}</b>
+        <b>{{ selected?.debtorAccount }}</b>
         ?
       </p>
     </div>
 
-    <div class="dialog-actions">
-      <button class="btn cancel" (click)="closeDeleteDebtorConfirm()">Cancel</button>
-      <button class="btn danger" (click)="deleteDebtor()">Delete</button>
+    <div class="ac-dialog-footer">
+      <button class="ac-btn ac-btn-ghost" (click)="closeDeleteDebtorConfirm()">
+        Cancel
+      </button>
+      <button class="ac-btn ac-btn-danger" (click)="deleteDebtor()">Delete</button>
     </div>
   </div>
+</div>
 </div>

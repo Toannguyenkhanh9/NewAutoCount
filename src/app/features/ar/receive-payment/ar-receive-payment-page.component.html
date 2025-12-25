@@ -478,7 +478,8 @@
             Cancel
           </button>
 
-          <ng-container *ngIf="hasAnyChequeMethod">
+          <!-- <ng-container *ngIf="hasAnyChequeMethod"> -->
+            <ng-container>
             <button type="button" class="ac-btn ac-btn-primary" (click)="askSave()" [disabled]="
                 unappliedAmount !== 0 ||
                 rpForm.invalid ||

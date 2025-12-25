@@ -3,7 +3,6 @@ import {
   OnInit,
   ElementRef,
   ViewChild,
-  AfterViewInit,
   ChangeDetectorRef,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
@@ -15,21 +14,10 @@ import {
 } from '@angular/forms';
 import { FormsModule } from '@angular/forms';
 import { AmountInputDirective } from '../../../_share/directives';
+import { DebtorRow } from '../../../_share/models/ar';
 
 type FormMode = 'new' | 'edit' | 'view';
-
-interface CreditorRow {
-  code: string;
-  name: string;
-  type: string;
-  phone: string;
-  currency: string;
-  creditTerm: string;
-  creditLimit: number;
-  active: boolean;
-  groupCompany: boolean;
-  remark?: string;
-}
+type DebtorSection = 'contact' | 'primary' | 'additional' | 'business';
 
 interface PriceRow {
   date: string;
@@ -39,18 +27,13 @@ interface PriceRow {
   price: number;
   docNo: string;
 }
-export interface CreditorContact {
-  id?: string;
+
+interface DebtorCurrency {
+  code: string;
   name: string;
-  department?: string;
-  title?: string;
-  directPhone?: string;
-  directFax?: string;
-  mobile?: string;
-  email?: string;
-  im?: string;
-  include?: boolean;
+  isDefault?: boolean;
 }
+
 export interface Branch {
   code: string;
   name: string;
@@ -74,795 +57,1060 @@ export interface Branch {
     styleUrls: ['./creditor-maintenance.component.scss'],
 })
 export class CreditorMaintenanceComponent {
-   @ViewChild('generalPane') generalPane?: ElementRef<HTMLDivElement>;
-    paneMinHeight = 0;
-    q = '';
-    private computePaneMinHeight() {
-      const el = this.generalPane?.nativeElement;
-      if (!el) return;
-      // scrollHeight cho chiều cao thực nội dung
-      const h = el.scrollHeight;
-      // Giới hạn theo viewport để không vượt quá modal
-      const max = Math.floor(window.innerHeight * 0.62); // tỉ lệ phần body trong panel
-      this.paneMinHeight = Math.min(h, max);
-      this.cdr.detectChanges();
-    }
-    // ===== Grid mock =====
-    rows: CreditorRow[] = [
-      {
-        code: '400-C001',
-        name: 'CELCOM SDN BHD',
-        type: 'MANUF',
-        phone: '012-3456789',
-        currency: 'MYR',
-        creditTerm: '30D',
-        creditLimit: 10000,
-        active: true,
-        groupCompany:true,
-      },
-      {
-        code: '400-D001',
-        name: 'DIGI SDN BHD',
-        type: 'MANUF',
-        phone: '03-2222222',
-        currency: 'USD',
-        creditTerm: '30D',
-        creditLimit: 0,
-        active: true,
-        groupCompany : true,
-      },
-      {
-        code: '400-M001',
-        name: 'MAXIS SDN BHD',
-        type: 'MANUF',
-        phone: '03-2222222',
-        currency: 'USD',
-        creditTerm: '30D',
-        creditLimit: 0,
-        active: true,
-        groupCompany : true,
-      },
-      {
-        code: '400-B001',
-        name: 'BEST PHONE SDN BHD',
-        type: 'IMPORT',
-        phone: '03-2222222',
-        currency: 'USD',
-        creditTerm: '30D',
-        creditLimit: 0,
-        active: true,
-        groupCompany : true,
-      },
-    ];
-      filteredRows(): CreditorRow[] {
-        const k = (this.q || '').trim().toLowerCase();
-        if (!k) return this.rows;
-        return this.rows.filter(
-          (r) =>
-            r.code.toLowerCase().includes(k) ||
-            r.name.toLowerCase().includes(k) ||
-            r.type.toLowerCase().includes(k) ||
-            r.phone.toLowerCase().includes(k)
-        );
-      }
-    selected: CreditorRow | null = null;
-    showDeleteDebtorConfirm = false;
-    sortKey: keyof CreditorRow = 'code';
-    sortAsc = true;
+    // ====== Currency dropdown (Xero style) ======
+     showCurrencyPanel = false;
+     currencySearch = '';
 
-    page = 1;
-    pageSize = 10;
-    get filtered(): CreditorRow[] {
-      const out = [...this.rows].sort((a, b) => {
-        const va = String(a[this.sortKey] ?? '').toUpperCase();
-        const vb = String(b[this.sortKey] ?? '').toUpperCase();
-        return this.sortAsc ? va.localeCompare(vb) : vb.localeCompare(va);
-      });
-      return out;
-    }
-    get totalPages() {
-      return Math.max(1, Math.ceil(this.filtered.length / this.pageSize));
-    }
-    get paged(): CreditorRow[] {
-      const s = (this.page - 1) * this.pageSize;
-      return this.filtered.slice(s, s + this.pageSize);
-    }
-    setSort(k: keyof CreditorRow) {
-      if (this.sortKey === k) this.sortAsc = !this.sortAsc;
-      else {
-        this.sortKey = k;
-        this.sortAsc = true;
-      }
-    }
-    select(r: CreditorRow) {
-      this.selected = r;
-    }
-    first() {
-      this.page = 1;
-    }
-    prev() {
-      this.page = Math.max(1, this.page - 1);
-    }
-    next() {
-      this.page = Math.min(this.totalPages, this.page + 1);
-    }
-    last() {
-      this.page = this.totalPages;
-    }
+     /** Toàn bộ currency dùng cho dropdown */
+     currencies: DebtorCurrency[] = [
+       { code: 'MYR', name: 'Malaysian Ringgit', isDefault: true },
+       { code: 'USD', name: 'US Dollar' },
+       { code: 'EUR', name: 'Euro' },
+       { code: 'SGD', name: 'Singapore Dollar' },
+       { code: 'THB', name: 'Thai Baht' },
+       { code: 'JPY', name: 'Japanese Yen' },
+       { code: 'CNY', name: 'Chinese Yuan' },
+       { code: 'AUD', name: 'Australian Dollar' },
+     ];
 
-    refresh() {
-      /* mock */
-    }
-    private initBranchForm() {
-      this.branchForm = this.fb.group({
-        code: ['', Validators.required],
-        name: ['', Validators.required],
-        address: [''],
-        postCode: [''],
-        attention: [''],
-        phone1: [''],
-        phone2: [''],
-        fax1: [''],
-        fax2: [''],
-        agent: [''],
-        area: [''],
-        email: ['', Validators.email],
-      });
-    }
+     /** “My currencies” – ví dụ: default + currency đang chọn */
+     myCurrencies: DebtorCurrency[] = [];
 
-    // ===== dialogs/toggles =====
-    showFind = false;
-    showPrice = false;
-    showPrint = false;
-    showPrintPreview = false;
-    showDetail = false;
+     /** All currencies sau khi filter bằng ô search */
+     filteredCurrencies: DebtorCurrency[] = [];
 
-    // ===== Forms (khởi tạo trong constructor) =====
-    findForm!: FormGroup;
-    printForm!: FormGroup;
-    creditorForm!: FormGroup;
-    creditForm!: FormGroup;
-    contactForm!: FormGroup;
-    branchForm!: FormGroup;
+     // ========== layout / scroll ==========
+     @ViewChild('generalPane') generalPane?: ElementRef<HTMLDivElement>;
+     paneMinHeight = 0;
 
-    // ===== Data sources (mock) =====
-    controlAccounts = [{ code: '400-0000', name: '' }];
-    creditorTypes = [
-      { code: 'MANUF', name: 'MANUF' },
-      { code: 'IMPORT', name: 'IMPORT' },
-      { code: 'WSALE', name: 'WHOLE SALE' },
-    ];
-    areas = [
-      { code: 'CENTRAL', name: 'Central' },
-      { code: 'SOUTH', name: 'South' },
-    ];
-    agents = [
-      { code: 'ALICE', name: 'Alice' },
-      { code: 'BOB', name: 'Bob' },
-    ];
-    currencies = [{ code: 'MYR' }, { code: 'USD' }];
-    creditTerms = [
-      { code: '30D', name: '30 Days' },
-      { code: 'COD', name: 'Cash on Delivery' },
-    ];
-    taxTypes = [
-      { code: 'GST6', name: 'GST 6%' },
-      { code: 'ZRL', name: 'Zero Rated' },
-    ];
-    priceCategories = [
-      { code: 'STD', name: 'Standard' },
-      { code: 'VIP', name: 'VIP' },
-    ];
-    accountGroups = [
-      { code: 'AG01', name: 'Retail' },
-      { code: 'AG02', name: 'Wholesale' },
-    ];
+     private computePaneMinHeight() {
+       const el = this.generalPane?.nativeElement;
+       if (!el) return;
 
-    // Contacts / Branches / Links
-    contacts: any[] = [];
-    selectedContact: any | null = null;
-    branches: any[] = [];
-    selectedBranch: any | null = null;
-    externalLinks: string[] = [];
-    selectedLink: string | null = null;
+       const h = el.scrollHeight;
+       const max = Math.floor(window.innerHeight * 0.62);
+       this.paneMinHeight = Math.min(h, max);
+       this.cdr.detectChanges();
+     }
 
-    // Price history rows (mock)
-    priceRows: PriceRow[] = [
-      {
-        date: '2025-01-10',
-        item: 'ITEM-001',
-        uom: 'PCS',
-        qty: 10,
-        price: 12.5,
-        docNo: 'INV-250110-001',
-      },
-      {
-        date: '2025-02-05',
-        item: 'ITEM-002',
-        uom: 'PCS',
-        qty: 5,
-        price: 99.0,
-        docNo: 'INV-250205-013',
-      },
-    ];
+     // ===== Grid mock =====
+     q = '';
 
-    // ===== form modal =====
-    showForm = false;
-    formMode: FormMode = 'new';
-    tab: 'general' | 'contact' | 'branches' | 'others' | 'note' = 'general';
-    ngOnInit() {
-      this.setupCreditControlReactions();
-      this.initBranchForm();
-    }
-    setupCreditControlReactions() {
-      const modeCtrl = this.creditForm.get('mode');
-      modeCtrl?.valueChanges.subscribe(() => this.applyCreditMode());
-      this.applyCreditMode(); // chạy lần đầu
-    }
+     rows: DebtorRow[] = [
+       {
+         debtorAccount: '400-N00A',
+         companyName: 'Normal Debtor A',
+         type: '123456789',
+         phone: '012-3456789',
+         currency: 'MYR',
+         creditTerm: '30D',
+         creditLimit: 10000,
+         active: true,
+         groupCompany: true,
+         registrationNo: '',
+         billAddress: '',
+         fax: '',
+         email: '',
+         website: '',
+         postCode: '',
+         deliveryAddress: '',
+         deliveryPostCode: '',
+         customerTin: 'A12563311',
+       },
+       {
+         debtorAccount: '400-GABB',
+         companyName: 'General Trading Berhad',
+         type: '12354863',
+         phone: '03-2222222',
+         currency: 'USD',
+         creditTerm: '30D',
+         creditLimit: 0,
+         active: true,
+         groupCompany: true,
+         registrationNo: '',
+         billAddress: '',
+         fax: '',
+         email: '',
+         website: '',
+         postCode: '',
+         deliveryAddress: '',
+         deliveryPostCode: '',
+         customerTin: 'B1234442',
+       },
+     ];
 
-    private applyCreditMode() {
-      const mode = this.creditForm.get('mode')?.value as
-        | 'DISABLED'
-        | 'BY_TERM'
-        | 'SUSPEND';
+     filteredRows(): DebtorRow[] {
+       const k = (this.q || '').trim().toLowerCase();
+       if (!k) return this.rows;
+       return this.rows.filter(
+         (r) =>
+           r.debtorAccount.toLowerCase().includes(k) ||
+           r.companyName.toLowerCase().includes(k) ||
+           r.type.toLowerCase().includes(k) ||
+           r.phone.toLowerCase().includes(k)
+       );
+     }
 
-      const ec = this.creditForm.get('exceedCreditAction')!;
-      const eo = this.creditForm.get('exceedOverdueAction')!;
-      const sr = this.creditForm.get('suspendReason')!;
+     selected: DebtorRow | null = null;
+     showDeleteDebtorConfirm = false;
+     sortKey: keyof DebtorRow = 'debtorAccount';
+     sortAsc = true;
 
-      if (mode === 'BY_TERM') {
-        ec.enable({ emitEvent: false });
-        eo.enable({ emitEvent: false });
-        sr.disable({ emitEvent: false });
-      } else if (mode === 'SUSPEND') {
-        ec.disable({ emitEvent: false });
-        eo.disable({ emitEvent: false });
-        sr.enable({ emitEvent: false });
-      } else {
-        // DISABLED
-        ec.disable({ emitEvent: false });
-        eo.disable({ emitEvent: false });
-        sr.disable({ emitEvent: false });
-      }
-    }
+     page = 1;
+     pageSize = 10;
 
-    constructor(private fb: FormBuilder, private cdr: ChangeDetectorRef) {
-      // Khởi tạo form TẠI ĐÂY để tránh lỗi "fb used before initialization"
-      this.findForm = this.fb.group({
-        keyword: [''],
-        area: [''],
-        agent: [''],
-        active: ['all'],
-      });
+     get filtered(): DebtorRow[] {
+       const out = [...this.rows].sort((a, b) => {
+         const va = String(a[this.sortKey] ?? '').toUpperCase();
+         const vb = String(b[this.sortKey] ?? '').toUpperCase();
+         return this.sortAsc ? va.localeCompare(vb) : vb.localeCompare(va);
+       });
+       return out;
+     }
 
-      this.printForm = this.fb.group({
-        active: ['all'],
-        area: [''],
-        agent: [''],
-        currency: [''],
-        sort: ['code'],
-      });
+     get totalPages() {
+       return Math.max(1, Math.ceil(this.filtered.length / this.pageSize));
+     }
 
-      this.creditorForm = this.fb.group({
-        controlAccount: ['400-0000'],
-        type: ['', Validators.required], // validate Debtor Type
-        groupCompany: [false],
-        name: ['', Validators.required], // Company Name
-        registrationNo: [''],
-        code: ['', Validators.required], // Debtor Account
-        active: [true],
+     get paged(): DebtorRow[] {
+       const s = (this.page - 1) * this.pageSize;
+       return this.filtered.slice(s, s + this.pageSize);
+     }
 
-        billAddress: [''],
-        phone: [''],
-        fax: [''],
-        postCode: [''],
-        deliveryAddress: [''],
-        deliveryPostCode: [''],
-        email: [''],
-        website: [''],
-        currency: [''],
+     setSort(k: keyof DebtorRow) {
+       if (this.sortKey === k) this.sortAsc = !this.sortAsc;
+       else {
+         this.sortKey = k;
+         this.sortAsc = true;
+       }
+     }
 
-        statementType: ['OpenItem'],
-        agingOn: ['InvoiceDate'],
-        creditTerm: [''],
+     select(r: DebtorRow) {
+       this.selected = r;
+     }
 
-        includeContactInfo: [false],
+     first() {
+       this.page = 1;
+     }
 
-        taxExemptionNo: [''],
-        taxExemptionExpiry: [null], // string | null, dạng 'YYYY-MM-DDTHH:mm'
-        discountPercent: [0],
-        gstType: [''],
-        priceCategory: [''],
-        accountGroup: [''],
-        note: [''],
-      });
-      this.contactForm = this.fb.group({
-        name: [''],
-        department: [''],
-        title: [''],
-        directPhone: [''],
-        directFax: [''],
-        mobile: [''],
-        email: [''],
-        im: [''],
-        include: [true],
-      });
+     prev() {
+       this.page = Math.max(1, this.page - 1);
+     }
 
-      this.creditForm = this.fb.group({
-        creditLimit: [0],
-        overdueLimit: [0],
-        scope: ['ALL'], // ALL | BYDOC
-        mode: ['DISABLED'], // DISABLED | BY_TERM | SUSPEND
-        exceedCreditAction: ['ALLOW'], // ALLOW | BLOCK | NEEDPWD
-        exceedOverdueAction: ['ALLOW'], // ALLOW | BLOCK | NEEDPWD
-        suspendReason: [''],
-      });
-    }
+     next() {
+       this.page = Math.min(this.totalPages, this.page + 1);
+     }
 
-    showContactEditor = false;
-    contactEditIndex = -1;
-    // Preview dòng “Contact info displayed in report”
-    contactInfoPreview = '';
+     last() {
+       this.page = this.totalPages;
+     }
 
-    openContactEditor(c?: CreditorContact) {
-      if (this.formMode === 'view') return;
-      if (c) {
-        this.contactEditIndex = this.contacts.indexOf(c);
-        this.contactForm.reset({
-          name: c.name ?? '',
-          department: c.department ?? '',
-          title: c.title ?? '',
-          directPhone: c.directPhone ?? '',
-          directFax: c.directFax ?? '',
-          mobile: c.mobile ?? '',
-          email: c.email ?? '',
-          im: c.im ?? '',
-          include: !!c.include,
-        });
-      } else {
-        this.contactEditIndex = -1;
-        this.contactForm.reset({
-          name: '',
-          department: '',
-          title: '',
-          directPhone: '',
-          directFax: '',
-          mobile: '',
-          email: '',
-          im: '',
-          include: true,
-        });
-      }
-      this.showContactEditor = true;
-    }
+     refresh() {
+       /* mock */
+     }
 
-    closeContactEditor() {
-      this.showContactEditor = false;
-    }
+     private initBranchForm() {
+       this.branchForm = this.fb.group({
+         code: ['', Validators.required],
+         name: ['', Validators.required],
+         address: [''],
+         postCode: [''],
+         attention: [''],
+         phone1: [''],
+         phone2: [''],
+         fax1: [''],
+         fax2: [''],
+         agent: [''],
+         area: [''],
+         email: ['', Validators.email],
+       });
+     }
 
-    saveContactEditor() {
-      const v = this.contactForm.value as CreditorContact;
+     // ===== dialogs/toggles =====
+     showFind = false;
+     showPrice = false;
+     showPrint = false;
+     showPrintPreview = false;
+     showDetail = false;
 
-      if (this.contactEditIndex === -1) {
-        this.contacts = [...this.contacts, { ...v }];
-      } else {
-        const arr = [...this.contacts];
-        arr[this.contactEditIndex] = { ...arr[this.contactEditIndex], ...v };
-        this.contacts = arr;
-      }
+     // ===== Forms =====
+     findForm!: FormGroup;
+     printForm!: FormGroup;
+     debtorForm!: FormGroup;
+     creditForm!: FormGroup;
+     contactForm!: FormGroup;
+     branchForm!: FormGroup;
 
-      this.showContactEditor = false;
-      this.refreshContactInfoPreview();
-      this.openSuccess('Contact saved successfully.');
-    }
+     // ===== Data sources (mock) =====
+     controlAccounts = [{ code: '300-0000', name: '' }];
+     debtorTypes = [
+       { code: 'LOCAL', name: 'LOCAL USER' },
+       { code: 'TRADER', name: 'TRADER AND REDISTRIBUTOR' },
+       { code: 'EXPORT', name: 'EXPORTER' },
+     ];
+     areas = [
+       { code: 'CENTRAL', name: 'Central' },
+       { code: 'SOUTH', name: 'South' },
+     ];
+     agents = [
+       { code: 'ALICE', name: 'Alice' },
+       { code: 'BOB', name: 'Bob' },
+     ];
 
-    private refreshContactInfoPreview() {
-      const parts: string[] = [];
-      const included = this.contacts.filter((c) => c.include);
-      included.forEach((c) => {
-        const tel = c.directPhone || c.mobile;
-        const p: string[] = [];
-        p.push(`Contact: ${c.name}`);
-        if (tel) p.push(`Tel: ${tel}`);
-        if (c.email) p.push(`Email: ${c.email}`);
-        parts.push(p.join(', '));
-      });
-      this.contactInfoPreview = parts.join('  |  ');
-    }
+     creditTerms = [
+       { code: '30D', name: '30 Days' },
+       { code: 'COD', name: 'Cash on Delivery' },
+     ];
+     taxTypes = [
+       { code: 'GST6', name: 'GST 6%' },
+       { code: 'ZRL', name: 'Zero Rated' },
+     ];
+     priceCategories = [
+       { code: 'STD', name: 'Standard' },
+       { code: 'VIP', name: 'VIP' },
+     ];
+     accountGroups = [
+       { code: 'AG01', name: 'Retail' },
+       { code: 'AG02', name: 'Wholesale' },
+     ];
 
-    // ===== Toolbar actions =====
-    openFind() {
-      this.showFind = true;
-    }
-    openPrint() {
-      this.showPrint = true;
-    }
-    openPriceHistory() {
-      this.showPrice = true;
-    }
-    openDetail() {
-      if (!this.selected) return;
-      this.showDetail = true;
-    }
+     // Contacts / Branches / Links
+     contacts: any[] = [];
+     selectedContact: any | null = null;
+     branches: any[] = [];
+     selectedBranch: any | null = null;
+     externalLinks: string[] = [];
+     selectedLink: string | null = null;
 
-    runFind() {
-      const k = (this.findForm.value.keyword || '')
-        .toString()
-        .trim()
-        .toLowerCase();
-      this.findResults = this.rows.filter((r) =>
-        (r.code + ' ' + r.name + ' ')
-          .toLowerCase()
-          .includes(k)
-      );
-    }
-    findResults: CreditorRow[] = [];
-    pickFromFind(r: CreditorRow) {
-      this.selected = r;
-      this.showFind = false;
-    }
+     // Price history rows (mock)
+     priceRows: PriceRow[] = [
+       {
+         date: '2025-01-10',
+         item: 'ITEM-001',
+         uom: 'PCS',
+         qty: 10,
+         price: 12.5,
+         docNo: 'INV-250110-001',
+       },
+       {
+         date: '2025-02-05',
+         item: 'ITEM-002',
+         uom: 'PCS',
+         qty: 5,
+         price: 99.0,
+         docNo: 'INV-250205-013',
+       },
+     ];
 
-    buildListing() {
-      const f = this.printForm.value;
-      let list = [...this.rows];
-      if (f.active === 'active') list = list.filter((x) => x.active);
-      if (f.active === 'inactive') list = list.filter((x) => !x.active);
-      if (f.currency) list = list.filter((x) => x.currency === f.currency);
-      return list;
-    }
-    printNow() {
-      window.print();
-    }
+     // ===== form modal =====
+     showForm = false;
+     formMode: FormMode = 'new';
+     tab: 'general' | 'contact' | 'branches' | 'others' | 'note' = 'general';
 
-    // ===== Modal: New/Edit/View =====
-    newDebtor() {
-      this.formMode = 'new';
-      this.creditorForm.reset({
-        controlAccount: '400-0000',
-        type: 'MANUF',
-        groupCompany: false,
-        name: '',
-        registrationNo: '',
-        code: '',
-        active: false,
-        statementType: 'OpenItem',
-        agingOn: 'InvoiceDate',
-        creditTerm : '30D',
-        currency : 'MYR',
-        gstType : 'GST6'
-      });
-      this.creditorForm.enable({ emitEvent: false });
-      this.tab = 'general';
-      this.showForm = true;
-          setTimeout(() => this.computePaneMinHeight(), 0);
-    }
-    editDebtor() {
-      if (!this.selected) return;
-      this.formMode = 'edit';
-      this.creditorForm.reset({
-        controlAccount: '400-0000',
-        type: this.selected.type,
-        groupCompany: this.selected.groupCompany,
-        name: this.selected.name,
-        registrationNo: '',
-        code: this.selected.code,
-        active: this.selected.active,
-        currency: this.selected.currency,
-        statementType: 'OpenItem',
-        agingOn: 'InvoiceDate',
-        creditTerm: this.selected.creditTerm,
-        billAddress:"17 KKLL Kula",
-        phone : '09352556532',
-        fax : '34234243143',
-        postCode : '700000',
-        deliveryAddress: '345 KLCC',
-        deliveryPostCode :'40000',
-        email : 'mycompany@gmail.com',
-      });
-      this.creditorForm.enable({ emitEvent: false });
-      this.tab = 'general';
-      this.showForm = true;
-          setTimeout(() => this.computePaneMinHeight(), 0);
-    }
-    viewDebtor() {
-      if (!this.selected) return;
-      this.formMode = 'view';
-      this.creditorForm.reset({
-        controlAccount: '300-0000',
-        type: this.selected.type,
-        groupCompany: this.selected.groupCompany,
-        name: this.selected.name,
-        registrationNo: '',
-        code: this.selected.code,
-        active: this.selected.active,
-        currency: this.selected.currency,
-        statementType: 'OpenItem',
-        agingOn: 'InvoiceDate',
-        creditTerm: this.selected.creditTerm,
-      });
-      this.creditorForm.enable({ emitEvent: false });
-      this.tab = 'general';
-      this.showForm = true;
-          setTimeout(() => this.computePaneMinHeight(), 0);
-    }
-    deleteDebtor() {
-      if (!this.selected) return;
-      this.rows = this.rows.filter((r) => r !== this.selected);
-      this.selected = null;
-      this.closeDeleteDebtorConfirm();
-      this.openSuccess(`Debtor is deleted successfully.`);
-    }
+     // ===== Contact editor =====
+     showContactEditor = false;
+     contactEditIndex = -1;
+     contactInfoPreview = '';
 
-    autoGenerateCode() {
-      if (this.formMode !== 'new') return;
-      const name = (this.creditorForm.value.name || '').toString().trim();
-      const init = name
-        ? name
-            .replace(/[^A-Za-z0-9]/g, '')
-            .slice(0, 3)
-            .toUpperCase()
-        : 'N';
-      const code = `400-${init}${Math.floor(1000 + Math.random() * 9000)}`;
-      this.creditorForm.patchValue({ code });
-    }
+     // ===== Credit control popup =====
+     showCredit = false;
 
-    saveDebtor() {
-      if (this.creditorForm.invalid) {
-        this.creditorForm.markAllAsTouched();
-        alert(
-          'Please fill required fields: Debtor Type, Company Name and Debtor Account.'
-        );
-        return;
-      }
-      const v = this.creditorForm.getRawValue();
-      if (this.formMode === 'new') {
-        this.rows = [
-          {
-            code: v.code!,
-            name: v.name!,
-            type: v.type!,
-            phone: v.phone || '',
-            currency: v.currency || 'MYR',
-            creditTerm: v.creditTerm || '',
-            creditLimit: 0,
-            active: !!v.active,
-            remark: v.note || '',
-            groupCompany : !!v.groupCompany
-          },
-          ...this.rows,
-        ];
-      } else if (this.formMode === 'edit' && this.selected) {
-        Object.assign(this.selected, {
-          name: v.name!,
-          type: v.type!,
-          phone: v.phone || '',
-          area: v.area || '',
-          agent: v.agent || '',
-          currency: v.currency || 'MYR',
-          creditTerm: v.creditTerm || '',
-          active: !!v.active,
-          groupCompany : !!v.groupCompany
-        });
-      }
-      this.showForm = false;
-    }
+     // ===== Delete / success dialog =====
+     showContactDeleteConfirm = false;
+     showSuccess = false;
+     successMsg = '';
+     showBranchEditor = false;
+     branchEditIndex = -1;
+     showBranchDeleteConfirm = false;
 
-    // Contacts
-    addContact() {
-      this.contacts.push({
-        name: '',
-        department: '',
-        title: '',
-        directPhone: '',
-        mobile: '',
-        email: '',
-        im: '',
-      });
-    }
-    editContact() {
-      /* mock */
-    }
-    removeContact() {
-      if (!this.selectedContact) return;
-      const name = this.selectedContact.name || 'this contact';
-      if (!confirm(`Delete contact "${name}"?`)) return;
+     constructor(private fb: FormBuilder, private cdr: ChangeDetectorRef) {
+       // Find form
+       this.findForm = this.fb.group({
+         keyword: [''],
+         area: [''],
+         agent: [''],
+         active: ['all'],
+       });
 
-      this.contacts = this.contacts.filter((x) => x !== this.selectedContact);
-      this.selectedContact = undefined;
-      this.refreshContactInfoPreview();
-    }
-    generateContactInfo() {
-      const included = this.contacts.filter((c) => c.include);
-      if (included.length === 0) {
-        alert(
-          'Please select at least one contact to "Include in contact info". Edit a contact and tick the checkbox.'
-        );
-        return;
-      }
-      this.refreshContactInfoPreview();
-      this.openSuccess('Contact info generated successfully.');
-    }
-    showContactDeleteConfirm = false;
-    showSuccess = false;
-    successMsg = '';
+       // Print form
+       this.printForm = this.fb.group({
+         active: ['all'],
+         area: [''],
+         agent: [''],
+         currency: [''],
+         sort: ['code'],
+       });
 
-    askDeleteContact() {
-      if (!this.selectedContact) return;
-      this.showContactDeleteConfirm = true;
-    }
+       // Debtor form
+       this.debtorForm = this.fb.group({
+         controlAccount: ['300-0000'],
+         type: ['', Validators.required],
+         groupCompany: [false],
+         name: ['', Validators.required],
+         registrationNo: [''],
+         code: ['', Validators.required],
+         active: [true],
 
-    closeContactDeleteConfirm() {
-      this.showContactDeleteConfirm = false;
-    }
+         billAddress: ['', Validators.required],
+         phone: ['', Validators.required],
+         fax: ['', Validators.required],
+         postCode: ['', Validators.required],
+         deliveryAddress: [''],
+         deliveryPostCode: [''],
+         email: [''],
+         website: [''],
+         currency: [''],
+         creditTerm: [''],
+         actualTerm: this.fb.control<number | null>(null),
+         includeContactInfo: [false],
 
-    confirmDeleteContact() {
-      if (!this.selectedContact) {
-        this.showContactDeleteConfirm = false;
-        return;
-      }
-      const name = this.selectedContact.name || 'contact';
-      this.contacts = this.contacts.filter((x) => x !== this.selectedContact);
-      this.selectedContact = undefined;
-      this.refreshContactInfoPreview();
-      this.showContactDeleteConfirm = false;
-      this.openSuccess(`Contact "${name}" deleted successfully.`);
-    }
+         taxExemptionNo: [''],
+         taxExemptionExpiry: [null],
+         priceCategory: [''],
+         accountGroup: [''],
+         note: [''],
+         individualId: ['', Validators.required],
+         tinNo: ['', Validators.required],
+         sstRegNo: [''],
+         creditLimitAmount: [null],                 // number | null
+         blockInvoicesWhenLimitReached: [{ value: false, disabled: true }],
 
-    // success modal
-    openSuccess(msg: string) {
-      this.successMsg = msg;
-      this.showSuccess = true;
-    }
-    closeSuccess() {
-      this.showSuccess = false;
-    }
-    // External Links
-    addExternalLink() {
-      this.externalLinks.push('https://example.com/doc.pdf');
-    }
-    removeExternalLink() {
-      if (this.selectedLink) {
-        this.externalLinks = this.externalLinks.filter(
-          (x) => x !== this.selectedLink
-        );
-        this.selectedLink = null;
-      }
-    }
+       });
 
-    // ===== Credit Control popup =====
-    showCredit = false;
-    openCreditControl() {
-      this.creditForm.reset(
-        {
-          creditLimit: 10000,
-          overdueLimit: 2000,
-          scope: 'ALL',
-          mode: 'DISABLED',
-          exceedCreditAction: 'ALLOW',
-          exceedOverdueAction: 'ALLOW',
-          suspendReason: '',
-        },
-        { emitEvent: false }
-      );
-      this.showCredit = true;
-    }
-    saveCreditControl() {
-      this.showCredit = false;
-    }
-    showBranchEditor = false;
-    branchEditIndex = -1;
-    showBranchDeleteConfirm = false;
+       // Contact form
+       this.contactForm = this.fb.group({
+         name: [''],
+         department: [''],
+         title: [''],
+         directPhone: [''],
+         directFax: [''],
+         mobile: [''],
+         email: [''],
+         im: [''],
+         include: [true],
+       });
 
-    // ---- Open editor: Add
-    addBranch() {
-      if (!this.branchForm) this.initBranchForm(); // phòng ngừa
-      if (this.formMode === 'view') return;
+       // Credit control form
+       this.creditForm = this.fb.group({
+         creditLimit: [0],
+         overdueLimit: [0],
+         scope: ['ALL'],
+         mode: ['DISABLED'],
+         exceedCreditAction: ['ALLOW'],
+         exceedOverdueAction: ['ALLOW'],
+         suspendReason: [''],
+       });
+     }
 
-      this.branchEditIndex = -1;
-      this.branchForm.reset({
-        code: '',
-        name: '',
-        address: '',
-        postCode: '',
-        attention: '',
-        phone1: '',
-        phone2: '',
-        fax1: '',
-        fax2: '',
-        agent: this.creditorForm?.value?.agent || '',
-        area: this.creditorForm?.value?.area || '',
-        email: '',
-      });
-      this.showBranchEditor = true;
-    }
+     ngOnInit() {
+       this.setupCreditControlReactions();
+       this.initBranchForm();
+       this.initCurrencyLists();
+       this.setupCreditLimitWatcher();
+     }
 
-    // ---- Open editor: Edit
-    editBranch() {
-      if (this.formMode === 'view' || !this.selectedBranch) return;
-      this.branchEditIndex = this.branches.indexOf(this.selectedBranch);
-      const b = this.selectedBranch;
-      this.branchForm.reset({
-        code: b.code || '',
-        name: b.name || '',
-        address: b.address || '',
-        postCode: b.postCode || '',
-        attention: b.attention || '',
-        phone1: b.phone1 || '',
-        phone2: b.phone2 || '',
-        fax1: b.fax1 || '',
-        fax2: b.fax2 || '',
-        agent: b.agent || '',
-        area: b.area || '',
-        email: b.email || '',
-      });
-      this.showBranchEditor = true;
-    }
+     // ========= Currency helpers =========
 
-    closeBranchEditor() {
-      this.showBranchEditor = false;
-      this.branchEditIndex = -1;
-    }
+     /** Currency đang chọn để hiển thị trên nút */
+     get selectedCurrency(): DebtorCurrency | undefined {
+       const code = this.debtorForm.get('currency')?.value;
+       return this.currencies.find((c) => c.code === code);
+     }
 
-    // ---- Save
-    saveBranchEditor() {
-      const v = this.branchForm.value as Branch;
-      if (!this.branchForm.valid) return;
+     /** Label hiển thị trên nút trigger */
+     get currencyDisplayLabel(): string {
+       const cur = this.selectedCurrency;
+       if (!cur) return 'Select currency';
+       return `${cur.name || cur.code} (${cur.code})`;
+     }
 
-      if (this.branchEditIndex === -1) {
-        this.branches = [...this.branches, v];
-      } else {
-        this.branches = this.branches.map((x, i) =>
-          i === this.branchEditIndex ? v : x
-        );
-      }
-      this.selectedBranch = v;
-      this.showBranchEditor = false;
-      this.branchEditIndex = -1;
+     /** Khởi tạo “My currencies” và danh sách filter */
+     private initCurrencyLists(): void {
+       // currency mặc định trong form
+       let currentCode =
+         this.debtorForm.get('currency')?.value ||
+         this.currencies.find((c) => c.isDefault)?.code ||
+         this.currencies[0]?.code;
 
-      // nếu bạn đã có cơ chế success popup:
-      // this.successMsg = 'Saved';
-      // this.showSuccess = true;
-    }
+       if (!currentCode) {
+         currentCode = 'MYR';
+       }
 
-    // ---- Delete
-    removeBranch() {
-      if (this.formMode === 'view' || !this.selectedBranch) return;
-      this.showBranchDeleteConfirm = true;
-    }
+       this.debtorForm.patchValue({ currency: currentCode }, { emitEvent: false });
 
-    closeBranchDeleteConfirm() {
-      this.showBranchDeleteConfirm = false;
-    }
+       this.updateMyCurrencies();
+       this.filteredCurrencies = [...this.currencies];
+     }
 
-    confirmDeleteBranch() {
-      if (!this.selectedBranch) return;
-      const target = this.selectedBranch;
-      this.branches = this.branches.filter((b) => b !== target);
-      this.selectedBranch = null;
-      this.showBranchDeleteConfirm = false;
+     private updateMyCurrencies(): void {
+       const currentCode = this.debtorForm.get('currency')?.value;
 
-      // Optional success:
-      // this.successMsg = 'Branch deleted';
-      // this.showSuccess = true;
-    }
-    onDeleteDebtor() {
-      if (!this.selected) return;
-      this.showDeleteDebtorConfirm = true;
-    }
-    closeDeleteDebtorConfirm() {
-      this.showDeleteDebtorConfirm = false;
-    }
-    private toLocalDatetimeInputValue(d: Date | null): string | null {
-      if (!d) return null;
-      const pad = (n: number) => n.toString().padStart(2, '0');
-      return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(
-        d.getDate()
-      )}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
-    }
-    private fromLocalDatetimeInput(val: string | null): string | null {
-      if (!val) return null;
-      // 'YYYY-MM-DDTHH:mm' -> ISO UTC string để lưu DB/API
-      return new Date(val).toISOString();
-    }
-    minDateTime = this.toLocalDatetimeInputValue(new Date());
-  }
+       const codes = new Set<string>();
+       this.myCurrencies = [];
+
+       // luôn ưu tiên default
+       for (const c of this.currencies) {
+         if (c.isDefault) {
+           this.myCurrencies.push(c);
+           codes.add(c.code);
+         }
+       }
+
+       // thêm currency đang chọn nếu chưa có trong list
+       const current = this.currencies.find((c) => c.code === currentCode);
+       if (current && !codes.has(current.code)) {
+         this.myCurrencies.unshift(current);
+         codes.add(current.code);
+       }
+     }
+
+     toggleCurrencyPanel(): void {
+       if (this.showCurrencyPanel) {
+         this.closeCurrencyPanel();
+       } else {
+         this.openCurrencyPanel();
+       }
+     }
+
+     openCurrencyPanel(): void {
+       this.showCurrencyPanel = true;
+       this.currencySearch = '';
+       this.filteredCurrencies = [...this.currencies];
+     }
+
+     closeCurrencyPanel(): void {
+       this.showCurrencyPanel = false;
+     }
+
+     onCurrencySearchChange(value: string): void {
+       this.currencySearch = value;
+       this.filterCurrencies();
+     }
+
+     filterCurrencies(): void {
+       const term = (this.currencySearch || '').trim().toLowerCase();
+       if (!term) {
+         this.filteredCurrencies = [...this.currencies];
+         return;
+       }
+
+       this.filteredCurrencies = this.currencies.filter((c) => {
+         const name = (c.name || '').toLowerCase();
+         const code = c.code.toLowerCase();
+         return name.includes(term) || code.includes(term);
+       });
+     }
+
+     selectCurrency(cur: DebtorCurrency): void {
+       this.debtorForm.patchValue({ currency: cur.code });
+       this.updateMyCurrencies();
+       this.closeCurrencyPanel();
+     }
+
+     // ========= Credit control =========
+
+     setupCreditControlReactions() {
+       const modeCtrl = this.creditForm.get('mode');
+       modeCtrl?.valueChanges.subscribe(() => this.applyCreditMode());
+       this.applyCreditMode();
+     }
+
+     private applyCreditMode() {
+       const mode = this.creditForm.get('mode')?.value as
+         | 'DISABLED'
+         | 'BY_TERM'
+         | 'SUSPEND';
+
+       const ec = this.creditForm.get('exceedCreditAction')!;
+       const eo = this.creditForm.get('exceedOverdueAction')!;
+       const sr = this.creditForm.get('suspendReason')!;
+
+       if (mode === 'BY_TERM') {
+         ec.enable({ emitEvent: false });
+         eo.enable({ emitEvent: false });
+         sr.disable({ emitEvent: false });
+       } else if (mode === 'SUSPEND') {
+         ec.disable({ emitEvent: false });
+         eo.disable({ emitEvent: false });
+         sr.enable({ emitEvent: false });
+       } else {
+         // DISABLED
+         ec.disable({ emitEvent: false });
+         eo.disable({ emitEvent: false });
+         sr.disable({ emitEvent: false });
+       }
+     }
+
+     // ===== Contact editor helpers =====
+
+     closeContactEditor() {
+       this.showContactEditor = false;
+     }
+
+     private refreshContactInfoPreview() {
+       const parts: string[] = [];
+       const included = this.contacts.filter((c) => c.include);
+       included.forEach((c) => {
+         const tel = c.directPhone || c.mobile;
+         const p: string[] = [];
+         p.push(`Contact: ${c.name}`);
+         if (tel) p.push(`Tel: ${tel}`);
+         if (c.email) p.push(`Email: ${c.email}`);
+         parts.push(p.join(', '));
+       });
+       this.contactInfoPreview = parts.join('  |  ');
+     }
+
+     // ===== Toolbar actions =====
+     openFind() {
+       this.showFind = true;
+     }
+
+     openPrint() {
+       this.showPrint = true;
+     }
+
+     openPriceHistory() {
+       this.showPrice = true;
+     }
+
+     openDetail() {
+       if (!this.selected) return;
+       this.showDetail = true;
+     }
+
+     runFind() {
+       const k = (this.findForm.value.keyword || '')
+         .toString()
+         .trim()
+         .toLowerCase();
+       this.findResults = this.rows.filter((r) =>
+         (r.debtorAccount + ' ' + r.companyName + ' ')
+           .toLowerCase()
+           .includes(k)
+       );
+     }
+
+     findResults: DebtorRow[] = [];
+
+     pickFromFind(r: DebtorRow) {
+       this.selected = r;
+       this.showFind = false;
+     }
+
+     buildListing() {
+       const f = this.printForm.value;
+       let list = [...this.rows];
+       if (f.active === 'active') list = list.filter((x) => x.active);
+       if (f.active === 'inactive') list = list.filter((x) => !x.active);
+       if (f.currency) list = list.filter((x) => x.currency === f.currency);
+       return list;
+     }
+
+     printNow() {
+       window.print();
+     }
+
+     // ===== Modal: New/Edit/View =====
+     newDebtor() {
+       this.formMode = 'new';
+       this.debtorForm.reset({
+         controlAccount: '400-0000',
+         type: 'LOCAL',
+         groupCompany: false,
+         name: '',
+         registrationNo: '',
+         code: '',
+         active: false,
+         statementType: 'OpenItem',
+         agingOn: 'InvoiceDate',
+         creditTerm: '30D',
+         currency: 'MYR',
+         gstType: 'GST6',
+       });
+       this.debtorForm.enable({ emitEvent: false });
+       this.tab = 'general';
+       this.showForm = true;
+       this.activeSection = 'contact';
+       this.initCurrencyLists();
+       setTimeout(() => this.computePaneMinHeight(), 0);
+     }
+
+     editDebtor() {
+       if (!this.selected) return;
+       this.formMode = 'edit';
+       this.debtorForm.reset({
+         controlAccount: '400-0000',
+         type: this.selected.type,
+         groupCompany: this.selected.groupCompany,
+         name: this.selected.companyName,
+         registrationNo: '',
+         code: this.selected.debtorAccount,
+         active: this.selected.active,
+         currency: this.selected.currency,
+         statementType: 'OpenItem',
+         agingOn: 'InvoiceDate',
+         creditTerm: this.selected.creditTerm,
+         billAddress: '17 KKLL Kula',
+         phone: '09352556532',
+         fax: '34234243143',
+         postCode: '700000',
+         deliveryAddress: '345 KLCC',
+         deliveryPostCode: '40000',
+         email: 'mycompany@gmail.com',
+       });
+       this.debtorForm.enable({ emitEvent: false });
+       this.tab = 'general';
+       this.showForm = true;
+       this.activeSection = 'contact';
+       this.initCurrencyLists();
+       setTimeout(() => this.computePaneMinHeight(), 0);
+       this.setupCreditLimitWatcher();
+     }
+
+     viewDebtor() {
+       if (!this.selected) return;
+       this.formMode = 'view';
+       this.debtorForm.reset({
+         controlAccount: '400-0000',
+         type: this.selected.type,
+         groupCompany: this.selected.groupCompany,
+         name: this.selected.companyName,
+         registrationNo: '',
+         code: this.selected.debtorAccount,
+         active: this.selected.active,
+         currency: this.selected.currency,
+         statementType: 'OpenItem',
+         agingOn: 'InvoiceDate',
+         creditTerm: this.selected.creditTerm,
+       });
+       this.debtorForm.enable({ emitEvent: false });
+       this.tab = 'general';
+       this.showForm = true;
+       this.activeSection = 'contact';
+       this.initCurrencyLists();
+       setTimeout(() => this.computePaneMinHeight(), 0);
+     }
+
+     deleteDebtor() {
+       if (!this.selected) return;
+       this.rows = this.rows.filter((r) => r !== this.selected);
+       this.selected = null;
+       this.closeDeleteDebtorConfirm();
+       this.openSuccess(`Debtor is deleted successfully.`);
+     }
+
+     autoGenerateCode() {
+       if (this.formMode !== 'new') return;
+       const name = (this.debtorForm.value.name || '').toString().trim();
+       const init = name
+         ? name.replace(/[^A-Za-z0-9]/g, '').slice(0, 3).toUpperCase()
+         : 'N';
+       const code = `300-${init}${Math.floor(1000 + Math.random() * 9000)}`;
+       this.debtorForm.patchValue({ code });
+     }
+
+     saveDebtor() {
+       this.submitted = true;
+       if (this.debtorForm.invalid) {
+         this.debtorForm.markAllAsTouched();
+         alert(
+           'Please fill required fields: Debtor Type, Company Name and Debtor Account.'
+         );
+         return;
+       }
+
+       const v = this.debtorForm.getRawValue();
+       if (!v.code || !String(v.code).trim()) {
+         const tmp = 'D' + Math.random().toString(36).slice(2, 8).toUpperCase();
+         this.debtorForm.patchValue({ code: tmp });
+       }
+
+       const payload = {
+         debtorAccount: v.code,
+         companyName: v.name,
+         registrationNo: v.registrationNo,
+         individualId: v.individualId,
+         tinNo: v.tinNo,
+         sstRegNo: v.sstRegNo,
+         currency: v.currency,
+         billAddress: v.billAddress,
+         phone: v.phone,
+         fax: v.fax,
+         postCode: v.postCode,
+         deliveryAddress: v.deliveryAddress,
+         deliveryPostCode: v.deliveryPostCode,
+         email: v.email,
+         website: v.website,
+         creditTerm: v.creditTerm,
+         actualTerm: v.actualTerm,
+         taxExemptionNo: v.taxExemptionNo,
+         taxExemptionExpiry: v.taxExemptionExpiry,
+         active: true,
+       };
+
+       // TODO: call API với payload ở trên
+
+       if (this.formMode === 'edit' && this.selected) {
+         Object.assign(this.selected, {
+           name: v.name!,
+           type: v.type!,
+           phone: v.phone || '',
+           area: (v as any).area || '',
+           agent: (v as any).agent || '',
+           currency: v.currency || 'MYR',
+           creditTerm: v.creditTerm || '',
+           active: !!v.active,
+           groupCompany: !!v.groupCompany,
+         });
+       }
+
+       this.showForm = false;
+     }
+
+     // ===== Contacts =====
+     addContact() {
+       this.contacts.push({
+         name: '',
+         department: '',
+         title: '',
+         directPhone: '',
+         mobile: '',
+         email: '',
+         im: '',
+       });
+     }
+
+     editContact() {
+       /* mock */
+     }
+
+     removeContact() {
+       if (!this.selectedContact) return;
+       const name = this.selectedContact.name || 'this contact';
+       if (!confirm(`Delete contact "${name}"?`)) return;
+
+       this.contacts = this.contacts.filter((x) => x !== this.selectedContact);
+       this.selectedContact = undefined;
+       this.refreshContactInfoPreview();
+     }
+
+     generateContactInfo() {
+       const included = this.contacts.filter((c) => c.include);
+       if (included.length === 0) {
+         alert(
+           'Please select at least one contact to "Include in contact info". Edit a contact and tick the checkbox.'
+         );
+         return;
+       }
+       this.refreshContactInfoPreview();
+       this.openSuccess('Contact info generated successfully.');
+     }
+
+     askDeleteContact() {
+       if (!this.selectedContact) return;
+       this.showContactDeleteConfirm = true;
+     }
+
+     closeContactDeleteConfirm() {
+       this.showContactDeleteConfirm = false;
+     }
+
+     confirmDeleteContact() {
+       if (!this.selectedContact) {
+         this.showContactDeleteConfirm = false;
+         return;
+       }
+       const name = this.selectedContact.name || 'contact';
+       this.contacts = this.contacts.filter((x) => x !== this.selectedContact);
+       this.selectedContact = undefined;
+       this.refreshContactInfoPreview();
+       this.showContactDeleteConfirm = false;
+       this.openSuccess(`Contact "${name}" deleted successfully.`);
+     }
+
+     // success modal
+     openSuccess(msg: string) {
+       this.successMsg = msg;
+       this.showSuccess = true;
+     }
+
+     closeSuccess() {
+       this.showSuccess = false;
+     }
+
+     // External Links
+     addExternalLink() {
+       this.externalLinks.push('https://example.com/doc.pdf');
+     }
+
+     removeExternalLink() {
+       if (this.selectedLink) {
+         this.externalLinks = this.externalLinks.filter(
+           (x) => x !== this.selectedLink
+         );
+         this.selectedLink = null;
+       }
+     }
+
+     // ===== Credit Control popup =====
+     openCreditControl() {
+       this.creditForm.reset(
+         {
+           creditLimit: 10000,
+           overdueLimit: 2000,
+           scope: 'ALL',
+           mode: 'DISABLED',
+           exceedCreditAction: 'ALLOW',
+           exceedOverdueAction: 'ALLOW',
+           suspendReason: '',
+         },
+         { emitEvent: false }
+       );
+       this.showCredit = true;
+     }
+
+     saveCreditControl() {
+       this.showCredit = false;
+     }
+
+     // ===== Branch editor =====
+     addBranch() {
+       if (!this.branchForm) this.initBranchForm();
+       if (this.formMode === 'view') return;
+
+       this.branchEditIndex = -1;
+       this.branchForm.reset({
+         code: '',
+         name: '',
+         address: '',
+         postCode: '',
+         attention: '',
+         phone1: '',
+         phone2: '',
+         fax1: '',
+         fax2: '',
+         agent: this.debtorForm?.value?.agent || '',
+         area: this.debtorForm?.value?.area || '',
+         email: '',
+       });
+       this.showBranchEditor = true;
+     }
+
+     editBranch() {
+       if (this.formMode === 'view' || !this.selectedBranch) return;
+       this.branchEditIndex = this.branches.indexOf(this.selectedBranch);
+       const b = this.selectedBranch;
+       this.branchForm.reset({
+         code: b.code || '',
+         name: b.name || '',
+         address: b.address || '',
+         postCode: b.postCode || '',
+         attention: b.attention || '',
+         phone1: b.phone1 || '',
+         phone2: b.phone2 || '',
+         fax1: b.fax1 || '',
+         fax2: b.fax2 || '',
+         agent: b.agent || '',
+         area: b.area || '',
+         email: b.email || '',
+       });
+       this.showBranchEditor = true;
+     }
+
+     closeBranchEditor() {
+       this.showBranchEditor = false;
+       this.branchEditIndex = -1;
+     }
+
+     saveBranchEditor() {
+       const v = this.branchForm.value as Branch;
+       if (!this.branchForm.valid) return;
+
+       if (this.branchEditIndex === -1) {
+         this.branches = [...this.branches, v];
+       } else {
+         this.branches = this.branches.map((x, i) =>
+           i === this.branchEditIndex ? v : x
+         );
+       }
+       this.selectedBranch = v;
+       this.showBranchEditor = false;
+       this.branchEditIndex = -1;
+     }
+
+     removeBranch() {
+       if (this.formMode === 'view' || !this.selectedBranch) return;
+       this.showBranchDeleteConfirm = true;
+     }
+
+     closeBranchDeleteConfirm() {
+       this.showBranchDeleteConfirm = false;
+     }
+
+     confirmDeleteBranch() {
+       if (!this.selectedBranch) return;
+       const target = this.selectedBranch;
+       this.branches = this.branches.filter((b) => b !== target);
+       this.selectedBranch = null;
+       this.showBranchDeleteConfirm = false;
+     }
+
+     onDeleteDebtor() {
+       if (!this.selected) return;
+       this.showDeleteDebtorConfirm = true;
+     }
+
+     closeDeleteDebtorConfirm() {
+       this.showDeleteDebtorConfirm = false;
+     }
+
+     private toLocalDatetimeInputValue(d: Date | null): string | null {
+       if (!d) return null;
+       const pad = (n: number) => n.toString().padStart(2, '0');
+       return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(
+         d.getDate()
+       )}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+     }
+
+     private fromLocalDatetimeInput(val: string | null): string | null {
+       if (!val) return null;
+       return new Date(val).toISOString();
+     }
+
+     minDateTime = this.toLocalDatetimeInputValue(new Date());
+
+     openTinLookup() {
+       window.open('https://mytax.hasil.gov.my/carian', '_blank');
+     }
+
+     copyBillingToDelivery() {
+       const bill = this.debtorForm.get('billAddress')?.value ?? '';
+       const post = this.debtorForm.get('postCode')?.value ?? '';
+       this.debtorForm.patchValue({
+         deliveryAddress: bill,
+         deliveryPostCode: post,
+       });
+     }
+
+     debtorCodeList: string[] = [];
+
+     onCodeFocus() {
+       const all = Array.from(
+         { length: 999 },
+         (_, i) => `300-${(i + 1).toString().padStart(3, '0')}`
+       );
+       const used = new Set(
+         this.rows.map((r) => (r.debtorAccount || '').trim()).filter(Boolean)
+       );
+       this.debtorCodeList = all.filter((c) => !used.has(c)).slice(0, 20);
+     }
+
+     closeForm() {
+       this.showForm = false;
+       this.tab = 'general';
+       this.formMode = 'new';
+       this.selected = null;
+     }
+
+     activeSection: DebtorSection = 'contact';
+
+     @ViewChild('formScroll') formScroll!: ElementRef<HTMLElement>;
+     @ViewChild('contactSection') contactSection!: ElementRef<HTMLElement>;
+     @ViewChild('primarySection') primarySection!: ElementRef<HTMLElement>;
+     @ViewChild('additionalSection') additionalSection!: ElementRef<HTMLElement>;
+     @ViewChild('businessSection') businessSection!: ElementRef<HTMLElement>;
+
+     scrollToSection(section: DebtorSection): void {
+       this.activeSection = section;
+
+       const container = this.formScroll?.nativeElement;
+       if (!container) return;
+
+       let targetEl: HTMLElement | null = null;
+
+       switch (section) {
+         case 'contact':
+           targetEl = this.contactSection?.nativeElement;
+           break;
+         case 'primary':
+           targetEl = this.primarySection?.nativeElement;
+           break;
+         case 'additional':
+           targetEl = this.additionalSection?.nativeElement;
+           break;
+         case 'business':
+           targetEl = this.businessSection?.nativeElement;
+           break;
+       }
+
+       if (!targetEl) return;
+
+       const containerRect = container.getBoundingClientRect();
+       const targetRect = targetEl.getBoundingClientRect();
+       const offset =
+         targetRect.top - containerRect.top + container.scrollTop - 12;
+
+       container.scrollTo({
+         top: offset,
+         behavior: 'smooth',
+       });
+     }
+     submitted = false;
+     isFieldInvalid(name: string): boolean {
+       const c = this.debtorForm.get(name);
+       return !!c && c.invalid && (c.touched || this.submitted);
+     }
+     sectionHasError(section: 'contact' | 'primary' | 'additional' | 'business'): boolean {
+       switch (section) {
+         case 'contact':
+           // các field REQUIRED trong Contact details
+           return ['code', 'name', 'individualId', 'tinNo']
+             .some(ctrl => this.isFieldInvalid(ctrl));
+
+         case 'primary':
+           // REQUIRED trong Primary person
+           return ['billAddress', 'phone', 'fax', 'postCode']
+             .some(ctrl => this.isFieldInvalid(ctrl));
+
+         case 'additional':
+           // nếu sau này có required ở Additional people thì liệt kê vào đây
+           return false;
+
+         case 'business':
+           // ví dụ nếu Credit Term là required:
+           // return ['creditTerm'].some(ctrl => this.isFieldInvalid(ctrl));
+           return false;
+       }
+     }
+
+     creditLimitDisabled = true; // mặc định: chưa nhập limit => disable
+
+     private setupCreditLimitWatcher(): void {
+       const amountCtrl = this.debtorForm.get('creditLimitAmount');
+       const blockCtrl = this.debtorForm.get('blockNewInvoicesWhenLimitReached');
+
+       if (!amountCtrl || !blockCtrl) return;
+
+       const updateState = (raw: unknown) => {
+         const value = typeof raw === 'string'
+           ? parseFloat(raw.replace(/,/g, '')) || 0
+           : (Number(raw) || 0);
+
+         // không nhập hoặc <= 0 => disable
+         this.creditLimitDisabled = value <= 0;
+
+         if (this.creditLimitDisabled) {
+           // luôn tắt checkbox khi disable
+           blockCtrl.setValue(false, { emitEvent: false });
+         }
+       };
+
+       // chạy lần đầu
+       updateState(amountCtrl.value);
+
+       // nghe thay đổi
+       amountCtrl.valueChanges.subscribe(v => updateState(v));
+     }
+
+   }
