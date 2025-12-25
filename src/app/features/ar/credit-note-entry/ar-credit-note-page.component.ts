@@ -730,8 +730,8 @@ private updateLocksForRow(i: number) {
     }
 
     this.recalcTotals();
-    this.enableOnlyRchqWhenEdit(); // khóa toàn bộ, chỉ bật Is RCHQ/RCHQ Date nếu Cheque
-    this.disableKnockTableAll();
+    //this.enableOnlyRchqWhenEdit(); // khóa toàn bộ, chỉ bật Is RCHQ/RCHQ Date nếu Cheque
+    //this.disableKnockTableAll();
     this.showForm = true;
   }
 
@@ -824,6 +824,7 @@ private updateLocksForRow(i: number) {
     this.rows = this.rows.filter((x) => x !== this.selected);
     this.selected = undefined;
     this.showDeleteConfirm = false;
+    this.openSuccess(`Credit Note deleted successfully.`);
   }
 
   // ===== utils =====
@@ -1192,4 +1193,5 @@ isSelDisabled(i: number): boolean {
     );
     this.detailOpen = true;
   }
+
 }

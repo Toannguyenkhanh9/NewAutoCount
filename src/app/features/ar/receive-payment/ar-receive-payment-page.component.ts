@@ -770,8 +770,8 @@ export class ArReceivePaymentPageComponent {
     }
 
     this.recalcTotals();
-    this.enableOnlyRchqWhenEdit(); // khóa toàn bộ, chỉ bật Is RCHQ/RCHQ Date nếu Cheque
-    this.disableKnockTableAll();
+    //this.enableOnlyRchqWhenEdit(); // khóa toàn bộ, chỉ bật Is RCHQ/RCHQ Date nếu Cheque
+    //this.disableKnockTableAll();
     this.showForm = true;
   }
 
@@ -853,6 +853,7 @@ export class ArReceivePaymentPageComponent {
     this.rows = this.rows.filter((x) => x !== this.selected);
     this.selected = undefined;
     this.showDeleteConfirm = false;
+    this.openSuccess(`Receive Payment deleted successfully.`);
   }
 
   // ===== utils =====

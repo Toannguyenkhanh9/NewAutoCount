@@ -23,7 +23,16 @@
 
           <button type="button" class="ac-btn" (click)="openEdit()" [disabled]="!selected">
             <span class="ico eye"></span>
-            View
+            Edit
+          </button>
+                              <button
+            type="button"
+            class="ac-btn ac-btn-danger"
+            [disabled]="!selected"
+            (click)="askDelete()"
+          >
+            <span class="ico trash"></span>
+            Delete
           </button>
         </div>
       </div>
@@ -232,7 +241,7 @@
 </div>
             <!-- Description (wide) -->
             <label class="inv-field wide">
-              <span class="inv-label">Referrence</span>
+              <span class="inv-label">Description</span>
               <div class="inv-contact-input ac-input-prefix-group">
                 <span class="ac-input-prefix-icon">
                   <lucide-icon name="hash" [size]="13" color="#111827"></lucide-icon>
@@ -469,7 +478,7 @@
             Cancel
           </button>
 
-          <ng-container *ngIf="formMode !== 'edit' || hasAnyChequeMethod">
+          <ng-container *ngIf="hasAnyChequeMethod">
             <button type="button" class="ac-btn ac-btn-primary" (click)="askSave()" [disabled]="
                 unappliedAmount !== 0 ||
                 rpForm.invalid ||
@@ -488,8 +497,8 @@
   </ng-container>
 
   <!-- ===== DELETE CONFIRM ===== -->
-  <div class="dialog" *ngIf="showDeleteConfirm">
-    <div class="dialog-panel-small ac-card-no-padding" role="dialog" aria-modal="true" style="min-width: 360px">
+  <div class="ac-dialog-backdrop" *ngIf="showDeleteConfirm">
+    <div class="ac-card-no-padding ac-dialog-panel-sm" role="dialog" aria-modal="true" style="min-width: 360px">
       <div class="ac-dialog-header">
         <span>Delete Receive Payment</span>
         <button class="ac-dialog-close" type="button" (click)="showDeleteConfirm = false" aria-label="Close">

@@ -21,7 +21,16 @@
 
           <button type="button" class="ac-btn" (click)="openEdit()" [disabled]="!selected">
             <span class="ico eye"></span>
-            View
+            Edit
+          </button>
+                    <button
+            type="button"
+            class="ac-btn ac-btn-danger"
+            [disabled]="!selected"
+            (click)="askDelete()"
+          >
+            <span class="ico trash"></span>
+            Delete
           </button>
         </div>
       </div>
@@ -80,14 +89,17 @@
 
       <!-- DETAIL PANE -->
       <div *ngIf="detailOpen" class="ac-card ac-card-no-padding cn-detail-pane">
-        <div class="cn-detail-header">Invoices / Debit Notes Paid</div>
+        <div class="cn-detail-header">Invoices / Debit Notes Paid
+          <ng-container *ngIf="selected">
+              &nbsp;—&nbsp;<b>{{ selected.receiptNo }}</b>
+            </ng-container></div>
         <div class="ac-tablewrap">
           <table class="ac-table ac-table-sm">
             <colgroup>
-              <col style="width: 8%" />
-              <col style="width: 14%" />
-              <col style="width: 28%" />
-              <col style="width: 16%" />
+              <col style="width: 12%" />
+              <col style="width: 18%" />
+              <col style="width: 18%" />
+              <col style="width: 18%" />
               <col style="width: 16%" />
               <col style="width: 18%" />
             </colgroup>
@@ -135,7 +147,7 @@
     <div class="inv-form">
       <div class="inv-header">
         <div class="inv-title">
-          {{ formMode === "edit" ? "View" : "New" }} Credit Note
+          {{ formMode === "edit" ? "Edit" : "New" }} Credit Note
         </div>
         <div class="inv-subtitle">
           Record credit notes and knock off outstanding invoices / debit notes.
@@ -170,7 +182,42 @@
 
               <div class="inv-error" *ngIf="isInvalid('debtor')">Please select a contact.</div>
             </label>
+             <!-- CN No -->
+            <label class="inv-field">
+              <span class="inv-label">CN No.</span>
+              <div class="ac-input-prefix-group">
+                <span class="ac-input-prefix-icon">
+                  <lucide-icon name="hash" [size]="13" color="#111827"></lucide-icon>
+                </span>
+                <input class="ac-form-control" formControlName="docNo" placeholder="&lt;&lt;new&gt;&gt;"
+                  (input)="buildOrNoSuggestions()" (focus)="buildOrNoSuggestions()" list="orno-list"
+                  [readonly]="rpForm.value.autoNumbering || formMode !== 'new'" [class.invalid]="isInvalid('docNo')" />
+              </div>
 
+              <datalist id="orno-list">
+                <option *ngFor="let v of orNoSuggestions" [value]="v"></option>
+              </datalist>
+
+              <div class="inv-error" *ngIf="isInvalid('docNo')">
+                <ng-container *ngIf="rpForm.get('docNo')?.errors?.['pattern']">
+                  Only letters, numbers, '-', '_' and '/' are allowed.
+                </ng-container>
+                <ng-container *ngIf="rpForm.get('docNo')?.errors?.['duplicate']">
+                  This credit note number already exists.
+                </ng-container>
+                <ng-container *ngIf="rpForm.get('docNo')?.errors?.['required']">
+                  Credit note number is required.
+                </ng-container>
+              </div>
+            </label>
+                        <!-- Is Credit Journal -->
+            <label class="inv-field">
+              <span class="inv-label">&nbsp;</span>
+              <div class="inv-checkline">
+                <input type="checkbox" formControlName="isDebitJournal" [disabled]="formMode === 'edit'" />
+                <span>Is Credit Journal</span>
+              </div>
+            </label>
             <!-- Journal Type -->
             <label class="inv-field">
               <span class="inv-label">Journal Type</span>
@@ -199,15 +246,6 @@
               </div>
             </label>
 
-            <!-- Is Credit Journal -->
-            <label class="inv-field">
-              <span class="inv-label">&nbsp;</span>
-              <div class="inv-checkline">
-                <input type="checkbox" formControlName="isDebitJournal" [disabled]="formMode === 'edit'" />
-                <span>Is Credit Journal</span>
-              </div>
-            </label>
-
             <!-- Ref -->
             <label class="inv-field">
               <span class="inv-label">Ref. No</span>
@@ -230,34 +268,7 @@
               </div>
             </label>
 
-            <!-- CN No -->
-            <label class="inv-field">
-              <span class="inv-label">CN No.</span>
-              <div class="ac-input-prefix-group">
-                <span class="ac-input-prefix-icon">
-                  <lucide-icon name="hash" [size]="13" color="#111827"></lucide-icon>
-                </span>
-                <input class="ac-form-control" formControlName="docNo" placeholder="&lt;&lt;new&gt;&gt;"
-                  (input)="buildOrNoSuggestions()" (focus)="buildOrNoSuggestions()" list="orno-list"
-                  [readonly]="rpForm.value.autoNumbering || formMode !== 'new'" [class.invalid]="isInvalid('docNo')" />
-              </div>
 
-              <datalist id="orno-list">
-                <option *ngFor="let v of orNoSuggestions" [value]="v"></option>
-              </datalist>
-
-              <div class="inv-error" *ngIf="isInvalid('docNo')">
-                <ng-container *ngIf="rpForm.get('docNo')?.errors?.['pattern']">
-                  Only letters, numbers, '-', '_' and '/' are allowed.
-                </ng-container>
-                <ng-container *ngIf="rpForm.get('docNo')?.errors?.['duplicate']">
-                  This credit note number already exists.
-                </ng-container>
-                <ng-container *ngIf="rpForm.get('docNo')?.errors?.['required']">
-                  Credit note number is required.
-                </ng-container>
-              </div>
-            </label>
 
             <!-- Date -->
             <label class="inv-field">
@@ -270,20 +281,10 @@
               </div>
             </label>
 
-            <!-- Description -->
-            <label class="inv-field inv-field-wide">
-              <span class="inv-label">Description</span>
-              <div class="ac-input-prefix-group">
-                <span class="ac-input-prefix-icon">
-                  <lucide-icon name="hash" [size]="13" color="#111827"></lucide-icon>
-                </span>
-                <input class="ac-form-control" formControlName="description" [readonly]="formMode === 'edit'"
-                  placeholder="Document description" />
-              </div>
-            </label>
+
           </div>
 
-          <div class="to-box">
+          <div class="inv-to-box">
             <div class="to-title">To :</div>
             <textarea class="to-text" rows="3" readonly [value]="debtorToText"></textarea>
           </div>
@@ -298,7 +299,7 @@
                   <tr>
                     <th style="width: 240px">Debit A/C</th>
                     <th>Description</th>
-                    <th class="ac-text-right" style="width: 160px">Amount</th>
+                    <th class="ac-text-right" style="width: 220px">Amount</th>
                     <th style="width: 44px"></th>
                   </tr>
                 </thead>
@@ -441,10 +442,14 @@
         <div class="rp-footer">
           <button class="ac-btn ac-btn-ghost" type="button" (click)="closeForm()">Cancel</button>
 
-          <ng-container *ngIf="formMode !== 'edit'">
+          <ng-container>
             <button class="ac-btn ac-btn-primary" type="button" (click)="askSave()"
               [disabled]="totalAmount === 0 || rpForm.invalid">
-              Save
+            {{
+            formMode === 'new'
+            ? 'Create'
+            : 'Save'
+            }}
             </button>
           </ng-container>
         </div>
@@ -502,18 +507,18 @@
   </div>
 
   <!-- ===== Delete confirm ===== -->
-  <div class="dialog" *ngIf="showDeleteConfirm">
-    <div class="dialog-panel-small">
-      <div class="dialog-title">
+  <div class="ac-dialog-backdrop" *ngIf="showDeleteConfirm">
+    <div class="ac-card-no-padding ac-dialog-panel-sm">
+      <div class="ac-dialog-header">
         Delete Receive Payment
-        <button class="x" (click)="showDeleteConfirm = false">×</button>
+        <button class="ac-dialog-close" (click)="showDeleteConfirm = false">×</button>
       </div>
-      <div class="dialog-body">
+      <div class="ac-dialog-body">
         Are you sure you want to delete <b>{{ selected?.receiptNo }}</b>?
       </div>
-      <div class="dialog-actions">
-        <button class="btn" (click)="showDeleteConfirm = false">Cancel</button>
-        <button class="btn danger" (click)="doDelete()">Delete</button>
+      <div class="ac-dialog-footer">
+        <button class="ac-btn ac-btn-ghost" (click)="showDeleteConfirm = false">Cancel</button>
+        <button class="ac-btn ac-btn-danger" (click)="doDelete()">Delete</button>
       </div>
     </div>
   </div>
