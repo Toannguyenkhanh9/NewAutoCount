@@ -280,7 +280,16 @@
                 <input type="date" class="ac-form-control" formControlName="docDate" [readonly]="formMode === 'edit'" />
               </div>
             </label>
+                        <label class="inv-field wide">
+              <span class="inv-label">Description</span>
+              <div class="inv-contact-input ac-input-prefix-group">
+                <span class="ac-input-prefix-icon">
+                  <lucide-icon name="hash" [size]="13" color="#111827"></lucide-icon>
+                </span>
 
+                <input class="ac-form-control" formControlName="description" />
+              </div>
+            </label>
 
           </div>
 
