@@ -697,7 +697,7 @@ export class CreditorMaintenanceComponent {
        this.rows = this.rows.filter((r) => r !== this.selected);
        this.selected = null;
        this.closeDeleteDebtorConfirm();
-       this.openSuccess(`Debtor is deleted successfully.`);
+       this.openSuccess(`Creditor is deleted successfully.`);
      }
 
      autoGenerateCode() {
@@ -766,6 +766,7 @@ export class CreditorMaintenanceComponent {
        }
 
        this.showForm = false;
+           this.openSuccess((this.formMode === 'new' ? 'Create' : 'Edit') + ' creditor successfully.');
      }
 
      // ===== Contacts =====

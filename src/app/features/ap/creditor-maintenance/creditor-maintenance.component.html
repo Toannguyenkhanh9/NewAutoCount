@@ -500,4 +500,37 @@
     </div>
   </div>
 </div>
+  <div class="ac-dialog-backdrop" *ngIf="showSuccess">
+    <div
+      class="ac-card-no-padding ac-dialog-panel-sm ac-dialog-success"
+      role="dialog"
+      aria-modal="true"
+    >
+      <div class="ac-dialog-header ac-dialog-success-header">
+        <span>Success</span>
+        <button
+          class="ac-dialog-close"
+          (click)="closeSuccess()"
+          aria-label="Close"
+        >
+          ×
+        </button>
+      </div>
+      <div class="ac-dialog-body">
+        <p class="ac-dialog-success-text">
+          {{ successMsg }}
+        </p>
+      </div>
+      <div class="ac-dialog-footer">
+        <button
+          class="ac-btn ac-btn-primary"
+          type="button"
+          (click)="closeSuccess()"
+        >
+          OK
+        </button>
+      </div>
+    </div>
+  </div>
+
 </div>

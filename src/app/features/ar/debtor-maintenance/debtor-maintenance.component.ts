@@ -771,8 +771,8 @@ export class DebtorMaintenanceComponent implements OnInit {
     }
 
     this.showForm = false;
+    this.openSuccess((this.formMode === 'new' ? 'Create' : 'Edit') + ' debtor successfully.');
   }
-
   // ===== Contacts =====
   addContact() {
     this.contacts.push({

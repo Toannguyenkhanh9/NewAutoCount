@@ -302,7 +302,7 @@
                     </td>
                     <td class="col-del">
                       <button type="button" class="ac-btn ac-btn-icon-danger" (click)="removeMethod(i)"
-                        [disabled]="formMode === 'edit'">
+                      >
                         🗑
                       </button>
                     </td>
@@ -372,7 +372,7 @@
                 Knock Off Invoices / Debit Notes
               </div>
               <button class="ac-btn ac-btn-primary" type="button" (click)="autoAllocate()"
-                [disabled]="!canAllocate || formMode === 'edit'">
+                [disabled]="!canAllocate">
                 Auto allocate
               </button>
             </div>
@@ -457,14 +457,14 @@
                   <td class="ac-text-right">
                     <input appAmount [decimals]="2" [allowNegative]="false" [formatOnBlurOnly]="true"
                       formControlName="pay" [readonly]="
-                        formMode === 'edit' ||
+
                         !canAllocate ||
                         discIsFull(i)
                       " (input)="onPayChanged(i)" (blur)="onPayBlur(i)" />
                   </td>
                   <td class="c">
                     <input type="checkbox" [checked]="(+fg.value.pay || 0) > 0" (change)="toggleAlloc(i, $event)"
-                      [disabled]="formMode === 'edit'" />
+                      />
                   </td>
                 </tr>
               </tbody>
