@@ -1,0 +1,264 @@
+/* khi chưa cho phân bổ thì mờ phần knock */
+.knock-table.dim {
+  opacity: 0.6;
+  pointer-events: none;
+}
+.totals-grid {
+  margin: 10px 0 16px;
+  display: grid;
+  grid-template-columns: 1fr auto; /* label | number */
+  row-gap: 6px;
+  align-items: baseline;
+
+  .label {
+    text-align: right;
+    padding-right: 12px;
+    color: #475569;
+  }
+  .value {
+    min-width: 140px;
+    text-align: right;
+    font-weight: 600;
+    color: #0f172a;
+  }
+  .value.warn {
+    color: #b91c1c;
+  }
+  .knock-table .num,
+  .knock-table td.r input,
+  .pm-table td.r input {
+    text-align: center;
+  }
+}
+/* khung giống bảng dưới */
+.box {
+  background: #fff;
+  overflow: hidden;
+}
+
+/* bọc bảng để không tràn */
+.tablewrap {
+  width: 100%;
+  overflow: auto;
+}
+
+/* bảng payment: giống knock-table */
+.pm-table {
+  width: 100%;
+  table-layout: fixed;        /* canh cột đều, không tràn */
+  border-collapse: separate;
+  border-spacing: 0;
+
+  th, td {
+    padding: 8px 10px;
+    vertical-align: middle;
+  }
+
+  th.r, td.r { text-align: right; }
+  th.c, td.c { text-align: center; }
+
+  input, select {
+    width: 100%;
+    box-sizing: border-box;
+  }
+}
+/* cột delete nhỏ gọn và canh giữa */
+.pm-table {
+  table-layout: fixed;
+
+  th.col-del,
+  td.col-del {
+    width: 65px;            /* vừa nút */
+    text-align: center;     /* canh giữa */
+    white-space: nowrap;
+  }
+
+  /* nút delete dạng icon nhỏ */
+  .btn.icon {
+    width: 28px;
+    height: 28px;
+    padding: 0;             /* gọn */
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;     /* cùng style với nút khác */
+    line-height: 1;
+  }
+}
+.knock-table td.withdisc input[type="checkbox"] { margin: 0; }
+/* ===== Totals (Amount / Unapplied) ===== */
+.totals-grid{
+  display: grid;
+  grid-template-columns: auto 160px; /* label | value */
+  align-items: center;
+  column-gap: 12px;
+  row-gap: 6px;
+}
+.totals-grid .label{
+  color: #334155;
+}
+.totals-grid .value{
+  justify-self: end;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+  min-width: 140px;
+
+  /* khung viền nổi bật */
+  padding: 6px 10px;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  background: #f8fafc;
+}
+.totals-grid .value.warn{
+  border-color: #ef4444;
+  background: #fff1f2;
+  color: #b91c1c;
+}
+
+/* ===== Knock-off title bold ===== */
+.knock-title{
+  font-weight: 700;
+}
+/* highlight nhẹ cho dòng quá hạn */
+.overdue-row td {
+  background: #fff1f2;      /* đỏ nhạt */
+}
+
+.overdue-row td,
+.overdue-row input {
+  /* chữ hơi đậm để nổi nhẹ */
+  color: #7f1d1d;           /* red-900 nhạt hơn có thể dùng #b91c1c */
+}
+/* Ẩn placeholder mm/dd/yyyy trên các trình duyệt WebKit khi chưa focus & chưa có giá trị */
+input.no-ph[type="date"]:not(:focus):invalid::-webkit-datetime-edit {
+  color: transparent;
+}
+/* Khi focus hoặc đã có giá trị thì hiện bình thường */
+input.no-ph[type="date"]:focus::-webkit-datetime-edit,
+input.no-ph[type="date"]:valid::-webkit-datetime-edit {
+  color: inherit;
+}
+/* FireFox: tắt màu khi chưa có giá trị */
+@supports (-moz-appearance: none) {
+  input.no-ph[type="date"]:not(:focus):invalid {
+    color: transparent;
+  }
+  input.no-ph[type="date"]:focus,
+  input.no-ph[type="date"]:valid {
+    color: inherit;
+  }
+}
+/* Cột delete nhỏ, canh giữa */
+.pm-table .col-del {
+  width: 64px;
+  text-align: center;
+}
+
+/* Nút delete kiểu hồng bo tròn */
+.btn.del {
+  --pink1: #ff6b8b;
+  --pink2: #ff3d61;
+
+  height: 36px;
+  width: 48px;
+  padding: 0;
+  border: 0;
+  border-radius: 12px;
+  color: #fff;
+  background: linear-gradient(180deg, var(--pink1) 0%, var(--pink2) 100%);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 0 rgba(0, 0, 0, .08) inset;
+  cursor: pointer;
+  transition: transform .05s ease, filter .15s ease;
+  line-height: 1;        /* để emoji nằm gọn giữa */
+  font-size: 16px;       /* cỡ icon 🗑 */
+}
+
+.btn.del:hover { filter: brightness(1.05); }
+.btn.del:active { transform: translateY(1px); }
+
+/* Trạng thái disabled nếu cần */
+.btn.del:disabled {
+  filter: grayscale(0.3) opacity(.6);
+  cursor: not-allowed;
+}
+/* ô Outstanding có giá trị > 0 -> vàng nhạt, giữ màu chữ gốc */
+/* nếu bạn đang dùng class cho dòng quá hạn, giữ nhẹ nhàng như cũ */
+.overdue-row {
+  background: #fff1f2;   /* hồng nhạt (tùy bạn) */
+  color: #b91c1c;
+}
+.out-gt0 {/* xóa nền vàng cũ nếu còn */
+  color: #2563eb !important;                   /* blue-600 */                /* tùy chọn: đậm hơn chút cho dễ nhìn */
+}
+/* vỏ full-page cho Receive Payment */
+.rp-form-shell {
+  display: flex;
+  flex-direction: column;
+  height: calc(100vh - 150px); // chừa top nav/header
+  background: #fff;
+}
+
+/* header text */
+.rp-header {
+  padding: 16px 32px 8px;
+  border-bottom: 1px solid #e5e7eb;
+  background: #f9fafb;
+}
+
+.rp-title {
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.rp-subtitle {
+  font-size: 13px;
+  color: #6b7280;
+}
+
+/* thân form: 1 vùng scroll + footer sticky */
+.rp-body {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+}
+
+.rp-body-scroll {
+  flex: 1 1 auto;
+  overflow-y: auto;
+  padding: 24px 32px 80px;
+}
+
+/* footer nút Save/Cancel cố định */
+.rp-footer {
+  position: sticky;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 12px 32px;
+  background: #f9fafb;
+  border-top: 1px solid #e5e7eb;
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  z-index: 10;
+}
+
+/* ===== Credit Note page specifics ===== */
+.cn-detail-pane .cn-detail-header{
+  padding: 10px 14px;
+  font-weight: 600;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+/* Knock title bar */
+.knock-titlebar{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:6px;
+}

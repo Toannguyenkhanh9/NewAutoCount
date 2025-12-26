@@ -846,7 +846,7 @@ export class ApPaymentPageComponent {
      this.rows = this.rows.filter((x) => x !== this.selected);
      this.selected = undefined;
      this.showDeleteConfirm = false;
-     this.openSuccess(`Receive Payment deleted successfully.`);
+     this.openSuccess(`Payment deleted successfully.`);
    }
 
    // ===== utils =====
