@@ -1,7 +1,7 @@
-import { CommonModule } from '@angular/common';
-import { Component, computed, effect, signal } from '@angular/core';
+import { CommonModule, } from '@angular/common';
+import { Component, computed, effect, signal,inject } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, FormGroup } from '@angular/forms';
-
+import { CompanyContextService } from '../../../core/services/company-context.service';
 type Bucket = {
   cur: number;
   m1: number;
@@ -49,7 +49,9 @@ type RowView = {
   styleUrls: ['./creditor-aging-report.component.scss']
 })
 export class CreditorAgingReportComponent  {
-
+   private companyContext = inject(CompanyContextService);
+       companyName$ = this.companyContext.companyName$;
+      companyName = this.readCompanyName();
   fg!: FormGroup;
    constructor(private fb: FormBuilder) {
      this.fg = this.fb.group({
@@ -72,7 +74,17 @@ export class CreditorAgingReportComponent  {
    ];
 
    debtorTypes: Array<'RETAIL' | 'TRADING'> = ['RETAIL', 'TRADING'];
-
+    private readCompanyName(): string {
+      var comname : string | null = null;
+      this.companyName$.subscribe((name) => {
+        comname = name || null;
+      });
+      // tuỳ dự án bạn lưu company ở đâu; ưu tiên localStorage/sessionStorage
+      return (
+        comname ||
+        'Company'
+      );
+    }
    private masterTxns: Txn[] = [
      // CARE PHONE SDN (RETAIL) — 1 chứng từ => 5+ OVER 1,250.00
      {
