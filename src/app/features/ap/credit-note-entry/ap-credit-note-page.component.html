@@ -221,10 +221,7 @@
             <!-- Journal Type -->
             <label class="inv-field">
               <span class="inv-label">Journal Type</span>
-              <div class="ac-input-prefix-group">
-                <span class="ac-input-prefix-icon">
-                  <lucide-icon name="hash" [size]="13" color="#111827"></lucide-icon>
-                </span>
+              <div >
                 <select class="ac-form-control" formControlName="journalType">
                   <option *ngFor="let j of journalTypes" [ngValue]="j.typeCode">
                     {{ j.typeCode }}
@@ -236,10 +233,7 @@
             <!-- CN Type -->
             <label class="inv-field">
               <span class="inv-label">CN Type</span>
-              <div class="ac-input-prefix-group">
-                <span class="ac-input-prefix-icon">
-                  <lucide-icon name="hash" [size]="13" color="#111827"></lucide-icon>
-                </span>
+              <div>
                 <select class="ac-form-control" formControlName="dnType" >
                   <option *ngFor="let t of dnTypes" [ngValue]="t">{{ t }}</option>
                 </select>
@@ -248,7 +242,7 @@
 
             <!-- Ref -->
             <label class="inv-field">
-              <span class="inv-label">Ref. No</span>
+              <span class="inv-label">Ref. No.</span>
               <div class="ac-input-prefix-group">
                 <span class="ac-input-prefix-icon">
                   <lucide-icon name="hash" [size]="13" color="#111827"></lucide-icon>
@@ -256,20 +250,6 @@
                 <input class="ac-form-control" formControlName="ref"  />
               </div>
             </label>
-
-            <!-- Ref2 -->
-            <label class="inv-field">
-              <span class="inv-label">Ref. No.2</span>
-              <div class="ac-input-prefix-group">
-                <span class="ac-input-prefix-icon">
-                  <lucide-icon name="hash" [size]="13" color="#111827"></lucide-icon>
-                </span>
-                <input class="ac-form-control" formControlName="ref2"  />
-              </div>
-            </label>
-
-
-
             <!-- Date -->
             <label class="inv-field">
               <span class="inv-label">Date</span>
@@ -280,18 +260,16 @@
                 <input type="date" class="ac-form-control" formControlName="docDate" />
               </div>
             </label>
+             </div>
                         <label class="inv-field wide">
               <span class="inv-label">Description</span>
-              <div class="inv-contact-input ac-input-prefix-group">
-                <span class="ac-input-prefix-icon">
-                  <lucide-icon name="hash" [size]="13" color="#111827"></lucide-icon>
-                </span>
+              <div class="inv-contact-input">
 
                 <input class="ac-form-control" formControlName="description" />
               </div>
             </label>
-
-          </div>
+            <br>
+         
 
           <div class="inv-to-box">
             <div class="to-title">To :</div>
@@ -448,7 +426,11 @@
         </div>
 
         <!-- footer cố định -->
-        <div class="rp-footer">
+        <div class="inv-footer">
+          <label class="chk" *ngIf="formMode === 'new'">
+            <input type="checkbox" formControlName="continueNew"/>
+            <span>After save, proceed with new credit note entry</span>
+          </label>
           <button class="ac-btn ac-btn-ghost" type="button" (click)="closeForm()">Cancel</button>
 
           <ng-container>

@@ -328,6 +328,8 @@ export class ApCreditNotePageComponent {
       }
     }
     selected?: ReceivePaymentRow;
+    /** Giữ CN No gốc khi Edit (dùng để so sánh / tránh nhầm khi validate) */
+    editingDocNo: string | null = null;
     select(r: ReceivePaymentRow) {
       this.selected = r;
     }
@@ -394,7 +396,7 @@ export class ApCreditNotePageComponent {
         outstanding: [0],
         methods: this.fb.array([]),
         knockOff: this.fb.array([]),
-        continueNew: [true],
+        continueNew: [false],
       });
       this.addMethod();
       this.recalcTotals();
@@ -642,6 +644,7 @@ export class ApCreditNotePageComponent {
 
     openNew() {
       this.formMode = 'new';
+      this.editingDocNo = null;
       this.resetFormForNew();
       this.rpForm.enable({ emitEvent: false });
       this.showForm = true;
@@ -650,6 +653,7 @@ export class ApCreditNotePageComponent {
     openEdit() {
       if (!this.selected) return;
       this.formMode = 'edit';
+      this.editingDocNo = this.selected.receiptNo;
       this.resetFormForNew(); // clear trước
       this.showSuccess = false; // <-- thêm dòng này
       const s = this.selected;
@@ -661,14 +665,14 @@ export class ApCreditNotePageComponent {
           {
             debtor: p.debtor ?? s.debtor,
             journalType: p.journalType,
-            date: p.date ?? s.date,
             description: p.description ?? s.description ?? '',
             dnType: p.dnType,
             isDebitJournal: p.isDebitJournal,
             ref: p.ref,
             ref2: p.ref2,
-            docNo: p.docNo,
-            docDate: p.docDate,
+            docNo: (p.docNo ?? s.receiptNo),
+            docDate: this.normalizeYmd(p.docDate ?? p.date ?? s.date),
+            continueNew: false,
           },
           { emitEvent: false }
         );
@@ -713,10 +717,10 @@ export class ApCreditNotePageComponent {
         this.rpForm.patchValue(
           {
             debtor: s.debtor,
-            officialNo: s.receiptNo,
-            date: s.date,
-            currency: 'MYR',
+            docNo: s.receiptNo,
+            docDate: this.normalizeYmd(s.date),
             description: s.description || '',
+            continueNew: false,
           },
           { emitEvent: false }
         );
@@ -735,7 +739,42 @@ export class ApCreditNotePageComponent {
     private today() {
       return new Date().toISOString().slice(0, 10);
     }
-    private resetFormForNew() {
+    
+
+    /** Chuẩn hoá ngày về YYYY-MM-DD (phục vụ <input type="date">) */
+    private normalizeYmd(v: any): string {
+      if (!v) return '';
+
+      // Date object
+      if (v instanceof Date && !isNaN(v.getTime())) {
+        return v.toISOString().slice(0, 10);
+      }
+
+      const s = String(v).trim();
+      if (!s) return '';
+
+      // yyyy-mm-dd
+      if (/^\d{4}-\d{2}-\d{2}$/.test(s)) return s;
+
+      // yyyy-mm-ddThh:mm...
+      const iso = s.match(/^(\d{4}-\d{2}-\d{2})[T\s]/);
+      if (iso) return iso[1];
+
+      // dd/mm/yyyy or d/m/yyyy
+      const dmy = s.match(/^(\d{1,2})[\/-](\d{1,2})[\/-](\d{4})$/);
+      if (dmy) {
+        const dd = String(+dmy[1]).padStart(2, '0');
+        const mm = String(+dmy[2]).padStart(2, '0');
+        const yy = dmy[3];
+        return `${yy}-${mm}-${dd}`;
+      }
+
+      const dt = new Date(s);
+      if (!isNaN(dt.getTime())) return dt.toISOString().slice(0, 10);
+
+      return '';
+    }
+private resetFormForNew() {
       const jtDefault = this.journalTypes?.[0]?.typeCode ?? '';
       this.rpForm.reset({
         docNo: '',
@@ -752,6 +791,7 @@ export class ApCreditNotePageComponent {
         outstanding: 0,
         journalType: jtDefault,
         dnType: 'RETURN',
+        continueNew: false,
       });
       while (this.methodsFA.length) this.methodsFA.removeAt(0);
       this.addMethod();
@@ -804,8 +844,21 @@ export class ApCreditNotePageComponent {
 
       // New
       this.rows.unshift(row as any);
+
+      const keepNew = !!v.continueNew;
+      if (keepNew) {
+        // Giữ form để nhập tiếp
+        this.openSuccess(`Saved receipt ${receiptNo} successfully.`);
+        this.formMode = 'new';
+        this.editingDocNo = null;
+        this.resetFormForNew();
+        this.rpForm.patchValue({ continueNew: true }, { emitEvent: false });
+        this.rpForm.enable({ emitEvent: false });
+        this.showForm = true;
+        return;
+      }
+
       this.showForm = false;
-      // KHÔNG đóng form – hiện success
       this.openSuccess(`Saved receipt ${receiptNo} successfully.`);
     }
 

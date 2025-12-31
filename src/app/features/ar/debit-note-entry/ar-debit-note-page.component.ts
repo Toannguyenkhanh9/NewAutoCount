@@ -385,8 +385,39 @@ export class ArDebitNotePageComponent {
     return this.toYMD(d);
   }
 
+
+/** Chuẩn hoá ngày về YYYY-MM-DD (phục vụ <input type="date">) */
+private normalizeYmd(v: any): string {
+  if (!v) return '';
+  if (v instanceof Date && !isNaN(v.getTime())) return v.toISOString().slice(0, 10);
+
+  const s = String(v).trim();
+  if (!s) return '';
+
+  if (/^\d{4}-\d{2}-\d{2}$/.test(s)) return s;
+
+  const iso = s.match(/^(\d{4}-\d{2}-\d{2})[T\s]/);
+  if (iso) return iso[1];
+
+  const dmy = s.match(/^(\d{1,2})[\/-](\d{1,2})[\/-](\d{4})$/);
+  if (dmy) {
+    const dd = String(+dmy[1]).padStart(2, '0');
+    const mm = String(+dmy[2]).padStart(2, '0');
+    const yy = dmy[3];
+    return `${yy}-${mm}-${dd}`;
+  }
+
+  const dt = new Date(s);
+  if (!isNaN(dt.getTime())) return dt.toISOString().slice(0, 10);
+
+  return '';
+}
+
+
   // ===== list state =====
   selected?: Invoice;
+  /** Giữ docNo gốc khi View/Edit để validator không báo trùng */
+  editingDocNo: string | null = null;
   q = '';
   sortBy: keyof Invoice = 'docDate';
   sortDir: 'asc' | 'desc' = 'desc';
@@ -419,7 +450,7 @@ export class ArDebitNotePageComponent {
       ref: [''],
       ref2: [''],
       autoNumbering: [true], // điều khiển Invoice No
-      docNo: ['', Validators.required],
+      docNo: ['', [this.docNoValidator]],
       docDate: [this.todayYMD()],
       terms: ['N30'],
       dueDate: [this.addDaysYMD(new Date(), 30)],
@@ -429,7 +460,7 @@ export class ArDebitNotePageComponent {
       lines: this.fb.array([]),
       grandTotal: [0],
       outstanding: [0],
-      continueNew: [true],
+      continueNew: [false],
     });
     if (this.acLinesFA.length === 0) this.addAcLine();
     this.findForm = this.fb.group({
@@ -640,6 +671,7 @@ export class ArDebitNotePageComponent {
   // ===== CRUD =====
   newInvoice() {
     this.formMode = 'new';
+    this.editingDocNo = null;
     const jtDefault = this.journalTypes?.[0]?.typeCode ?? '';
     const termsDefault = this.creditTerms?.[0]?.code ?? '';
     this.invForm.reset({
@@ -660,6 +692,11 @@ export class ArDebitNotePageComponent {
       terms: termsDefault,
       dnType: 'OMIT',
       isDebitJournal: false,
+      agent: '',
+      ref: '',
+      ref2: '',
+      autoNumbering: true,
+      continueNew: false,
     });
     this.acLinesFA.clear();
     this.addAcLine();
@@ -669,13 +706,17 @@ export class ArDebitNotePageComponent {
   viewInvoice() {
     if (!this.selected) return;
     this.formMode = 'view';
+    this.editingDocNo = this.selected.docNo;
     this.patchInvoice(this.selected);
+    this.invForm.get('docNo')?.updateValueAndValidity({ emitEvent: false });
     this.showForm = true;
   }
   editInvoice() {
     if (!this.selected) return;
     this.formMode = 'edit';
+    this.editingDocNo = this.selected.docNo;
     this.patchInvoice(this.selected);
+    this.invForm.get('docNo')?.updateValueAndValidity({ emitEvent: false });
     this.showForm = true;
   }
   deleteInvoice() {
@@ -686,8 +727,8 @@ export class ArDebitNotePageComponent {
   private patchInvoice(inv: Invoice) {
     this.invForm.patchValue({
       docNo: inv.docNo,
-      docDate: inv.docDate,
-      dueDate: inv.dueDate,
+      docDate: this.normalizeYmd(inv.docDate),
+      dueDate: this.normalizeYmd(inv.dueDate),
       debtor: inv.debtor,
       debtorName: inv.debtorName,
       currency: inv.currency,
@@ -697,7 +738,8 @@ export class ArDebitNotePageComponent {
       subTotal: inv.subTotal,
       taxTotal: inv.taxTotal,
       grandTotal: inv.grandTotal,
-      outstanding: inv.grandTotal,
+      outstanding: inv.outstanding ?? inv.grandTotal,
+      continueNew: false
     });
     this.acLinesFA.clear();
     // map tạm: mô tả lấy description, số tiền lấy total (hoặc amount tùy bạn)
@@ -719,65 +761,160 @@ export class ArDebitNotePageComponent {
    *  - Nếu có giá trị: chỉ cho [A–Z,a–z,0–9,-,_ ,/]
    *  - Không được trùng với invoice đã có
    */
-  docNoValidator: ValidatorFn = (ctrl: AbstractControl) => {
-    const v = (ctrl.value ?? '').trim();
-    if (!v) return null; // rỗng = dùng auto, hợp lệ
-    if (!/^[A-Za-z0-9\-_\/]+$/.test(v)) return { pattern: true };
-    const dup = this.invoices.some((x) => (x.docNo || '').toLowerCase() === v.toLowerCase());
-    return dup ? { duplicate: true } : null;
-  };
+  
+docNoValidator: ValidatorFn = (ctrl: AbstractControl) => {
+  const v = (ctrl.value ?? '').trim();
+
+  // nếu manual numbering => bắt buộc nhập
+  const auto = !!(ctrl.parent?.get('autoNumbering')?.value ?? this.invForm?.value?.autoNumbering);
+  if (!v) return auto ? null : { required: true };
+
+  // chỉ cho [A–Z,a–z,0–9,-,_ ,/]
+  if (!/^[A-Za-z0-9\-_\/]+$/.test(v)) return { pattern: true };
+
+  // ignore chính nó khi đang edit/view
+  const current = (this.editingDocNo || '').toLowerCase();
+  const vv = v.toLowerCase();
+
+  const dup = this.invoices.some((x) => {
+    const dn = (x.docNo || '').toLowerCase();
+    return dn === vv && dn !== current;
+  });
+
+  return dup ? { duplicate: true } : null;
+};
 
   isInvalid(name: string): boolean {
     const c = this.invForm?.get(name);
     return !!(c && c.invalid && (c.touched || this.submitted));
   }
-  saveInvoice() {
-    this.submitted = true;
-    if (this.invForm.invalid) return; // chặn Save nếu form lỗi
-    localStorage.setItem('ar_inv_last_desc', this.invForm.value.description || '');
-    const v = this.invForm.getRawValue();
-    const docNo = v.autoNumbering && !v.docNo ? this.nextRunningNo() : v.docNo;
+  
+private buildInvoiceFromForm(docNo: string): Invoice {
+  const v: any = this.invForm.getRawValue();
 
-    const payload = { ...v, docNo };
-    // TODO: call API create invoice
+  const debtorCode = v.debtor || '';
+  const debtorName =
+    v.debtorName ||
+    (this.debtors ?? []).find((d) => d.debtorAccount === debtorCode)?.companyName ||
+    debtorCode;
 
-    if (v.continueNew) {
-      // reset form cho chứng từ mới
-      const jtDefault = this.journalTypes?.[0]?.typeCode ?? '';
-      const termsDefault = this.creditTerms?.[0]?.code ?? '';
-      this.invForm.reset({
-        docNo: this.nextNumber(),
-        docDate: this.today(),
-        dueDate: this.addDays(this.today(), 0),
-        debtor: '',
-        debtorName: '',
-        currency: 'MYR',
-        rate: 1,
-        description: '',
-        status: 'OPEN',
-        subTotal: 0,
-        taxTotal: 0,
-        grandTotal: 0,
-        outstanding: 0,
-        journalType: jtDefault,
-        terms: termsDefault,
-        dnType: 'OMIT',
-        isDebitJournal: false,
-      });
-      while (this.acLinesFA.length) this.acLinesFA.removeAt(0);
-      this.addAcLine();
-      this.formMode = 'new';
-      this.submitted = false;
-      this.invForm.markAsPristine();
-      this.invForm.markAsUntouched();
+  // map lines (UI accounting lines) -> InvoiceLine (shape để edit lại được)
+  const lines: InvoiceLine[] = (this.acLinesFA.controls || []).map((fg: any) => {
+    const lv = fg.getRawValue ? fg.getRawValue() : fg.value;
+    const amt = Number(lv.amount ?? 0) || 0;
+    return {
+      item: String(lv.accNo ?? ''),
+      description: String(lv.lineDesc ?? ''),
+      uom: '',
+      qty: 1,
+      unitPrice: amt,
+      tax: 'ZR',
+      amount: amt,
+      taxAmt: 0,
+      total: amt,
+    };
+  });
 
-      this.openSuccess((this.formMode === 'new' ? 'Create' : 'Edit') + ' debit note successfully.');
-      this.showForm = true;
-      return;
-    }
-    this.showForm = false;
-    this.openSuccess((this.formMode === 'new' ? 'Create' : 'Edit') + ' debit note successfully.');
+  const grandTotal = Number(v.grandTotal ?? 0) || 0;
+  const outstanding = Number(v.outstanding ?? grandTotal) || 0;
+
+  return {
+    docNo,
+    docDate: this.normalizeYmd(v.docDate),
+    dueDate: this.normalizeYmd(v.dueDate),
+    debtor: debtorCode,
+    debtorName,
+    currency: v.currency || 'MYR',
+    rate: Number(v.rate ?? 1) || 1,
+    description: v.description || '',
+    agent: v.agent || '',
+    lines,
+    subTotal: Number(v.subTotal ?? grandTotal) || grandTotal,
+    taxTotal: Number(v.taxTotal ?? 0) || 0,
+    grandTotal,
+    outstanding,
+  };
+}
+
+saveInvoice() {
+  this.submitted = true;
+  if (this.invForm.invalid) return;
+
+  localStorage.setItem('ar_inv_last_desc', this.invForm.value.description || '');
+
+  const v: any = this.invForm.getRawValue();
+
+  // docNo: new (auto/manual) hoặc giữ docNo cũ khi edit/view
+  let docNo = v.autoNumbering && !v.docNo ? this.nextRunningNo() : v.docNo;
+  if (this.formMode !== 'new') {
+    docNo = this.editingDocNo || docNo;
   }
+
+  const inv = this.buildInvoiceFromForm(docNo);
+
+  // TODO: call API create/update debit note (payload = inv + journalType/dnType/terms nếu cần)
+
+  const key = (this.editingDocNo || docNo || '').toLowerCase();
+
+  if (this.formMode === 'edit') {
+    const idx = this.invoices.findIndex((x) => (x.docNo || '').toLowerCase() === key);
+    if (idx >= 0) this.invoices[idx] = inv;
+    else this.invoices.unshift(inv);
+    this.selected = inv;
+  } else {
+    // new
+    this.invoices.unshift(inv);
+    this.selected = inv;
+  }
+
+  // về page 1 để thấy record mới/cập nhật rõ ràng
+  this.page = 1;
+
+  if (v.continueNew && this.formMode === 'new') {
+    // reset form cho chứng từ mới
+    const jtDefault = this.journalTypes?.[0]?.typeCode ?? '';
+    const termsDefault = this.creditTerms?.[0]?.code ?? '';
+    this.invForm.reset({
+      docNo: this.nextNumber(),
+      docDate: this.today(),
+      dueDate: this.addDays(this.today(), 0),
+      debtor: '',
+      debtorName: '',
+      currency: 'MYR',
+      rate: 1,
+      description: '',
+      status: 'OPEN',
+      subTotal: 0,
+      taxTotal: 0,
+      grandTotal: 0,
+      outstanding: 0,
+      journalType: jtDefault,
+      terms: termsDefault,
+      dnType: 'OMIT',
+      isDebitJournal: false,
+        agent: '',
+        ref: '',
+        ref2: '',
+      autoNumbering: true,
+      continueNew: false,
+    });
+
+    this.editingDocNo = null;
+    this.acLinesFA.clear();
+    this.addAcLine();
+    this.submitted = false;
+    this.invForm.markAsPristine();
+    this.invForm.markAsUntouched();
+
+    this.openSuccess('Create debit note successfully.');
+    this.showForm = true;
+    return;
+  }
+
+  this.showForm = false;
+  this.editingDocNo = null;
+  this.openSuccess((this.formMode === 'new' ? 'Create' : 'Edit') + ' debit note successfully.');
+}
   private valueFromForm(): Invoice {
     const fv = this.invForm.getRawValue();
     // LẤY DÒNG VỚI KIỂU RÕ RÀNG
@@ -937,6 +1074,7 @@ export class ArDebitNotePageComponent {
   closeForm() {
     this.showForm = false;
     this.submitted = false;
+    this.editingDocNo = null;
   }
   toggleDueShortcuts(event: MouseEvent): void {
     event.stopPropagation();

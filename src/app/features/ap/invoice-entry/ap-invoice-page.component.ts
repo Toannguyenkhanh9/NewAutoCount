@@ -241,6 +241,7 @@ export class ApInvoicePageComponent implements OnInit {
      debtorQuery = '';
      debtorFiltered: DebtorRow[] = [];
      showDueShortcuts = false;
+     editingDocNo: string | null = null;
      openDebtorDropdown() {
        this.debtorQuery = '';
        this.debtorFiltered = [...(this.debtors ?? [])];
@@ -417,7 +418,7 @@ export class ApInvoicePageComponent implements OnInit {
          agent: [''],
          ref2: [''],
          autoNumbering: [true], // điều khiển Invoice No
-         docNo: ['', Validators.required],
+         docNo: ['', [Validators.required, this.docNoValidator]],
          docDate: [this.todayYMD()],
          terms: ['N30'],
          dueDate: [this.addDaysYMD(new Date(), 30)],
@@ -703,6 +704,8 @@ export class ApInvoicePageComponent implements OnInit {
 
      // ===== CRUD =====
      newInvoice() {
+       this.editingDocNo = null;
+       this.submitted = false;
        this.formMode = 'new';
        const jtDefault = this.journalTypes?.[0]?.typeCode ?? '';
        const termsDefault = this.creditTerms?.[0]?.code ?? '';
@@ -725,17 +728,22 @@ export class ApInvoicePageComponent implements OnInit {
        });
        this.showDueShortcuts = false;
        this.acLinesFA.clear();
+       this.accNoSugs = [];
        this.addAcLine();
        this.showForm = true;
      }
      viewInvoice() {
        if (!this.selected) return;
+       this.editingDocNo = this.selected.docNo;
+       this.submitted = false;
        this.formMode = 'view';
        this.patchInvoice(this.selected);
        this.showForm = true;
      }
      editInvoice() {
        if (!this.selected) return;
+       this.editingDocNo = this.selected.docNo;
+       this.submitted = false;
        this.formMode = 'edit';
        this.patchInvoice(this.selected);
        this.showForm = true;
@@ -748,8 +756,8 @@ export class ApInvoicePageComponent implements OnInit {
      private patchInvoice(inv: Invoice) {
        this.invForm.patchValue({
          docNo: inv.docNo,
-         docDate: inv.docDate,
-         dueDate: inv.dueDate,
+         docDate: this.normalizeYmd(inv.docDate),
+         dueDate: this.normalizeYmd(inv.dueDate),
          debtor: inv.debtor,
          debtorName: inv.debtorName,
          currency: inv.currency,
@@ -759,20 +767,32 @@ export class ApInvoicePageComponent implements OnInit {
          subTotal: inv.subTotal,
          taxTotal: inv.taxTotal,
          grandTotal: inv.grandTotal,
-         outstanding: inv.grandTotal,
+         outstanding: inv.outstanding ?? inv.grandTotal,
+         // tránh trường hợp edit bị "dính" continueNew=true từ lần Create trước
+         continueNew: false,
        });
        this.acLinesFA.clear();
+       this.accNoSugs = [];
        // map tạm: mô tả lấy description, số tiền lấy total (hoặc amount tùy bạn)
        inv.lines.forEach((l) => {
          const fg = this.createLine();
          fg.patchValue({
-           accNo: '', // chưa có account -> để trống cho user chọn
+           // nếu invoice line có item => dùng làm accNo để Edit hiển thị lại đúng
+           accNo: (l as any).item || '',
            toAccRate: 1,
            lineDesc: l.description || '',
            amount: l.total ?? l.amount ?? 0,
          });
          this.acLinesFA.push(fg);
+         this.accNoSugs.push([]);
        });
+
+       if (this.acLinesFA.length === 0) {
+         this.addAcLine();
+       }
+
+       // đảm bảo total/outstanding khớp với lines
+       this.recalcTotals();
      }
      submitted = false;
 
@@ -785,7 +805,11 @@ export class ApInvoicePageComponent implements OnInit {
        const v = (ctrl.value ?? '').trim();
        if (!v) return null; // rỗng = dùng auto, hợp lệ
        if (!/^[A-Za-z0-9\-_\/]+$/.test(v)) return { pattern: true };
-       const dup = this.invoices.some((x) => (x.docNo || '').toLowerCase() === v.toLowerCase());
+       const current = (this.editingDocNo || '').toLowerCase();
+       const dup = this.invoices.some((x) => {
+         const d = (x.docNo || '').toLowerCase();
+         return d === v.toLowerCase() && d !== current;
+       });
        return dup ? { duplicate: true } : null;
      };
 
@@ -795,74 +819,97 @@ export class ApInvoicePageComponent implements OnInit {
      }
      saveInvoice() {
        this.submitted = true;
-       if (this.invForm.invalid) return; // chặn Save nếu form lỗi
-       localStorage.setItem('ar_inv_last_desc', this.invForm.value.description || '');
+       if (this.invForm.invalid) return;
+
        const v = this.invForm.getRawValue();
-       const docNo = v.autoNumbering && !v.docNo ? this.nextRunningNo() : v.docNo;
+       localStorage.setItem('ar_inv_last_desc', v.description || '');
 
-       const payload = { ...v, docNo };
-       // TODO: call API create invoice
+       // docNo: New có thể auto; Edit/View luôn giữ docNo hiện tại
+       let docNo = (v.docNo || '').toString().trim();
+       if (this.formMode === 'new') {
+         if (v.autoNumbering && !docNo) docNo = this.nextRunningNo();
+         if (!docNo) docNo = this.nextNumber();
+       } else {
+         docNo = this.editingDocNo || docNo;
+       }
 
-       if (v.continueNew) {
-         const jtDefault = this.journalTypes?.[0]?.typeCode ?? '';
-         const termsDefault = this.creditTerms?.[0]?.code ?? '';
-         // reset form cho chứng từ mới
-         this.invForm.reset({
-           docNo: this.nextNumber(),
-           docDate: this.today(),
-           dueDate: this.addDays(this.today(), 0),
-           debtor: '',
-           debtorName: '',
-           currency: 'MYR',
-           rate: 1,
-           description: '',
-           status: 'OPEN',
-           subTotal: 0,
-           taxTotal: 0,
-           grandTotal: 0,
-           outstanding: 0,
-           journalType: jtDefault,
-           terms: termsDefault,
-           continueNew: true,
-         });
-         while (this.acLinesFA.length) this.acLinesFA.removeAt(0);
-         this.addAcLine();
-         this.formMode = 'new';
-         this.submitted = false;
-         this.invForm.markAsPristine();
-         this.invForm.markAsUntouched();
+       const inv = this.buildInvoiceFromForm(docNo);
 
-         this.openSuccess((this.formMode === 'new' ? 'Create' : 'Edit') + ' invoice successfully.');
-         this.showForm = true;
+       // Update list
+       if (this.formMode === 'edit') {
+         const key = (this.editingDocNo || docNo).toLowerCase();
+         const idx = this.invoices.findIndex((x) => (x.docNo || '').toLowerCase() === key);
+         if (idx >= 0) this.invoices[idx] = inv;
+         else this.invoices.unshift(inv);
+       } else {
+         // NEW
+         this.invoices.unshift(inv);
+       }
+
+       this.selected = inv;
+       this.loadPaymentHistory(inv);
+
+       // Continue new chỉ áp dụng khi Create
+       if (this.formMode === 'new' && v.continueNew) {
+         this.openSuccess('Invoice created successfully.');
+         this.newInvoice();
          return;
        }
+
        this.showForm = false;
-       this.openSuccess((this.formMode === 'new' ? 'Create' : 'Edit') + ' invoice successfully.');
+       this.openSuccess(this.formMode === 'edit' ? 'Invoice updated successfully.' : 'Invoice created successfully.');
      }
-     private valueFromForm(): Invoice {
-       const fv = this.invForm.getRawValue();
-       // LẤY DÒNG VỚI KIỂU RÕ RÀNG
-       const lines: InvoiceLine[] = this.linesFA.controls.map((fg) => fg.getRawValue() as InvoiceLine);
-       const subTotal = +lines.reduce((s, l) => s + l.amount, 0).toFixed(2);
-       const taxTotal = +lines.reduce((s, l) => s + l.taxAmt, 0).toFixed(2);
+     private buildInvoiceFromForm(docNo: string): Invoice {
+       const fv: any = this.invForm.getRawValue();
+
+       const debtor = (fv.debtor || '').toString();
+       const debtorName =
+         this.debtors.find((d) => d.debtorAccount === debtor)?.companyName || (fv.debtorName || '').toString();
+
+       // Form lines hiện tại là dạng A/C lines: { accNo, toAccRate, lineDesc, amount }
+       // Map sang InvoiceLine để tái dùng cấu trúc Invoice (không cần thay model).
+       const lines: InvoiceLine[] = (fv.lines || []).map((l: any) => {
+         const amount = +((l?.amount ?? 0) || 0);
+         return {
+           item: (l?.accNo || '').toString(),
+           description: (l?.lineDesc || '').toString(),
+           uom: '',
+           qty: 1,
+           unitPrice: amount,
+           tax: 'ZR',
+           amount,
+           taxAmt: 0,
+           total: amount,
+         };
+       });
+
+       const subTotal = +lines.reduce((s, x) => s + (x.amount || 0), 0).toFixed(2);
+       const taxTotal = +lines.reduce((s, x) => s + (x.taxAmt || 0), 0).toFixed(2);
        const grandTotal = +(subTotal + taxTotal).toFixed(2);
-       const debtorName = this.debtors.find((d) => d.debtorAccount === fv.debtor)?.companyName || '';
+       const outstanding = +((fv.outstanding ?? grandTotal) || 0);
+
        return {
-         docNo: fv.docNo,
-         docDate: fv.docDate,
-         dueDate: fv.dueDate,
-         debtor: fv.debtor,
+         docNo,
+         docDate: this.normalizeYmd(fv.docDate),
+         dueDate: this.normalizeYmd(fv.dueDate),
+         debtor,
          debtorName,
-         currency: fv.currency,
-         rate: fv.rate,
-         description: fv.description,
-         agent: fv.agent,
+         currency: (fv.currency || 'MYR') as any,
+         rate: 1,
+         description: (fv.description || '').toString(),
+         agent: (fv.agent || '').toString(),
          lines,
          subTotal,
          taxTotal,
          grandTotal,
-         outstanding: grandTotal,
+         outstanding,
        };
+     }
+
+     // Giữ lại hàm cũ nếu nơi khác đang gọi
+     private valueFromForm(): Invoice {
+       const fv = this.invForm.getRawValue() as any;
+       return this.buildInvoiceFromForm((fv.docNo || '').toString());
      }
 
      refresh() {
@@ -991,6 +1038,10 @@ export class ApInvoicePageComponent implements OnInit {
      }
      closeForm() {
        this.showForm = false;
+       this.editingDocNo = null;
+       this.submitted = false;
+       this.showDueShortcuts = false;
+       this.showAddRowMenu = false;
        this.invForm.markAsPristine();
      }
      showCurrencyPanel = false;
@@ -1105,5 +1156,38 @@ export class ApInvoicePageComponent implements OnInit {
        this.updateMyCurrencies();
        this.filteredCurrencies = [...this.currencies];
      }
+     private normalizeYmd(v: any): string {
+  if (!v) return '';
+
+  // Date object
+  if (v instanceof Date && !isNaN(v.getTime())) {
+    return v.toISOString().slice(0, 10);
+  }
+
+  const s = String(v).trim();
+  if (!s) return '';
+
+  // ISO yyyy-mm-dd
+  if (/^\d{4}-\d{2}-\d{2}$/.test(s)) return s;
+
+  // ISO datetime: yyyy-mm-ddThh:mm:ss...
+  const iso = s.match(/^(\d{4}-\d{2}-\d{2})[T\s]/);
+  if (iso) return iso[1];
+
+  // dd/mm/yyyy hoặc d/m/yyyy (hay gặp ở VN)
+  const dmy = s.match(/^(\d{1,2})[\/-](\d{1,2})[\/-](\d{4})$/);
+  if (dmy) {
+    const dd = String(+dmy[1]).padStart(2, '0');
+    const mm = String(+dmy[2]).padStart(2, '0');
+    const yy = dmy[3];
+    return `${yy}-${mm}-${dd}`;
+  }
+
+  // Fallback
+  const dt = new Date(s);
+  if (!isNaN(dt.getTime())) return dt.toISOString().slice(0, 10);
+
+  return '';
+}
    }
 

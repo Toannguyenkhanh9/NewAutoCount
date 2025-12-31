@@ -82,7 +82,7 @@
             </table>
           </div>
         </div>
-      <div class="account-type-footer">
+       <div class="account-type-footer">
         <div class="account-type-rec">
           Total Records: 3
         </div>
@@ -106,9 +106,9 @@
             &raquo;
           </button>
         </div>
-      </div>
+       </div>
         <!-- Detail pane -->
-        <div class="ac-card ac-card-no-padding payment-panel" *ngIf="selected">
+        <div class="ac-card ac-card-no-padding cn-detail-pane" *ngIf="selected">
           <div class="pp-head">
             <div class="pp-title">
               Invoices / Debit Notes Paid
@@ -213,7 +213,7 @@
 
             <!-- Official Receipt No -->
             <label class="inv-field">
-              <span class="inv-label">Official Receipt No</span>
+              <span class="inv-label">Official Receipt No.</span>
               <div class="inv-contact-input ac-input-prefix-group">
                 <span class="ac-input-prefix-icon">
                   <lucide-icon name="hash" [size]="13" color="#111827"></lucide-icon>
@@ -242,11 +242,7 @@
             <!-- Description (wide) -->
             <label class="inv-field wide">
               <span class="inv-label">Description</span>
-              <div class="inv-contact-input ac-input-prefix-group">
-                <span class="ac-input-prefix-icon">
-                  <lucide-icon name="hash" [size]="13" color="#111827"></lucide-icon>
-                </span>
-
+              <div class="inv-contact-input">
                 <input class="ac-form-control" formControlName="description" />
               </div>
             </label>

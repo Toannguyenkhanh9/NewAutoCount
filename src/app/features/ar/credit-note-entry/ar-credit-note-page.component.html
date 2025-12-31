@@ -23,12 +23,7 @@
             <span class="ico eye"></span>
             Edit
           </button>
-                    <button
-            type="button"
-            class="ac-btn ac-btn-danger"
-            [disabled]="!selected"
-            (click)="askDelete()"
-          >
+          <button type="button" class="ac-btn ac-btn-danger" [disabled]="!selected" (click)="askDelete()">
             <span class="ico trash"></span>
             Delete
           </button>
@@ -91,8 +86,9 @@
       <div *ngIf="detailOpen" class="ac-card ac-card-no-padding cn-detail-pane">
         <div class="cn-detail-header">Invoices / Debit Notes Paid
           <ng-container *ngIf="selected">
-              &nbsp;—&nbsp;<b>{{ selected.receiptNo }}</b>
-            </ng-container></div>
+            &nbsp;—&nbsp;<b>{{ selected.receiptNo }}</b>
+          </ng-container>
+        </div>
         <div class="ac-tablewrap">
           <table class="ac-table ac-table-sm">
             <colgroup>
@@ -182,7 +178,7 @@
 
               <div class="inv-error" *ngIf="isInvalid('debtor')">Please select a contact.</div>
             </label>
-             <!-- CN No -->
+            <!-- CN No -->
             <label class="inv-field">
               <span class="inv-label">CN No.</span>
               <div class="ac-input-prefix-group">
@@ -210,7 +206,7 @@
                 </ng-container>
               </div>
             </label>
-                        <!-- Is Credit Journal -->
+            <!-- Is Credit Journal -->
             <label class="inv-field">
               <span class="inv-label">&nbsp;</span>
               <div class="inv-checkline">
@@ -221,10 +217,7 @@
             <!-- Journal Type -->
             <label class="inv-field">
               <span class="inv-label">Journal Type</span>
-              <div class="ac-input-prefix-group">
-                <span class="ac-input-prefix-icon">
-                  <lucide-icon name="hash" [size]="13" color="#111827"></lucide-icon>
-                </span>
+              <div>
                 <select class="ac-form-control" formControlName="journalType">
                   <option *ngFor="let j of journalTypes" [ngValue]="j.typeCode">
                     {{ j.typeCode }}
@@ -236,11 +229,8 @@
             <!-- CN Type -->
             <label class="inv-field">
               <span class="inv-label">CN Type</span>
-              <div class="ac-input-prefix-group">
-                <span class="ac-input-prefix-icon">
-                  <lucide-icon name="hash" [size]="13" color="#111827"></lucide-icon>
-                </span>
-                <select class="ac-form-control" formControlName="dnType" >
+              <div >
+                <select class="ac-form-control" formControlName="dnType">
                   <option *ngFor="let t of dnTypes" [ngValue]="t">{{ t }}</option>
                 </select>
               </div>
@@ -248,28 +238,14 @@
 
             <!-- Ref -->
             <label class="inv-field">
-              <span class="inv-label">Ref. No</span>
+              <span class="inv-label">Ref. No.</span>
               <div class="ac-input-prefix-group">
                 <span class="ac-input-prefix-icon">
                   <lucide-icon name="hash" [size]="13" color="#111827"></lucide-icon>
                 </span>
-                <input class="ac-form-control" formControlName="ref"  />
+                <input class="ac-form-control" formControlName="ref" />
               </div>
             </label>
-
-            <!-- Ref2 -->
-            <label class="inv-field">
-              <span class="inv-label">Ref. No.2</span>
-              <div class="ac-input-prefix-group">
-                <span class="ac-input-prefix-icon">
-                  <lucide-icon name="hash" [size]="13" color="#111827"></lucide-icon>
-                </span>
-                <input class="ac-form-control" formControlName="ref2"  />
-              </div>
-            </label>
-
-
-
             <!-- Date -->
             <label class="inv-field">
               <span class="inv-label">Date</span>
@@ -280,18 +256,15 @@
                 <input type="date" class="ac-form-control" formControlName="docDate" />
               </div>
             </label>
-                        <label class="inv-field wide">
-              <span class="inv-label">Description</span>
-              <div class="inv-contact-input ac-input-prefix-group">
-                <span class="ac-input-prefix-icon">
-                  <lucide-icon name="hash" [size]="13" color="#111827"></lucide-icon>
-                </span>
-
-                <input class="ac-form-control" formControlName="description" />
-              </div>
-            </label>
-
           </div>
+          <label class="inv-field wide">
+            <span class="inv-label">Description</span>
+            <div class="inv-contact-input">
+              <input class="ac-form-control" formControlName="description" />
+            </div>
+          </label>
+          <br>
+
 
           <div class="inv-to-box">
             <div class="to-title">To :</div>
@@ -322,7 +295,7 @@
                     </td>
                     <td class="ac-text-right">
                       <input class="ac-form-control ac-text-right" appAmount formControlName="amount"
-                        (input)="onMethodAmtOrFeeChanged()"  />
+                        (input)="onMethodAmtOrFeeChanged()" />
                     </td>
                     <td class="ac-text-center">
                       <button type="button" class="ac-btn ac-btn-icon-danger" (click)="removeMethod(i)"
@@ -391,8 +364,7 @@
           <div formArrayName="knockOff">
             <div class="knock-titlebar">
               <div class="title sm knock-title">Knock Off Invoices / Debit Notes</div>
-              <button class="ac-btn ac-btn-primary" type="button" (click)="autoAllocate()"
-                [disabled]="!canAllocate">
+              <button class="ac-btn ac-btn-primary" type="button" (click)="autoAllocate()" [disabled]="!canAllocate">
                 Auto allocate
               </button>
             </div>
@@ -448,17 +420,21 @@
         </div>
 
         <!-- footer cố định -->
-        <div class="rp-footer">
+        <div class="inv-footer">
+          <label class="chk" *ngIf="formMode === 'new'">
+            <input type="checkbox" formControlName="continueNew"/>
+            <span>After save, proceed with new credit note entry</span>
+          </label>
           <button class="ac-btn ac-btn-ghost" type="button" (click)="closeForm()">Cancel</button>
 
           <ng-container>
             <button class="ac-btn ac-btn-primary" type="button" (click)="askSave()"
               [disabled]="totalAmount === 0 || rpForm.invalid">
-            {{
-            formMode === 'new'
-            ? 'Create'
-            : 'Save'
-            }}
+              {{
+              formMode === 'new'
+              ? 'Create'
+              : 'Save'
+              }}
             </button>
           </ng-container>
         </div>
@@ -552,7 +528,7 @@
     </div>
   </div>
   <div class="ac-dialog-backdrop" *ngIf="showSaveConfirm">
-        <div class="ac-card-no-padding ac-dialog-panel-sm" role="dialog" aria-modal="true" style="min-width: 360px">
+    <div class="ac-card-no-padding ac-dialog-panel-sm" role="dialog" aria-modal="true" style="min-width: 360px">
       <div class="ac-dialog-header">
         Confirm
         <button class="ac-dialog-close" (click)="cancelConfirmSave()">×</button>

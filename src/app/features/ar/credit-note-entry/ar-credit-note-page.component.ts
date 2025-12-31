@@ -334,7 +334,9 @@ export class ArCreditNotePageComponent {
     }
   }
   selected?: ReceivePaymentRow;
-  select(r: ReceivePaymentRow) {
+    /** DocNo hiện đang sửa (để ignore duplicate khi Edit) */
+  editingDocNo: string | null = null;
+select(r: ReceivePaymentRow) {
     this.selected = r;
   }
   first() {
@@ -400,8 +402,10 @@ export class ArCreditNotePageComponent {
       outstanding: [0],
       methods: this.fb.array([]),
       knockOff: this.fb.array([]),
-      continueNew: [true],
+      continueNew: [false],
     });
+    // default: continueNew luôn false khi load page
+    this.rpForm.get('continueNew')?.setValue(false, { emitEvent: false });
     this.addMethod();
     this.recalcTotals();
   }
@@ -647,6 +651,7 @@ private updateLocksForRow(i: number) {
   }
 
   openNew() {
+    this.editingDocNo = null;
     this.formMode = 'new';
     this.resetFormForNew();
     this.rpForm.enable({ emitEvent: false });
@@ -655,6 +660,7 @@ private updateLocksForRow(i: number) {
   private settledAtOpen = false;
   openEdit() {
     if (!this.selected) return;
+    this.editingDocNo = this.selected.receiptNo;
     this.formMode = 'edit';
     this.resetFormForNew(); // clear trước
     this.showSuccess = false; // <-- thêm dòng này
@@ -667,14 +673,13 @@ private updateLocksForRow(i: number) {
         {
           debtor: p.debtor ?? s.debtor,
           journalType: p.journalType,
-          date: p.date ?? s.date,
           description: p.description ?? s.description ?? '',
           dnType: p.dnType,
           isDebitJournal: p.isDebitJournal,
           ref: p.ref,
           ref2: p.ref2,
-          docNo: p.docNo,
-          docDate: p.docDate,
+                    docNo: p.docNo ?? s.receiptNo,
+          docDate: this.normalizeYmd(p.docDate ?? p.date ?? s.date),
         },
         { emitEvent: false }
       );
@@ -719,9 +724,8 @@ private updateLocksForRow(i: number) {
       this.rpForm.patchValue(
         {
           debtor: s.debtor,
-          officialNo: s.receiptNo,
-          date: s.date,
-          currency: 'MYR',
+          docNo: s.receiptNo,
+          docDate: this.normalizeYmd(s.date),
           description: s.description || '',
         },
         { emitEvent: false }
@@ -737,6 +741,7 @@ private updateLocksForRow(i: number) {
 
   closeForm() {
     this.showForm = false;
+    this.editingDocNo = null;
   }
   private today() {
     return new Date().toISOString().slice(0, 10);
@@ -758,6 +763,7 @@ private updateLocksForRow(i: number) {
       outstanding: 0,
       journalType: jtDefault,
       dnType: 'RETURN',
+      continueNew : false,
     });
     while (this.methodsFA.length) this.methodsFA.removeAt(0);
     this.addMethod();
@@ -773,14 +779,28 @@ private updateLocksForRow(i: number) {
     }
 
     const v = this.rpForm.getRawValue();
+    const keepContinue = this.formMode === 'new' && !!v.continueNew;
     const debtor = this.debtors.find((d) => d.debtorAccount === v.debtor);
     const receiptNo = v.docNo?.trim() ? v.docNo.trim() : this.nextRunningNo();
+
+    const docDate = this.normalizeYmd(v.docDate) || this.todayYMD();
+
+    // check duplicate docNo (ignore chính nó khi Edit)
+    const key = String(receiptNo || '').toLowerCase();
+    const current = String(this.editingDocNo || '').toLowerCase();
+    const dup = this.rows.some(r => String(r.receiptNo || '').toLowerCase() === key && String(r.receiptNo || '').toLowerCase() !== current);
+    if (dup) {
+      const c = this.rpForm.get('docNo');
+      c?.setErrors({ ...(c.errors || {}), duplicate: true });
+      c?.markAsTouched();
+      return;
+    }
 
     localStorage.setItem('arp_last_desc', v.description || '');
 
     const row = {
       receiptNo,
-      date: v.docDate,
+      date: docDate,
       debtor: v.debtor,
       dnType: v.dnType,
       journalType: v.journalType,
@@ -791,8 +811,9 @@ private updateLocksForRow(i: number) {
       amount: this.netTotal,
       paidAmt: this.totalAmount,
       outstanding: this.unappliedAmount,
-      payload: {
+            payload: {
         ...v,
+        docDate,
         methods: this.methodsFA.getRawValue(),
         knockOff: this.knockFA.getRawValue(),
       },
@@ -802,16 +823,28 @@ private updateLocksForRow(i: number) {
       const idx = this.rows.indexOf(this.selected);
       if (idx >= 0) this.rows[idx] = row as any;
       this.selected = this.rows[idx];
+      this.editingDocNo = null;
       this.showForm = false;
-      // KHÔNG đóng form – hiện success
       this.openSuccess(`Updated receipt ${receiptNo} successfully.`);
       return;
     }
 
     // New
     this.rows.unshift(row as any);
+
+    if (keepContinue) {
+      this.resetFormForNew();
+      this.rpForm.get('continueNew')?.setValue(true, { emitEvent: false });
+      this.formMode = 'new';
+      this.editingDocNo = null;
+      this.selected = undefined;
+      this.showForm = true;
+      this.openSuccess(`Saved receipt ${receiptNo} successfully.`);
+      return;
+    }
+
+    this.editingDocNo = null;
     this.showForm = false;
-    // KHÔNG đóng form – hiện success
     this.openSuccess(`Saved receipt ${receiptNo} successfully.`);
   }
 
@@ -839,6 +872,42 @@ private updateLocksForRow(i: number) {
     const dd = String(d.getDate()).padStart(2, '0');
     return `${y}-${m}-${dd}`;
   }
+
+  /** Chuẩn hoá ngày về YYYY-MM-DD (phục vụ <input type="date">) */
+  private normalizeYmd(v: any): string {
+    if (!v) return '';
+
+    // Date object
+    if (v instanceof Date && !isNaN(v.getTime())) {
+      return v.toISOString().slice(0, 10);
+    }
+
+    const s = String(v).trim();
+    if (!s) return '';
+
+    // ISO yyyy-mm-dd
+    if (/^\d{4}-\d{2}-\d{2}$/.test(s)) return s;
+
+    // ISO datetime: yyyy-mm-ddThh:mm:ss...
+    const iso = s.match(/^(\d{4}-\d{2}-\d{2})[T\s]/);
+    if (iso) return iso[1];
+
+    // dd/mm/yyyy hoặc d/m/yyyy
+    const dmy = s.match(/^(\d{1,2})[\/-](\d{1,2})[\/-](\d{4})$/);
+    if (dmy) {
+      const dd = String(+dmy[1]).padStart(2, '0');
+      const mm = String(+dmy[2]).padStart(2, '0');
+      const yy = dmy[3];
+      return `${yy}-${mm}-${dd}`;
+    }
+
+    // Fallback
+    const dt = new Date(s);
+    if (!isNaN(dt.getTime())) return dt.toISOString().slice(0, 10);
+
+    return '';
+  }
+
   knockSortBy: 'type' | 'date' | 'orgAmt' = 'date';
   knockSortDir: 'asc' | 'desc' = 'asc';
 

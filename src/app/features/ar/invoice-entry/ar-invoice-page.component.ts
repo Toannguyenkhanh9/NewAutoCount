@@ -765,6 +765,7 @@ export class ArInvoicePageComponent implements OnInit {
       taxTotal: inv.taxTotal,
       grandTotal: inv.grandTotal,
       outstanding: inv.grandTotal,
+      continueNew: false,
     });
     this.acLinesFA.clear();
     // map tạm: mô tả lấy description, số tiền lấy total (hoặc amount tùy bạn)
@@ -828,7 +829,7 @@ export class ArInvoicePageComponent implements OnInit {
         outstanding: 0,
         journalType: jtDefault,
         terms: termsDefault,
-        continueNew: true,
+        continueNew: false,
       });
       while (this.acLinesFA.length) this.acLinesFA.removeAt(0);
       this.addAcLine();

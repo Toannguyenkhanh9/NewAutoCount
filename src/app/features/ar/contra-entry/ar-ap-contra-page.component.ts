@@ -12,10 +12,18 @@ import {
 } from '@angular/forms';
 import { AmountInputDirective } from '../../../_share/directives';
 import { JournalType } from '../../../_share//models/general-maintenance';
+import { LucideIconsModule } from '../../../_share/lucide-icons';
 type Status = 'OPEN' | 'POSTED' | 'VOID';
 
 interface DebtorRow {
   debtorAccount: string;
+  companyName: string;
+  billAddress?: string;
+  phone?: string;
+}
+
+interface CreditorRow {
+  creditorAccount: string;
   companyName: string;
   billAddress?: string;
   phone?: string;
@@ -66,6 +74,7 @@ type PaidLine = {
     FormsModule,
     ReactiveFormsModule,
     AmountInputDirective,
+    LucideIconsModule
   ],
   templateUrl: './ar-ap-contra-page.component.html',
   styleUrls: ['./ar-ap-contra-page.component.scss'],
@@ -73,8 +82,8 @@ type PaidLine = {
 export class ArApContraPageComponent {
   debtorOptions = [
     { code: '300-B001', name: 'BEST PHONE SDN BHD' },
-    { code: '300-C002', name: 'ALPHA TRADING' },
-    { code: '300-D003', name: 'BLUE RIVER CO.' },
+    { code: '300-C001', name: 'IPHONE SDN BHD' },
+    { code: '300-D001', name: 'FLC PHONE SDN BHD' },
   ];
   creditorOptions = [
     { code: '400-B001', name: 'BEST PHONE SDN BHD' },
@@ -175,6 +184,28 @@ export class ArApContraPageComponent {
       phone: '03-9988776',
     },
   ];
+
+  creditors: CreditorRow[] = [
+    {
+      creditorAccount: '400-B001',
+      companyName: 'BEST PHONE SDN BHD',
+      billAddress: 'Klang',
+      phone: '03-1234567',
+    },
+    {
+      creditorAccount: '400-S009',
+      companyName: 'OMEGA SUPPLIES',
+      billAddress: 'PJ',
+      phone: '03-7654321',
+    },
+    {
+      creditorAccount: '400-T010',
+      companyName: 'NOVA TECH LTD',
+      billAddress: 'KL',
+      phone: '03-9988776',
+    },
+  ];
+
 
   openDocsByDebtor = new Map<string, KnockRow[]>([
     [
@@ -315,12 +346,12 @@ export class ArApContraPageComponent {
     let arr = !k
       ? this.rows
       : this.rows.filter(
-          (r) =>
-            r.contraNo.toLowerCase().includes(k) ||
-            r.debtor.toLowerCase().includes(k) ||
-            r.debtorName.toLowerCase().includes(k) ||
-            (r.description || '').toLowerCase().includes(k)
-        );
+        (r) =>
+          r.contraNo.toLowerCase().includes(k) ||
+          r.debtor.toLowerCase().includes(k) ||
+          r.debtorName.toLowerCase().includes(k) ||
+          (r.description || '').toLowerCase().includes(k)
+      );
     arr = [...arr].sort((a, b) => {
       const va = String(a[this.sortBy] ?? '').toLowerCase();
       const vb = String(b[this.sortBy] ?? '').toLowerCase();
@@ -386,7 +417,7 @@ export class ArApContraPageComponent {
       contraNo: [''],
       date: [this.todayISO()],
       description: ['CONTRA'],
-      proceedWithNew: [true],
+      proceedWithNew: [false],
       ar: this.fb.array<FormGroup>([]),
       ap: this.fb.array<FormGroup>([]),
     });
@@ -407,6 +438,7 @@ export class ArApContraPageComponent {
     this.rows = this.rows.filter((x) => x !== this.selected);
     this.selected = undefined;
     this.showDeleteConfirm = false;
+    this.openSuccess(`Contra Entry deleted successfully.`);
   }
 
   // ===== utils =====
@@ -572,7 +604,7 @@ export class ArApContraPageComponent {
       contraNo: '',
       date: this.todayISO(),
       description: 'CONTRA',
-      proceedWithNew: true,
+      proceedWithNew: false,
     });
     this.arFA.clear();
     this.apFA.clear();
@@ -802,7 +834,10 @@ export class ArApContraPageComponent {
       return;
 
     // TODO: gọi API lưu; tạm thời chỉ show success và đóng form
-    this.successMsg = 'Contra saved successfully.';
+    if (this.formMode === 'edit')
+      this.successMsg = 'Edit contra entry successfully.';
+    else
+      this.successMsg = 'Contra Entry saved successfully.';
     this.showSuccess = true;
     const keepDesc = this.contraForm.get('description')!.value;
 
@@ -911,16 +946,16 @@ export class ArApContraPageComponent {
   openView(row?: ContraRow) {
     // Nếu bạn đã có openContraForm() để seed data demo, có thể tái dùng:
     this.openContraForm(); // nạp dữ liệu (hoặc tự load từ row nếu có API)
-    this.formMode = 'view';
-    this.setReadOnly(true);
+    this.formMode = 'edit';
+    //this.setReadOnly(true);
   }
   knSort: {
     ar: { key: 'type' | 'date' | 'no' | 'orgAmt'; dir: 'asc' | 'desc' };
     ap: { key: 'type' | 'date' | 'no' | 'orgAmt'; dir: 'asc' | 'desc' };
   } = {
-    ar: { key: 'date', dir: 'asc' },
-    ap: { key: 'date', dir: 'asc' },
-  };
+      ar: { key: 'date', dir: 'asc' },
+      ap: { key: 'date', dir: 'asc' },
+    };
 
   private sortVal(
     g: FormGroup,
@@ -952,5 +987,85 @@ export class ArApContraPageComponent {
     // ghi lại vào FormArray để template theo index hiện hành
     fa.clear();
     sorted.forEach((c) => fa.push(c));
+  }
+  showDebtorPicker = false;
+  debtorQuery = '';
+  debtorFiltered: DebtorRow[] = [];
+  openDebtorDropdown() {
+    this.debtorQuery = '';
+    this.debtorFiltered = [...(this.debtors ?? [])];
+    this.showDebtorPicker = true;
+  }
+
+  filterDebtors() {
+    const q = (this.debtorQuery || '').toLowerCase().trim();
+    const src = this.debtors ?? [];
+    this.debtorFiltered = !q
+      ? [...src]
+      : src.filter(
+        (d) =>
+          (d.debtorAccount || '').toLowerCase().includes(q) ||
+          (d.companyName || '').toLowerCase().includes(q) ||
+          (d.billAddress || '').toLowerCase().includes(q) ||
+          (d.phone || '').toLowerCase().includes(q)
+      );
+  }
+
+  pickDebtor(d: DebtorRow) {
+    const code = d?.debtorAccount || '';
+    this.contraForm.get('debtor')?.setValue(code, { emitEvent: true });
+    this.contraForm.get('debtor')?.markAsDirty();
+    this.contraForm.get('debtor')?.markAsTouched();
+    this.showDebtorPicker = false;
+    this.onDebtorChanged();
+  }
+
+
+  showCreditorPicker = false;
+  creditorQuery = '';
+  creditorFiltered: CreditorRow[] = [];
+
+  openCreditorDropdown() {
+    this.creditorQuery = '';
+    this.creditorFiltered = [...(this.creditors ?? [])];
+    this.showCreditorPicker = true;
+  }
+
+  filterCreditors() {
+    const q = (this.creditorQuery || '').toLowerCase().trim();
+    const src = this.creditors ?? [];
+    this.creditorFiltered = !q
+      ? [...src]
+      : src.filter(
+        (c) =>
+          (c.creditorAccount || '').toLowerCase().includes(q) ||
+          (c.companyName || '').toLowerCase().includes(q) ||
+          (c.billAddress || '').toLowerCase().includes(q) ||
+          (c.phone || '').toLowerCase().includes(q)
+      );
+  }
+
+  pickCreditor(c: CreditorRow) {
+    const code = c?.creditorAccount || '';
+    this.contraForm.get('creditor')?.setValue(code, { emitEvent: true });
+    this.contraForm.get('creditor')?.markAsDirty();
+    this.contraForm.get('creditor')?.markAsTouched();
+    this.showCreditorPicker = false;
+    this.onCreditorChanged();
+  }
+
+  submitted = false;
+  isInvalid(name: string): boolean {
+    const c = this.contraForm?.get(name);
+    return !!(c && c.invalid && (c.touched || this.submitted));
+  }
+  onDebtorChanged() {
+    const code = (this.contraForm.get('debtor')?.value || '') as string;
+    // TODO: load A/R outstanding docs by debtor
+    // Example: const list = this.openDocsByDebtor.get(code) ?? [];
+  }
+  onCreditorChanged() {
+    const code = (this.contraForm.get('creditor')?.value || '') as string;
+    // TODO: load A/P outstanding docs by creditor
   }
 }

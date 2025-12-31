@@ -97,7 +97,7 @@
         </div>
       </div>
         <!-- Payment history -->
-        <div class="ac-card ac-card-no-padding payment-panel"  *ngIf="selected">
+        <div class="ac-card ac-card-no-padding cn-detail-pane"  *ngIf="selected">
           <div class="pp-head">
             <div class="pp-title">
               Payment History
@@ -204,7 +204,7 @@
 
             <!-- DN No -->
             <label class="inv-field">
-              <span class="inv-label">Debit Note No</span>
+              <span class="inv-label">Debit Note No.</span>
               <div class="ac-input-prefix-group">
                 <span class="ac-input-prefix-icon">
                   <lucide-icon name="hash" [size]="13" color="#111827"></lucide-icon>
@@ -296,10 +296,8 @@
             <!-- Journal type -->
             <label class="inv-field">
               <span class="inv-label">Journal Type</span>
-              <div class="inv-contact-input ac-input-prefix-group">
-                <span class="ac-input-prefix-icon">
-                  <lucide-icon name="hash" [size]="13" color="#111827"></lucide-icon>
-                </span>
+              <div class="inv-contact-input">
+
 
                 <select class="ac-form-control" formControlName="journalType" [disabled]="formMode === 'view'">
                   <option *ngFor="let j of journalTypes" [ngValue]="j.typeCode">
@@ -312,11 +310,7 @@
             <!-- DN Type -->
             <label class="inv-field">
               <span class="inv-label">DN Type</span>
-              <div class="inv-contact-input ac-input-prefix-group">
-                <span class="ac-input-prefix-icon">
-                  <lucide-icon name="hash" [size]="13" color="#111827"></lucide-icon>
-                </span>
-
+              <div class="inv-contact-input ">
                 <select class="ac-form-control" formControlName="dnType" [disabled]="formMode === 'view'">
                   <option *ngFor="let x of dnTypes" [ngValue]="x">{{ x }}</option>
                 </select>
@@ -327,10 +321,7 @@
             <!-- Reference -->
             <label class="inv-field wide">
               <span class="inv-label">Description</span>
-              <div class="ac-input-prefix-group">
-                <span class="ac-input-prefix-icon">
-                  <lucide-icon name="hash" [size]="13" color="#111827"></lucide-icon>
-                </span>
+              <div class="">
                 <input class="ac-form-control" formControlName="ref2" [readonly]="formMode === 'view'" />
               </div>
             </label>
@@ -473,7 +464,7 @@
 
         <!-- FOOTER STICKY -->
         <div class="inv-footer">
-          <label class="chk">
+          <label class="chk" *ngIf="formMode === 'new'">
             <input type="checkbox" formControlName="continueNew" />
             <span>After save, proceed with new debit note entry</span>
           </label>

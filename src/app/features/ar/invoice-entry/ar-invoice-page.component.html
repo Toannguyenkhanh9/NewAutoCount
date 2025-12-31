@@ -230,9 +230,7 @@
             <!-- Reference -->
             <label class="inv-field">
               <span class="inv-label">Description</span>
-              <div class="ac-input-prefix-group">
-                <span class="ac-input-prefix-icon"><lucide-icon name="hash" [size]="13"
-                    color="#0c0c0c"></lucide-icon></span>
+              <div class="">
                 <input class="ac-form-control" formControlName="ref2" [readonly]="formMode === 'view'" />
               </div>
             </label>
@@ -500,7 +498,7 @@
 
         <!-- FOOTER STICKY -->
         <div class="inv-footer">
-          <label class="chk">
+          <label class="chk" *ngIf="formMode === 'new'">
             <input type="checkbox" formControlName="continueNew" />
             <span>After save, proceed with new A/R Invoice</span>
           </label>

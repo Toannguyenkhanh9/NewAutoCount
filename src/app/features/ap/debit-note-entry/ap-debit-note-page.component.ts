@@ -423,7 +423,7 @@ export class ApDebitNotePageComponent {
       lines: this.fb.array([]),
       grandTotal: [0],
       outstanding: [0],
-      continueNew: [true],
+      continueNew: [false],
     });
     if (this.acLinesFA.length === 0) this.addAcLine();
     this.findForm = this.fb.group({
@@ -692,6 +692,7 @@ export class ApDebitNotePageComponent {
       taxTotal: inv.taxTotal,
       grandTotal: inv.grandTotal,
       outstanding: inv.grandTotal,
+      continueNew : false,
     });
     this.acLinesFA.clear();
     // map tạm: mô tả lấy description, số tiền lấy total (hoặc amount tùy bạn)
@@ -757,6 +758,7 @@ export class ApDebitNotePageComponent {
         terms: termsDefault,
         dnType: 'OMIT',
         isDebitJournal: false,
+        continueNew:false
       });
       while (this.acLinesFA.length) this.acLinesFA.removeAt(0);
       this.addAcLine();

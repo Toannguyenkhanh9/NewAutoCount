@@ -309,7 +309,7 @@ export const routes: Routes = [
         path: 'contra-entry',
         component: ArApContraPageComponent,
         title: 'A/R and A/P Contra Entry',
-        data: { breadcrumb: '' },
+        data: { breadcrumb: 'A/R and A/P Contra Entry' },
       },
       {
         path: 'credit-note-entry',

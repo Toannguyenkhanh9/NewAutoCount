@@ -1724,7 +1724,7 @@ label.ac-checkbox-row {
   display: flex;
   flex-direction: column;
 }
-.payment-panel .pp-head{
+.cn-detail-pane .pp-head{
   padding: 8px 12px;
   background: linear-gradient(180deg,#eef7ff 0%,#e6f0ff 100%);
   border-bottom: 1px solid #e1e7f0;
@@ -1774,7 +1774,20 @@ label.ac-checkbox-row {
   row-gap: 12px;
   margin-bottom: 24px;
 }
-
+.inv-header-grid-3 {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  column-gap: 16px;
+  row-gap: 12px;
+  margin-bottom: 24px;
+}
+.inv-header-grid-2 {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  column-gap: 16px;
+  row-gap: 12px;
+  margin-bottom: 24px;
+}
 .inv-field {
   display: flex;
   flex-direction: column;
