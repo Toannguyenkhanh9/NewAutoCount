@@ -65,3 +65,23 @@ tr.debtor td{
   color:#0f172a;
 }
 .btn.back:hover{ background:#f8fafc; }
+.filters{
+  border:0;
+  padding:0;
+  margin:0;
+  display:grid;
+
+  /* 6 cột filter + 1 cột nhỏ dành cho Inquiry */
+  grid-template-columns: repeat(6, minmax(180px, 1fr)) minmax(120px, 160px);
+  gap:12px;
+  align-items:end;
+}
+
+/* ép nút Inquiry luôn nằm cột cuối, hàng 1 */
+.f.action{
+  grid-column: 7;
+  grid-row: 1;
+  justify-self: end;
+  align-items:flex-end;
+}
+.f.action .ctl{ justify-content:flex-end; }

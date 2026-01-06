@@ -6,21 +6,21 @@
       <fieldset class="filters">
         <div class="f">
           <div class="lbl">From Date</div>
-          <div class="ctl">
+          <div class="">
             <input type="date" formControlName="fromDate" />
           </div>
         </div>
 
         <div class="f">
           <div class="lbl">To Date</div>
-          <div class="ctl">
+          <div class="">
             <input type="date" formControlName="toDate" />
           </div>
         </div>
 
         <div class="f">
           <div class="lbl">Creditor</div>
-          <div class="ctl">
+          <div class="">
             <select formControlName="debtor">
               <option value="ALL">All</option>
               <option *ngFor="let d of debtors" [value]="d.code">
@@ -32,7 +32,7 @@
 
         <div class="f">
           <div class="lbl">Creditor Type</div>
-          <div class="ctl">
+          <div class="">
             <select formControlName="debtorType">
               <option value="ALL">All</option>
               <option *ngFor="let t of debtorTypes" [value]="t">
@@ -44,7 +44,7 @@
 
         <div class="f">
           <div class="lbl">Aging Months</div>
-          <div class="ctl">
+          <div class="">
             <select formControlName="agingMonths">
               <option [value]="4">4</option>
               <option [value]="6">6</option>
@@ -54,7 +54,7 @@
 
         <div class="f">
           <div class="lbl">Group by</div>
-          <div class="ctl">
+          <div class="">
             <select formControlName="groupBy">
               <option value="none">None</option>
               <option value="debtorType">Creditor Type</option>
@@ -65,7 +65,7 @@
         <!-- Inquiry (right aligned like Outstanding) -->
         <div class="f action">
           <div class="lbl">&nbsp;</div>
-          <div class="ctl">
+          <div class="">
             <button type="button" class="btn inquiry" (click)="inquiry()">Inquiry</button>
           </div>
         </div>
