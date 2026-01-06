@@ -4,22 +4,22 @@
   <div class="options">
     <form [formGroup]="fg">
       <fieldset class="filters">
-        <div class="f">
-          <div class="lbl">From Date</div>
+        <div class="inv-field">
+          <div class="inv-label">From Date</div>
           <div class="">
             <input type="date" formControlName="fromDate" />
           </div>
         </div>
 
-        <div class="f">
-          <div class="lbl">To Date</div>
+        <div class="inv-field">
+          <div class="inv-label">To Date</div>
           <div class="">
             <input type="date" formControlName="toDate" />
           </div>
         </div>
 
-        <div class="f">
-          <div class="lbl">Creditor</div>
+        <div class="inv-field">
+          <div class="inv-label">Creditor</div>
           <div class="">
             <select formControlName="debtor">
               <option value="ALL">All</option>
@@ -30,8 +30,8 @@
           </div>
         </div>
 
-        <div class="f">
-          <div class="lbl">Creditor Type</div>
+        <div class="inv-field">
+          <div class="inv-label">Creditor Type</div>
           <div class="">
             <select formControlName="debtorType">
               <option value="ALL">All</option>
@@ -42,8 +42,8 @@
           </div>
         </div>
 
-        <div class="f">
-          <div class="lbl">Aging Months</div>
+        <div class="inv-field">
+          <div class="inv-label">Aging Months</div>
           <div class="">
             <select formControlName="agingMonths">
               <option [value]="4">4</option>
@@ -52,8 +52,8 @@
           </div>
         </div>
 
-        <div class="f">
-          <div class="lbl">Group by</div>
+        <div class="inv-field">
+          <div class="inv-label">Group by</div>
           <div class="">
             <select formControlName="groupBy">
               <option value="none">None</option>
@@ -66,7 +66,7 @@
         <div class="f action">
           <div class="lbl">&nbsp;</div>
           <div class="">
-            <button type="button" class="btn inquiry" (click)="inquiry()">Inquiry</button>
+            <button type="button" class="ac-btn ac-btn-primary" (click)="inquiry()">Inquiry</button>
           </div>
         </div>
       </fieldset>
