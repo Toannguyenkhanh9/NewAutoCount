@@ -44,6 +44,24 @@ tr.debtor td{
   background: #fff;
 }
 .sum-row td{
-  font-weight: 800;
+  font-weight: 600;
   background: #fafcff;
 }
+.detail-toolbar{
+  display:flex;
+  gap:12px;
+  align-items:center;
+  margin-bottom:12px;
+}
+
+.detail-title{
+  font-size:14px;
+  color:#334155;
+}
+
+.btn.back{
+  background:#fff;
+  border-color:#d0d7e2;
+  color:#0f172a;
+}
+.btn.back:hover{ background:#f8fafc; }

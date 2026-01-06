@@ -55,7 +55,8 @@ export class CreditorAgingReportComponent  {
   fg!: FormGroup;
    constructor(private fb: FormBuilder) {
      this.fg = this.fb.group({
-       asOf: ['2025-11-05'],
+       fromDate: [this.startOfMonthYmd(this.maxDocDate(this.masterTxns) || this.today())],
+       toDate: [this.maxDocDate(this.masterTxns) || this.today()],
        debtor: ['ALL'], // All
        debtorType: ['ALL'], // All
        agingMonths: [6], // 4 hoặc 6
@@ -199,6 +200,24 @@ export class CreditorAgingReportComponent  {
    );
    private _sortDir = signal<'asc' | 'desc'>('asc');
 
+
+   // ======= view state =======
+   private _view = signal<'list' | 'detail'>('list');
+   private _selected = signal<RowView | null>(null);
+
+   viewMode = () => this._view();
+   selected = () => this._selected();
+
+   openDetail(r: RowView) {
+     this._selected.set(r);
+     this._view.set('detail');
+   }
+
+   backToList() {
+     this._view.set('list');
+     this._selected.set(null);
+   }
+
    sortKey = () => this._sortKey();
    sortDir = () => this._sortDir();
 
@@ -233,12 +252,29 @@ export class CreditorAgingReportComponent  {
 
    // ======= core =======
    inquiry() {
-     // đọc form
-     const v = this.fg.getRawValue();
-     const asOf = new Date(v.asOf || this.today());
 
-     // filter theo debtor / debtorType
+     this.backToList();
+// đọc form
+     const v = this.fg.getRawValue();
+
+     let fromYmd = v.fromDate || this.startOfMonthYmd(this.maxDocDate(this.masterTxns) || this.today());
+     let toYmd = v.toDate || this.maxDocDate(this.masterTxns) || this.today();
+
+     // Nếu user chọn ngược (From > To) thì swap lại cho hợp lý
+     if (fromYmd && toYmd && fromYmd > toYmd) {
+       const tmp = fromYmd;
+       fromYmd = toYmd;
+       toYmd = tmp;
+       this.fg.patchValue({ fromDate: fromYmd, toDate: toYmd }, { emitEvent: false });
+     }
+
+     // Aging tính "as at" theo To Date
+     const asOf = new Date(toYmd || this.today());
+
+     // filter theo date range + creditor / creditorType
      let rows = this.masterTxns
+       .filter((t) => !fromYmd || t.docDate >= fromYmd)
+       .filter((t) => !toYmd || t.docDate <= toYmd)
        .filter((t) => v.debtor === 'ALL' || t.debtorCode === v.debtor)
        .filter((t) => v.debtorType === 'ALL' || t.debtorType === v.debtorType)
        .map((t) => this.withBuckets(t, asOf, v.agingMonths ?? 6));
@@ -336,8 +372,45 @@ export class CreditorAgingReportComponent  {
      // nếu cùng tháng nhưng b ngày <= a ngày thì coi như chưa qua thêm 1 tháng
      return b.getDate() > a.getDate() ? months : months;
    }
+   // ======= Date helpers (From/To) =======
+   private maxDocDate(list: Txn[]): string {
+     let max = '';
+     for (const t of list || []) {
+       if (t?.docDate && t.docDate > max) max = t.docDate;
+     }
+     return max;
+   }
 
-   private today() {
+   private startOfMonthYmd(ymd: string): string {
+     if (!ymd || !/^\d{4}-\d{2}-\d{2}$/.test(ymd)) {
+       const t = this.today();
+       return t.slice(0, 8) + '01';
+     }
+     return ymd.slice(0, 8) + '01';
+   }
+
+   private formatLongYmd(ymd: string): string {
+     if (!ymd) return '';
+     const dt = new Date(ymd);
+     if (isNaN(dt.getTime())) return ymd;
+     return new Intl.DateTimeFormat('en-GB', {
+       day: 'numeric',
+       month: 'long',
+       year: 'numeric',
+     }).format(dt);
+   }
+
+   get periodLabel(): string {
+     const v = this.fg.getRawValue();
+     const from = v.fromDate || '';
+     const to = v.toDate || '';
+     if (!from && !to) return '';
+     if (from && to) return `For the period ${this.formatLongYmd(from)} to ${this.formatLongYmd(to)}`;
+     if (to) return `As at ${this.formatLongYmd(to)}`;
+     return `From ${this.formatLongYmd(from)}`;
+   }
+
+today() {
      const d = new Date();
      const m = String(d.getMonth() + 1).padStart(2, '0');
      const day = String(d.getDate()).padStart(2, '0');
