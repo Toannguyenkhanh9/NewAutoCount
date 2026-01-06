@@ -250,13 +250,15 @@
     <ng-container *ngIf="viewMode() === 'detail' && selected() as s">
       <div class="gridwrap">
         <div class="detail-toolbar">
-          <button type="button" class="btn back" (click)="backToList()">←</button>
+         <a href="#" (click)="backToList(); $event.preventDefault()">
+                  ←
+                </a>
           <div class="detail-title">
             <strong>{{ s.debtorCode }}</strong> — {{ s.debtorName }} ({{ s.currency }})
           </div>
         </div>
 
-        <table class="detail-grid">
+        <table>
           <thead>
             <tr>
               <th class="l">Doc Date</th>
