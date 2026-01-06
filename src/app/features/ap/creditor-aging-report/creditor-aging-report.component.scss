@@ -69,7 +69,6 @@
   /* 6 cột filter + 1 cột nhỏ dành cho Inquiry */
   grid-template-columns: repeat(6, minmax(180px, 1fr)) minmax(120px, 160px);
   gap:12px;
-  align-items:end;
 }
 
 /* ép nút Inquiry luôn nằm cột cuối, hàng 1 */
