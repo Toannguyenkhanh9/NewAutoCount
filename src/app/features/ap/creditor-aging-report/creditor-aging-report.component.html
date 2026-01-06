@@ -145,7 +145,7 @@
 
         <tfoot class="sum-row">
           <tr>
-            <td colspan="3" class="r"><strong>Total</strong></td>
+            <td colspan="3" class="r">Total</td>
             <td class="r blue">{{ totalsAll.cur | number : "1.2-2" }}</td>
             <td class="r blue">{{ totalsAll.m1 | number : "1.2-2" }}</td>
             <td class="r blue">{{ totalsAll.m2 | number : "1.2-2" }}</td>
@@ -250,7 +250,7 @@
     <ng-container *ngIf="viewMode() === 'detail' && selected() as s">
       <div class="gridwrap">
         <div class="detail-toolbar">
-          <button type="button" class="btn back" (click)="backToList()">← Back</button>
+          <button type="button" class="btn back" (click)="backToList()">←</button>
           <div class="detail-title">
             <strong>{{ s.debtorCode }}</strong> — {{ s.debtorName }} ({{ s.currency }})
           </div>
@@ -291,7 +291,7 @@
           </tbody>
           <tfoot class="sum-row">
             <tr>
-              <td colspan="4" class="r"><strong>Total</strong></td>
+              <td colspan="4" class="r">Total</td>
               <td class="r blue">{{ s.totals.cur | number : "1.2-2" }}</td>
               <td class="r blue">{{ s.totals.m1 | number : "1.2-2" }}</td>
               <td class="r blue">{{ s.totals.m2 | number : "1.2-2" }}</td>
