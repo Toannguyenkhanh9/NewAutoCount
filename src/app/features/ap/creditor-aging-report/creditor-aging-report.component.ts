@@ -89,7 +89,7 @@ export class CreditorAgingReportComponent  {
    private masterTxns: Txn[] = [
      // CARE PHONE SDN (RETAIL) — 1 chứng từ => 5+ OVER 1,250.00
      {
-       debtorCode: '400-A001',
+       debtorCode: '300-A001',
        debtorName: 'CARE PHONE SDN',
        debtorType: 'RETAIL',
        agent: 'TEH',
@@ -105,7 +105,7 @@ export class CreditorAgingReportComponent  {
      // BEST PHONE SDN BHD (TRADING) — đúng 3 dòng như hình:
      // 1) DN 120.00 -> CURRENT
      {
-       debtorCode: '400-B001',
+       debtorCode: '300-B001',
        debtorName: 'BEST PHONE SDN BHD',
        debtorType: 'TRADING',
        agent: 'TEH',
@@ -119,7 +119,7 @@ export class CreditorAgingReportComponent  {
      },
      // 2) IN 2,150.00 -> 1 MONTH
      {
-       debtorCode: '400-B001',
+       debtorCode: '300-B001',
        debtorName: 'BEST PHONE SDN BHD',
        debtorType: 'TRADING',
        agent: 'TEH',
@@ -133,7 +133,7 @@ export class CreditorAgingReportComponent  {
      },
      // 3) IN 3,549.00 -> 2 MONTHS
      {
-       debtorCode: '400-B001',
+       debtorCode: '300-B001',
        debtorName: 'BEST PHONE SDN BHD',
        debtorType: 'TRADING',
        agent: 'TEH',
@@ -148,7 +148,7 @@ export class CreditorAgingReportComponent  {
 
      // LGH ENTERPRISE (TRADING) — 1 chứng từ => 3 MONTHS 9,500.00
      {
-       debtorCode: '400-L001',
+       debtorCode: '300-L001',
        debtorName: 'LGH ENTERPRISE',
        debtorType: 'TRADING',
        agent: 'JLO',
