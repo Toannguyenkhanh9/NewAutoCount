@@ -87,7 +87,7 @@
           <th class="l" (click)="setSort('docNo')"
               [class.sorted]="currentSort === 'docNo'"
               [class.desc]="currentSort === 'docNo' && sortDir === 'desc'">
-            Doc No
+            Doc No.
             <span class="arrow" *ngIf="currentSort === 'docNo'">{{ sortDir === 'asc' ? '▲' : '▼' }}</span>
           </th>
 
