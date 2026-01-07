@@ -1,27 +1,22 @@
 <div class="page">
-  <div class="titlebar">
-    <h1>Debtor Statement Report</h1>
-  </div>
-
-  <!-- Options (giữ chung 1 khối, chỉ còn Inquiry) -->
   <div class="options">
-    <form [formGroup]="fg" class="options">
+    <form [formGroup]="fg">
       <fieldset class="filters">
-        <div class="f">
-          <div class="lbl">Date From</div>
-          <div class="ctl">
+        <div class="inv-field">
+          <div class="inv-label">Date From</div>
+          <div class="">
             <input type="date" formControlName="dateFrom" />
           </div>
         </div>
-        <div class="f">
-          <div class="lbl">Date To</div>
-          <div class="ctl"><input type="date" formControlName="dateTo" /></div>
+        <div class="inv-field">
+          <div class="inv-label">Date To</div>
+          <div class=""><input type="date" formControlName="dateTo" /></div>
         </div>
 
         <!-- Debtor (multi select với checkbox) -->
-        <div class="f">
-          <div class="lbl">Debtor</div>
-          <div class="ctl">
+        <div class="inv-field">
+          <div class="inv-label">Debtor</div>
+          <div class="">
             <!-- Khung giống select -->
             <div class="ms" (click)="onToggleDebtor($event)">
               <span class="ms-text">{{ debtorSummary }}</span>
@@ -75,9 +70,9 @@
           </div>
         </div>
 
-        <div class="f">
-          <div class="lbl">Debtor Type</div>
-          <div class="ctl">
+        <div class="inv-field">
+          <div class="inv-label">Debtor Type</div>
+          <div class="">
             <select formControlName="debtorType">
               <option value="ALL">All</option>
               <option *ngFor="let t of debtorTypes" [value]="t">{{ t }}</option>
@@ -86,9 +81,9 @@
         </div>
 
         <!-- ✅ Statement Type -->
-        <div class="f">
-          <div class="lbl">Statement Type</div>
-          <div class="ctl">
+        <div class="inv-field">
+          <div class="inv-label">Statement Type</div>
+          <div class="">
             <select formControlName="statementType">
               <option *ngFor="let s of statementTypes" [value]="s.value">
                 {{ s.label }}
@@ -98,9 +93,9 @@
         </div>
 
         <!-- ✅ Normal / KnockOff -->
-        <div class="f">
-          <div class="lbl">Normal/KnockOff</div>
-          <div class="ctl">
+        <div class="inv-field">
+          <div class="inv-label">Normal/KnockOff</div>
+          <div class="">
             <select formControlName="knockoffMode">
               <option *ngFor="let k of knockoffModes" [value]="k.value">
                 {{ k.label }}
@@ -109,185 +104,173 @@
           </div>
         </div>
 
-        <div class="f">
+        <div class="f action">
+          <div class="lbl">&nbsp;</div>
           <div class="ctl">
-            <button type="button" class="btn primary" (click)="inquiry()">
-              <span class="ico refresh"></span> Inquiry
+            <button type="button" class="ac-btn ac-btn-primary" (click)="inquiry()"> Inquiry
             </button>
           </div>
         </div>
       </fieldset>
     </form>
   </div>
-
-  <!-- Grid 3 cấp: Debtor -> Documents -> Ledger lines -->
-  <div class="gridwrap">
-    <table>
-      <thead>
-        <tr>
-          <th class="toggle"></th>
-          <th class="sortable" (click)="onSortLv1('debtorCode')">
-            Debtor No.
-            <span class="sort" [ngClass]="iconLv1('debtorCode')"></span>
-          </th>
-          <th class="sortable" (click)="onSortLv1('debtorName')">
-            Company Name
-            <span class="sort" [ngClass]="iconLv1('debtorName')"></span>
-          </th>
-          <th class="sortable" (click)="onSortLv1('debtorType')">
-            Debtor Type
-            <span class="sort" [ngClass]="iconLv1('debtorType')"></span>
-          </th>
-          <th>Phone</th>
-          <th>Currency</th>
-          <th class="r sortable" (click)="onSortLv1('balance')">
-            Balance <span class="sort" [ngClass]="iconLv1('balance')"></span>
-          </th>
-        </tr>
-      </thead>
-
-      <tbody *ngFor="let r of rows()">
-        <!-- Cấp 1: Debtor -->
-        <tr class="debtor">
-          <td class="toggle">
-            <button class="toggle-btn" (click)="toggle(r)" type="button">
-              {{ r.expanded ? "−" : "+" }}
-            </button>
-          </td>
-          <td>{{ r.debtorCode }}</td>
-          <td>{{ r.debtorName }}</td>
-          <td>{{ r.debtorType }}</td>
-          <td>{{ r.phone }}</td>
-          <td>{{ r.currency }}</td>
-          <td class="r">
-            <strong>{{ r.balance | number : "1.2-2" }}</strong>
-          </td>
-        </tr>
-
-        <!-- Cấp 2: Documents (ẩn/hiện khi expand debtor) -->
-        <tr class="detail-row" *ngIf="r.expanded">
-          <td [attr.colspan]="7">
-            <div class="detail-wrap full">
-              <table class="grid">
-                <thead>
-                  <tr>
-                    <th class="toggle"></th>
-                    <th class="sortable" (click)="onSortLv2('docDate')">
-                      Doc Date
-                      <span class="sort" [ngClass]="iconLv2('docDate')"></span>
-                    </th>
-                    <th class="sortable" (click)="onSortLv2('docNo')">
-                      Doc No
-                      <span class="sort" [ngClass]="iconLv2('docNo')"></span>
-                    </th>
-                    <th>Doc Type</th>
-                    <th>Description</th>
-                    <th class="c">Cheque No</th>
-                    <th class="r">Debit</th>
-                    <th class="r">Credit</th>
-                    <th class="r">Balance</th>
-                  </tr>
-                </thead>
-
-                <ng-container *ngFor="let d of r.documents">
-                  <tbody>
-                    <tr class="doc">
-                      <td class="toggle">
-                        <button
-                          *ngIf="d.lines && d.lines.length > 0"
-                          class="toggle-btn"
-                          (click)="toggleDoc(d)"
-                          type="button"
-                        >
-                          {{ d.expanded ? "−" : "+" }}
-                        </button>
-                        <span
-                          *ngIf="!d.lines || d.lines.length === 0"
-                          class="no-toggle"
-                        ></span>
-                      </td>
-                      <td>{{ d.docDate }}</td>
-                      <td>{{ d.docNo }}</td>
-                      <td>{{ d.docType }}</td>
-                      <td>{{ d.description }}</td>
-                      <td>{{ d.chequeNo }}</td>
-                      <td class="r">{{ d.debit | number : "1.2-2" }}</td>
-                      <td class="r">{{ d.credit | number : "1.2-2" }}</td>
-                      <td class="r">
-                        <strong>{{ d.balance | number : "1.2-2" }}</strong>
-                      </td>
-                    </tr>
-                  </tbody>
-
-                  <!-- Cấp 3: Ledger lines của Document -->
-                  <tbody *ngIf="d.expanded" class="detail-row">
-                    <tr>
-                      <td></td>
-                      <td colspan="8">
-                        <table class="grid detail-yellow">
-                          <thead>
-                            <tr>
-                              <th class="sortable" (click)="onSortLv3('date')">
-                                Doc Date
-                                <span
-                                  class="sort"
-                                  [ngClass]="iconLv3('date')"
-                                ></span>
-                              </th>
-                              <th class="sortable" (click)="onSortLv3('docNo')">
-                                Doc No
-                                <span
-                                  class="sort"
-                                  [ngClass]="iconLv3('docNo')"
-                                ></span>
-                              </th>
-                              <th>Doc Type</th>
-                              <th>Description</th>
-                              <th>Cheque No</th>
-                              <th>Currency</th>
-                              <th class="r">Debit</th>
-                              <th class="r">Credit</th>
-                              <th class="r">Balance</th>
-                            </tr>
-                          </thead>
-                          <tbody>
-                            <tr *ngFor="let l of d.lines">
-                              <td>{{ l.date }}</td>
-                              <td>{{ l.docNo }}</td>
-                              <td>{{ l.type }}</td>
-                              <td>{{ l.description }}</td>
-                              <td>{{ l.chequeNo || "" }}</td>
-                              <td>{{ l.currency || "" }}</td>
-                              <td class="r">
-                                {{ l.debit | number : "1.2-2" }}
-                              </td>
-                              <td class="r">
-                                {{ l.credit | number : "1.2-2" }}
-                              </td>
-                              <td class="r">
-                                {{ l.runBalance | number : "1.2-2" }}
-                              </td>
-                            </tr>
-                          </tbody>
-                        </table>
-                      </td>
-                    </tr>
-                  </tbody>
-                </ng-container>
-              </table>
-            </div>
-          </td>
-        </tr>
-      </tbody>
-
-      <!-- <tfoot class="sum-row">
-        <tr>
-          <td colspan="6" class="r"><strong>Total</strong></td>
-          <td class="r">
-            <strong>{{ totals().balance | number : "1.2-2" }}</strong>
-          </td>
-        </tr>
-      </tfoot> -->
-    </table>
+<div class="report-card">
+    <div class="report-head">
+    <div class="rh-title">Debtor Statement Report</div>
+    <div class="rh-company">{{ companyName }}</div>
+    <div class="rh-period">{{ periodLabel }}</div>
   </div>
+
+    <!-- Grid: List -> Detail -->
+  <ng-container *ngIf="viewMode() === 'list'">
+    <div class="gridwrap">
+      <table>
+        <thead>
+          <tr>
+            <th class="sortable l" (click)="onSortLv1('debtorCode')">
+              Debtor No.
+              <span class="sort" [ngClass]="iconLv1('debtorCode')"></span>
+            </th>
+            <th class="sortable l" (click)="onSortLv1('debtorName')">
+              Company Name
+              <span class="sort" [ngClass]="iconLv1('debtorName')"></span>
+            </th>
+            <th class="sortable l" (click)="onSortLv1('debtorType')">
+              Debtor Type
+              <span class="sort" [ngClass]="iconLv1('debtorType')"></span>
+            </th>
+            <th  class="l">Phone</th>
+            <th  class="l">Currency</th>
+            <th class="r sortable" (click)="onSortLv1('balance')">
+              Balance <span class="sort" [ngClass]="iconLv1('balance')"></span>
+            </th>
+          </tr>
+        </thead>
+
+        <tbody>
+          <tr class="debtor" *ngFor="let r of rows()">
+            <td class="l">
+              <a href="#" class="link" (click)="openDetail(r); $event.preventDefault()">
+                {{ r.debtorCode }}
+              </a>
+            </td>
+            <td>{{ r.debtorName }}</td>
+            <td>{{ r.debtorType }}</td>
+            <td>{{ r.phone }}</td>
+            <td>{{ r.currency }}</td>
+            <td class="r">
+              <strong>{{ r.balance | number : "1.2-2" }}</strong>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </ng-container>
+
+  <ng-container *ngIf="viewMode() === 'detail' && selected() as r">
+    <div class="gridwrap">
+    <div class="detail-toolbar">
+       <a href="#" (click)="backToList(); $event.preventDefault()">
+                  ←
+                </a>      <div class="detail-title">
+        <strong>{{ r.debtorCode }}</strong> — {{ r.debtorName }} ({{ r.currency }})
+      </div>
+    </div>
+
+
+      <table>
+        <thead>
+          <tr>
+            <th class="toggle"></th>
+            <th class="sortable l" (click)="onSortLv2('docDate')">
+              Doc Date
+              <span class="sort" [ngClass]="iconLv2('docDate')"></span>
+            </th>
+            <th class="sortable l" (click)="onSortLv2('docNo')">
+              Doc No
+              <span class="sort" [ngClass]="iconLv2('docNo')"></span>
+            </th>
+            <th class="l">Doc Type</th>
+            <th class="l">Description</th>
+            <th class="l">Cheque No</th>
+            <th class="r">Debit</th>
+            <th class="r">Credit</th>
+            <th class="r">Balance</th>
+          </tr>
+        </thead>
+
+        <ng-container *ngFor="let d of r.documents">
+          <tbody>
+            <tr class="doc">
+              <td class="toggle l">
+                <button
+                  *ngIf="d.lines && d.lines.length > 0"
+                  class="toggle-btn"
+                  (click)="toggleDoc(d)"
+                  type="button"
+                >
+                  {{ d.expanded ? "−" : "+" }}
+                </button>
+                <span *ngIf="!d.lines || d.lines.length === 0" class="no-toggle"></span>
+              </td>
+              <td class="l">{{ d.docDate }}</td>
+              <td>{{ d.docNo }}</td>
+              <td class="l">{{ d.docType }}</td>
+              <td class="l">{{ d.description }}</td>
+              <td class="l">{{ d.chequeNo }}</td>
+              <td class="r">{{ d.debit | number : "1.2-2" }}</td>
+              <td class="r">{{ d.credit | number : "1.2-2" }}</td>
+              <td class="r">
+                <strong>{{ d.balance | number : "1.2-2" }}</strong>
+              </td>
+            </tr>
+          </tbody>
+
+          <!-- Ledger lines -->
+          <tbody *ngIf="d.expanded" class="detail-row">
+            <tr>
+              <td></td>
+              <td colspan="8">
+                <table class="grid detail-yellow">
+                  <thead>
+                    <tr>
+                      <th class="sortable l" (click)="onSortLv3('date')">
+                        Doc Date
+                        <span class="sort" [ngClass]="iconLv3('date')"></span>
+                      </th>
+                      <th class="sortable l" (click)="onSortLv3('docNo')">
+                        Doc No
+                        <span class="sort" [ngClass]="iconLv3('docNo')"></span>
+                      </th>
+                      <th class="l">Doc Type</th>
+                      <th class="l">Description</th>
+                      <th class="l">Cheque No</th>
+                      <th class="l">Currency</th>
+                      <th class="r">Debit</th>
+                      <th class="r">Credit</th>
+                      <th class="r">Balance</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr *ngFor="let l of d.lines">
+                      <td class="l">{{ l.date }}</td>
+                      <td class="l">{{ l.docNo }}</td>
+                      <td class="l">{{ l.type }}</td>
+                      <td class="l">{{ l.description }}</td>
+                      <td class="l">{{ l.chequeNo || "" }}</td>
+                      <td class="l">{{ l.currency || "" }}</td>
+                      <td class="r">{{ l.debit | number : "1.2-2" }}</td>
+                      <td class="r">{{ l.credit | number : "1.2-2" }}</td>
+                      <td class="r">{{ l.runBalance | number : "1.2-2" }}</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </td>
+            </tr>
+          </tbody>
+        </ng-container>
+      </table>
+    </div>
+  </ng-container>
+</div>
 </div>

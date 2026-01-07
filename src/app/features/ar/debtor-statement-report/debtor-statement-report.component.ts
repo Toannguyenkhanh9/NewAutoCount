@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
-import { Component, HostListener, computed, signal } from '@angular/core';
+import { Component, HostListener, computed, signal,inject } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
-
+import { CompanyContextService } from '../../../core/services/company-context.service';
 type Line = {
   date: string; // yyyy-mm-dd
   docNo: string;
@@ -55,6 +55,9 @@ interface SortState {
   styleUrls: ['./debtor-statement-report.component.scss'],
 })
 export class DebtorStatementReportComponent {
+     private companyContext = inject(CompanyContextService);
+       companyName$ = this.companyContext.companyName$;
+      companyName = this.readCompanyName();
   // ===== Sort state (3 cấp) =====
   sortLv1: SortState = { key: 'debtorCode', dir: 'asc' };
   sortLv2: SortState = { key: 'docDate', dir: 'asc' };
@@ -143,7 +146,36 @@ export class DebtorStatementReportComponent {
     this.debtorDropOpen = false;
   }
 
-  // ===== dataset (master) — sample, structured 3-level =====
+    private readCompanyName(): string {
+      var comname : string | null = null;
+      this.companyName$.subscribe((name) => {
+        comname = name || null;
+      });
+      // tuỳ dự án bạn lưu company ở đâu; ưu tiên localStorage/sessionStorage
+      return (
+        comname ||
+        'Company'
+      );
+    }
+       private formatLongYmd(ymd: string): string {
+     if (!ymd) return '';
+     const dt = new Date(ymd);
+     if (isNaN(dt.getTime())) return ymd;
+     return new Intl.DateTimeFormat('en-GB', {
+       day: 'numeric',
+       month: 'long',
+       year: 'numeric',
+     }).format(dt);
+   }
+       get periodLabel(): string {
+     const v = this.fg.getRawValue();
+     const from = v.dateFrom || '';
+     const to = v.dateTo || '';
+     if (!from && !to) return '';
+     if (from && to) return `For the period ${this.formatLongYmd(from)} to ${this.formatLongYmd(to)}`;
+     if (to) return `As at ${this.formatLongYmd(to)}`;
+     return `From ${this.formatLongYmd(from)}`;
+   }
 // ===== dataset (master) — BEST PHONE giống số liệu trong hình =====
 private master: DebtorRow[] = [
   {
@@ -372,6 +404,24 @@ private master: DebtorRow[] = [
   // Template gọi rows() => lấy từ _viewRows để phản ánh sort đa cấp
   rows = computed(() => this._viewRows());
 
+  // ===== list/detail view state (click Debtor No. to open detail) =====
+  private _viewMode = signal<'list' | 'detail'>('list');
+  viewMode = computed(() => this._viewMode());
+
+  private _selected = signal<DebtorRow | null>(null);
+  selected = computed(() => this._selected());
+
+  openDetail(r: DebtorRow) {
+    this._selected.set(r);
+    this._viewMode.set('detail');
+  }
+
+  backToList() {
+    this._viewMode.set('list');
+    this._selected.set(null);
+  }
+
+
   // footer totals
   totals = computed(() => {
     const bal = this._viewRows().reduce((s, r) => s + (r.balance || 0), 0);
@@ -422,7 +472,11 @@ private master: DebtorRow[] = [
     this._rows.set(result);
 
     // Sau khi set dữ liệu mới => áp sort đa cấp hiện tại
-    this._recalcView();
+        // When running Inquiry, always go back to list view
+    this._viewMode.set('list');
+    this._selected.set(null);
+
+this._recalcView();
   }
 
   private withinDateRangeAndRecalc(
