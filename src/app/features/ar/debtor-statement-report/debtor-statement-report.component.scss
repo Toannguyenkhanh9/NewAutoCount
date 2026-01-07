@@ -1,42 +1,4 @@
 
-  /* ===== Grid lines cho bảng chính (non-grouped) ===== */
-.gridwrap > table {
-  width: 100%;
-  border-collapse: separate;
-  border-spacing: 0;
-}
-.gridwrap > table thead th {
-  font-weight: 600;
-  padding: 10px 12px;
-  border-bottom: 1px solid #edf1f4;      /* kẻ ngang header */
-}
-.gridwrap > table thead th:first-child { border-top-left-radius: 8px; }
-.gridwrap > table thead th:last-child  { border-top-right-radius: 8px; }
-
-.gridwrap > table tbody td,
-.gridwrap > table tfoot td {
-  padding: 10px 12px;
-  border-bottom: 1px solid #edf1f4;      /* kẻ ngang body + footer */
-}
-/* kẻ dọc cho tất cả cột trừ cột đầu */
-.gridwrap > table thead th + th,
-.gridwrap > table tbody td + td,
-.gridwrap > table tfoot td + td {
-  border-left: 1px solid #edf1f4;
-}
-
-/* ===== Grid lines cho bảng grouped (.table) để đồng bộ look & feel ===== */
-.table thead th,
-.table tbody td,
-.table tfoot td {
-  padding: 10px 12px;
-  border-bottom: 1px solid #edf1f4;      /* kẻ ngang */
-}
-.table thead th + th,
-.table tbody td + td,
-.table tfoot td + td {
-  border-left: 1px solid #edf1f4;        /* kẻ dọc */
-}
 
 /* ===== Tăng lưới cho bảng detail vàng nhạt (nếu muốn rõ hơn) ===== */
 .grid.detail-yellow thead th + th,
@@ -419,7 +381,7 @@ th.sortable{ cursor:pointer; user-select:none; }
   display:grid;
 
   /* 6 cột filter + 1 cột nhỏ dành cho Inquiry */
-  grid-template-columns: repeat(7, minmax(180px, 1fr)) minmax(120px, 160px);
+  grid-template-columns: repeat(6, minmax(180px, 1fr)) minmax(120px, 160px);
   gap:12px;
 }
 

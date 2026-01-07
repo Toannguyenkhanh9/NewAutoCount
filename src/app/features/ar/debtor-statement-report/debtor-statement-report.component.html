@@ -3,13 +3,13 @@
     <form [formGroup]="fg">
       <fieldset class="filters">
         <div class="inv-field">
-          <div class="inv-label">Date From</div>
+          <div class="inv-label">From Date</div>
           <div class="">
             <input type="date" formControlName="dateFrom" />
           </div>
         </div>
         <div class="inv-field">
-          <div class="inv-label">Date To</div>
+          <div class="inv-label">To Date</div>
           <div class=""><input type="date" formControlName="dateTo" /></div>
         </div>
 
@@ -141,7 +141,7 @@
             </th>
             <th  class="l">Phone</th>
             <th  class="l">Currency</th>
-            <th class="r sortable" (click)="onSortLv1('balance')">
+            <th class="sortable r" (click)="onSortLv1('balance')">
               Balance <span class="sort" [ngClass]="iconLv1('balance')"></span>
             </th>
           </tr>
@@ -187,7 +187,7 @@
               <span class="sort" [ngClass]="iconLv2('docDate')"></span>
             </th>
             <th class="sortable l" (click)="onSortLv2('docNo')">
-              Doc No
+              Doc No.
               <span class="sort" [ngClass]="iconLv2('docNo')"></span>
             </th>
             <th class="l">Doc Type</th>
@@ -214,7 +214,7 @@
                 <span *ngIf="!d.lines || d.lines.length === 0" class="no-toggle"></span>
               </td>
               <td class="l">{{ d.docDate }}</td>
-              <td>{{ d.docNo }}</td>
+              <td class="l blue">{{ d.docNo }}</td>
               <td class="l">{{ d.docType }}</td>
               <td class="l">{{ d.description }}</td>
               <td class="l">{{ d.chequeNo }}</td>
@@ -239,7 +239,7 @@
                         <span class="sort" [ngClass]="iconLv3('date')"></span>
                       </th>
                       <th class="sortable l" (click)="onSortLv3('docNo')">
-                        Doc No
+                        Doc No.
                         <span class="sort" [ngClass]="iconLv3('docNo')"></span>
                       </th>
                       <th class="l">Doc Type</th>
@@ -254,14 +254,14 @@
                   <tbody>
                     <tr *ngFor="let l of d.lines">
                       <td class="l">{{ l.date }}</td>
-                      <td class="l">{{ l.docNo }}</td>
+                      <td class="l blue">{{ l.docNo }}</td>
                       <td class="l">{{ l.type }}</td>
                       <td class="l">{{ l.description }}</td>
                       <td class="l">{{ l.chequeNo || "" }}</td>
                       <td class="l">{{ l.currency || "" }}</td>
                       <td class="r">{{ l.debit | number : "1.2-2" }}</td>
                       <td class="r">{{ l.credit | number : "1.2-2" }}</td>
-                      <td class="r">{{ l.runBalance | number : "1.2-2" }}</td>
+                      <td class="r"><strong>{{ l.runBalance | number : "1.2-2" }}</strong></td>
                     </tr>
                   </tbody>
                 </table>
