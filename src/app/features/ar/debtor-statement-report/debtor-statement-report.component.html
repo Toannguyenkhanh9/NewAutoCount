@@ -14,59 +14,16 @@
         </div>
 
         <!-- Debtor (multi select với checkbox) -->
+        <!-- Debtor (All + list) -->
         <div class="inv-field">
           <div class="inv-label">Debtor</div>
           <div class="">
-            <!-- Khung giống select -->
-            <div class="ms" (click)="onToggleDebtor($event)">
-              <span class="ms-text">{{ debtorSummary }}</span>
-              <span class="caret">▾</span>
-            </div>
-
-            <!-- Panel xổ xuống có checkbox -->
-            <div
-              class="ms-panel creditor-panel"
-              *ngIf="debtorDropOpen"
-              (click)="$event.stopPropagation()"
-            >
-              <label class="row all">
-                <input
-                  #allCk
-                  type="checkbox"
-                  [checked]="
-                    selectedDebtors.length === debtors.length &&
-                    debtors.length > 0
-                  "
-                  (change)="selectAllDebtors(allCk.checked)"
-                />
-                <span>Select all</span>
-              </label>
-
-              <div class="list">
-                <label class="row" *ngFor="let d of debtors">
-                  <input
-                    #rowCk
-                    type="checkbox"
-                    [checked]="isDebtorChecked(d.code)"
-                    (change)="toggleDebtor(d.code, rowCk.checked)"
-                  />
-                  <span>{{ d.code }} — {{ d.name }}</span>
-                </label>
-              </div>
-
-              <div class="actions">
-                <button type="button" class="btn sm" (click)="closeDebtor()">
-                  OK
-                </button>
-                <button
-                  type="button"
-                  class="btn sm ghost"
-                  (click)="selectAllDebtors(false)"
-                >
-                  Clear
-                </button>
-              </div>
-            </div>
+            <select formControlName="debtor">
+              <option value="">All</option>
+              <option *ngFor="let d of debtors" [value]="d.code">
+                {{ d.code }} — {{ d.name }}
+              </option>
+            </select>
           </div>
         </div>
 

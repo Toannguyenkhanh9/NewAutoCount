@@ -71,18 +71,17 @@ export class DebtorStatementReportComponent {
       dateFrom: ['2025-01-01'],
       dateTo: ['2025-11-06'],
 
-      debtorType: ['ALL'],           // 'RETAIL' | 'TRADING' | ALL
+      debtor: [''],
+      debtorType: ['ALL'],         // 'RETAIL' | 'TRADING' | ALL
       statementType: ['open'],       // 'default' | 'open' | 'balancebf'
       knockoffMode: ['normal'],      // 'normal' | 'knockoff' (placeholder)
       sortBy: ['debtorCode'],        // 'debtorCode' | 'debtorName' | 'debtorType'
     });
-
-    // default: select all debtors
-    this.selectedDebtors = this.debtors.map((d) => d.code);
-
     // initial data build
     this.inquiry();
-
+    this.fg.valueChanges.subscribe(() => {
+      this.inquiry();
+    });
     // Nếu muốn tự cập nhật khi đổi filter: bật dòng dưới
     // this.fg.valueChanges.subscribe(() => this.inquiry());
   }
@@ -441,12 +440,15 @@ private master: DebtorRow[] = [
     const v = this.fg.getRawValue();
     const from = this.toDate(v.dateFrom);
     const to = this.toDate(v.dateTo);
-    const selected = new Set(
-      this.selectedDebtors.length
-        ? this.selectedDebtors
-        : this.debtors.map((d) => d.code)
-    );
+    const one = String(v.debtor || '').trim();
+const selectedCodes =
+  one && one !== 'ALL'
+    ? [one]
+    : this.selectedDebtors.length
+      ? this.selectedDebtors
+      : this.debtors.map((d) => d.code);
 
+const selected = new Set(selectedCodes);
     // Deep clone master để không mutate nguồn
     const cloned: DebtorRow[] = this.master.map((m) => ({
       ...m,
@@ -461,7 +463,7 @@ private master: DebtorRow[] = [
 
     // Filter + tính toán lại theo khoảng ngày và statement type
     let result = cloned
-      .filter((r) => selected.has(r.debtorCode))
+    .filter((r) => selected.has(r.debtorCode))
       .filter((r) => v.debtorType === 'ALL' || r.debtorType === v.debtorType)
       .filter((r) => r.documents.length > 0);
 
@@ -474,7 +476,7 @@ private master: DebtorRow[] = [
     // Sau khi set dữ liệu mới => áp sort đa cấp hiện tại
         // When running Inquiry, always go back to list view
     this._viewMode.set('list');
-    this._selected.set(null);
+
 
 this._recalcView();
   }

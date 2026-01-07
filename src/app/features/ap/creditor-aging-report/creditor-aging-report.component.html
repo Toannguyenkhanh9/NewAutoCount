@@ -24,7 +24,7 @@
             <select formControlName="debtor">
               <option value="ALL">All</option>
               <option *ngFor="let d of debtors" [value]="d.code">
-                {{ d.name }}
+                  {{ d.code }} — {{ d.name }}
               </option>
             </select>
           </div>
