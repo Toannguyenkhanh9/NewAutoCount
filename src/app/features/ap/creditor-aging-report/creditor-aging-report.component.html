@@ -31,7 +31,7 @@
         </div>
 
         <div class="inv-field">
-          <div class="inv-label">Debtor Type</div>
+          <div class="inv-label">Creditor Type</div>
           <div class="">
             <select formControlName="debtorType">
               <option value="ALL">All</option>
@@ -57,7 +57,7 @@
           <div class="">
             <select formControlName="groupBy">
               <option value="none">None</option>
-              <option value="debtorType">Debtor Type</option>
+              <option value="debtorType">Creditor Type</option>
             </select>
           </div>
         </div>
@@ -76,7 +76,7 @@
 <!-- Report Card -->
 <div class="report-card">
   <div class="report-head">
-    <div class="rh-title">Debtor Aging Report</div>
+    <div class="rh-title">Creditor Aging Report</div>
     <div class="rh-company">{{ companyName }}</div>
     <div class="rh-period">{{ periodLabel }}</div>
   </div>
@@ -90,7 +90,7 @@
         <thead>
           <tr>
             <th class="l" (click)="onHeaderSort('debtorCode')">
-              Debtor No.
+              Creditor No.
               <span class="arrow" *ngIf="sortKey() === 'debtorCode'">
                 {{ sortDir() === "asc" ? "▲" : "▼" }}
               </span>
@@ -165,7 +165,7 @@
         <thead>
           <tr>
             <th class="l" (click)="onHeaderSort('debtorCode')">
-              Debtor No.
+              Creditor No.
               <span class="arrow" *ngIf="sortKey() === 'debtorCode'">
                 {{ sortDir() === "asc" ? "▲" : "▼" }}
               </span>
@@ -201,8 +201,8 @@
           <tbody class="group-head">
             <tr>
               <td colspan="11">
-                <strong>Debtor Type: {{ g.key }}</strong>
-                &nbsp; — Total Debtor: {{ g.items.length }}
+                <strong>Creditor Type: {{ g.key }}</strong>
+                &nbsp; — Total Creditor: {{ g.items.length }}
               </td>
             </tr>
           </tbody>
