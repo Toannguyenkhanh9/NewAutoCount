@@ -77,16 +77,13 @@ export class DebtorCollectionReportComponent {
     this.fg = this.fb.group({
       dateFrom: ['2025-10-01'],
       dateTo: ['2025-10-31'],
+      debtor: ['ALL'],            // filter Debtor
+      paymentType: ['ALL'],       // filter Payment Type
       groupBy: ['none'],           // 'none' | 'area' | 'debtorType'
       debtorType: ['ALL'],         // filter Debtor Type
       currency: ['ALL'],           // filter Currency
       cancelledStatus: ['all'],    // 'all' | 'cancelled' | 'uncancelled'
     });
-
-    // mặc định chọn tất cả Debtor & Payment Type
-    this.selectedDebtors = this.debtors.map((d) => d.code);
-    this.selectedPaymentTypes = this.paymentTypes.map((p) => p.value);
-
     this.inquiry();
   }
 
@@ -398,15 +395,18 @@ backToList() {
     const from = this.toDate(v.dateFrom);
     const to = this.toDate(v.dateTo);
 
+    const debtorOne = String(v.debtor || 'ALL').trim();
     const selectedDebtors =
-      this.selectedDebtors.length > 0
-        ? new Set(this.selectedDebtors)
+      debtorOne && debtorOne !== 'ALL'
+        ? new Set([debtorOne])
         : new Set(this.debtors.map((d) => d.code));
 
+    const payOne = String(v.paymentType || 'ALL').trim() as any;
     const selectedPayTypes =
-      this.selectedPaymentTypes.length > 0
-        ? new Set(this.selectedPaymentTypes)
+      payOne && payOne !== 'ALL'
+        ? new Set([payOne as PaymentType])
         : new Set(this.paymentTypes.map((p) => p.value));
+
 
     const debtorTypeFilter = v.debtorType;
     const currencyFilter = v.currency;

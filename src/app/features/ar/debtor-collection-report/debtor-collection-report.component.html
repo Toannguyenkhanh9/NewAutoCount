@@ -1,7 +1,7 @@
 <div class="page">
   <!-- Filters -->
   <div class="options">
-    <form [formGroup]="fg" class="options">
+    <form [formGroup]="fg">
       <fieldset class="filters">
         <!-- Date range -->
         <div class="inv-field">
@@ -18,126 +18,28 @@
           </div>
         </div>
 
-        <!-- Debtor: multi select -->
         <div class="inv-field">
           <div class="inv-label">Debtor</div>
           <div class="">
-            <div class="ms" (click)="onToggleDebtor($event)">
-              <span class="ms-text">{{ debtorSummary }}</span>
-              <span class="caret">▾</span>
-            </div>
-
-            <div
-              class="ms-panel"
-              *ngIf="debtorDropOpen"
-              (click)="$event.stopPropagation()"
-            >
-              <label class="row all">
-                <input
-                  type="checkbox"
-                  [checked]="
-                    selectedDebtors.length === debtors.length &&
-                    debtors.length > 0
-                  "
-                  (change)="selectAllDebtors($any($event.target).checked)"
-                />
-                <span>Select all</span>
-              </label>
-
-              <div class="list">
-                <label class="row" *ngFor="let d of debtors">
-                  <input
-                    type="checkbox"
-                    [checked]="isDebtorChecked(d.code)"
-                    (change)="
-                      toggleDebtor(d.code, $any($event.target).checked)
-                    "
-                  />
-                  <span>{{ d.code }} — {{ d.name }}</span>
-                </label>
-              </div>
-
-              <div class="actions">
-                <button
-                  type="button"
-                  class="btn sm"
-                  (click)="closeDebtor()"
-                >
-                  OK
-                </button>
-                <button
-                  type="button"
-                  class="btn sm ghost"
-                  (click)="selectAllDebtors(false)"
-                >
-                  Clear
-                </button>
-              </div>
-            </div>
+            <select formControlName="debtor">
+              <option value="ALL">All</option>
+              <option *ngFor="let d of debtors" [value]="d.code">
+                {{ d.code }} — {{ d.name }}
+              </option>
+            </select>
           </div>
         </div>
 
-        <!-- Payment Type: multi select -->
+        <!-- Payment Type -->
         <div class="inv-field">
           <div class="inv-label">Payment Type</div>
           <div class="">
-            <div class="ms" (click)="onTogglePaymentType($event)">
-              <span class="ms-text">{{ paymentTypeSummary }}</span>
-              <span class="caret">▾</span>
-            </div>
-
-            <div
-              class="ms-panel"
-              *ngIf="paymentTypeDropOpen"
-              (click)="$event.stopPropagation()"
-            >
-              <label class="row all">
-                <input
-                  type="checkbox"
-                  [checked]="
-                    selectedPaymentTypes.length === paymentTypes.length &&
-                    paymentTypes.length > 0
-                  "
-                  (change)="
-                    selectAllPaymentTypes($any($event.target).checked)
-                  "
-                />
-                <span>Select all</span>
-              </label>
-
-              <div class="list">
-                <label class="row" *ngFor="let p of paymentTypes">
-                  <input
-                    type="checkbox"
-                    [checked]="isPaymentTypeChecked(p.value)"
-                    (change)="
-                      togglePaymentType(
-                        p.value,
-                        $any($event.target).checked
-                      )
-                    "
-                  />
-                  <span>{{ p.label }}</span>
-                </label>
-              </div>
-
-              <div class="actions">
-                <button
-                  type="button"
-                  class="btn sm"
-                  (click)="closePaymentType()"
-                >
-                  OK
-                </button>
-                <button
-                  type="button"
-                  class="btn sm ghost"
-                  (click)="selectAllPaymentTypes(false)"
-                >
-                  Clear
-                </button>
-              </div>
-            </div>
+            <select formControlName="paymentType">
+              <option value="ALL">All</option>
+              <option *ngFor="let p of paymentTypes" [value]="p.value">
+                {{ p.label }}
+              </option>
+            </select>
           </div>
         </div>
 
