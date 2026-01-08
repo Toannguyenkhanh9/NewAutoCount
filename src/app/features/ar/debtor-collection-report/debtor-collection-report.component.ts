@@ -4,13 +4,14 @@ import {
   HostListener,
   computed,
   signal,
+  inject
 } from '@angular/core';
 import {
   FormBuilder,
   FormGroup,
   ReactiveFormsModule,
 } from '@angular/forms';
-
+import { CompanyContextService } from '../../../core/services/company-context.service';
 type PaymentType = 'normal' | 'return';
 
 type CollectionDetail = {
@@ -67,6 +68,9 @@ type Dir = 'asc' | 'desc';
   styleUrls: ['./debtor-collection-report.component.scss'],
 })
 export class DebtorCollectionReportComponent {
+     private companyContext = inject(CompanyContextService);
+        companyName$ = this.companyContext.companyName$;
+       companyName = this.readCompanyName();
  fg!: FormGroup;
 
   constructor(private fb: FormBuilder) {
@@ -193,6 +197,36 @@ export class DebtorCollectionReportComponent {
     this.paymentTypeDropOpen = false;
   }
 
+     private readCompanyName(): string {
+       var comname : string | null = null;
+       this.companyName$.subscribe((name) => {
+         comname = name || null;
+       });
+       // tuỳ dự án bạn lưu company ở đâu; ưu tiên localStorage/sessionStorage
+       return (
+         comname ||
+         'Company'
+       );
+     }
+        private formatLongYmd(ymd: string): string {
+      if (!ymd) return '';
+      const dt = new Date(ymd);
+      if (isNaN(dt.getTime())) return ymd;
+      return new Intl.DateTimeFormat('en-GB', {
+        day: 'numeric',
+        month: 'long',
+        year: 'numeric',
+      }).format(dt);
+    }
+        get periodLabel(): string {
+      const v = this.fg.getRawValue();
+      const from = v.dateFrom || '';
+      const to = v.dateTo || '';
+      if (!from && !to) return '';
+      if (from && to) return `For the period ${this.formatLongYmd(from)} to ${this.formatLongYmd(to)}`;
+      if (to) return `As at ${this.formatLongYmd(to)}`;
+      return `From ${this.formatLongYmd(from)}`;
+    }
   // ===== Demo master data (match screenshot logic) =====
   private master: {
     debtorCode: string;
@@ -308,6 +342,24 @@ export class DebtorCollectionReportComponent {
 
   rows = computed(() => this._rowsView());
 
+// ===== list/detail view (click Debtor Code to open detail) =====
+private _viewMode = signal<'list' | 'detail'>('list');
+viewMode = computed(() => this._viewMode());
+
+private _selected = signal<DebtorRow | null>(null);
+selected = computed(() => this._selected());
+
+openDetail(r: DebtorRow) {
+  this._selected.set(r);
+  this._viewMode.set('detail');
+}
+
+backToList() {
+  this._viewMode.set('list');
+  this._selected.set(null);
+}
+
+
   // ===== Grouped view =====
   showGrouped = () => this.fg.value.groupBy !== 'none';
 
@@ -403,7 +455,11 @@ export class DebtorCollectionReportComponent {
     }
 
     this._rows.set(rows);
-  }
+
+    // always return to list view after inquiry
+    this._viewMode.set('list');
+    this._selected.set(null);
+}
 
   // ===== Utils =====
   private toDate(iso: string): Date {

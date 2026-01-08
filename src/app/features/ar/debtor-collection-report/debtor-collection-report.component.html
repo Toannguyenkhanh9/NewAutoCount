@@ -1,31 +1,27 @@
 <div class="page">
-  <div class="titlebar">
-    <h1>Debtor Collection Report</h1>
-  </div>
-
   <!-- Filters -->
   <div class="options">
     <form [formGroup]="fg" class="options">
       <fieldset class="filters">
         <!-- Date range -->
-        <div class="f">
-          <div class="lbl">Date From</div>
-          <div class="ctl">
+        <div class="inv-field">
+          <div class="inv-label">Date From</div>
+          <div class="">
             <input type="date" formControlName="dateFrom" />
           </div>
         </div>
 
-        <div class="f">
-          <div class="lbl">Date To</div>
-          <div class="ctl">
+        <div class="inv-field">
+          <div class="inv-label">Date To</div>
+          <div class="">
             <input type="date" formControlName="dateTo" />
           </div>
         </div>
 
         <!-- Debtor: multi select -->
-        <div class="f">
-          <div class="lbl">Debtor</div>
-          <div class="ctl">
+        <div class="inv-field">
+          <div class="inv-label">Debtor</div>
+          <div class="">
             <div class="ms" (click)="onToggleDebtor($event)">
               <span class="ms-text">{{ debtorSummary }}</span>
               <span class="caret">▾</span>
@@ -82,9 +78,9 @@
         </div>
 
         <!-- Payment Type: multi select -->
-        <div class="f">
-          <div class="lbl">Payment Type</div>
-          <div class="ctl">
+        <div class="inv-field">
+          <div class="inv-label">Payment Type</div>
+          <div class="">
             <div class="ms" (click)="onTogglePaymentType($event)">
               <span class="ms-text">{{ paymentTypeSummary }}</span>
               <span class="caret">▾</span>
@@ -146,9 +142,9 @@
         </div>
 
         <!-- Group by -->
-        <div class="f">
-          <div class="lbl">Group by</div>
-          <div class="ctl">
+        <div class="inv-field">
+          <div class="inv-label">Group by</div>
+          <div class="">
             <select formControlName="groupBy">
               <option value="none">None</option>
               <option value="debtorType">Debtor Type</option>
@@ -157,9 +153,9 @@
         </div>
 
         <!-- Debtor Type -->
-        <div class="f">
-          <div class="lbl">Debtor Type</div>
-          <div class="ctl">
+        <div class="inv-field">
+          <div class="inv-label">Debtor Type</div>
+          <div class="">
             <select formControlName="debtorType">
               <option value="ALL">All</option>
               <option *ngFor="let t of debtorTypes" [value]="t">
@@ -170,9 +166,9 @@
         </div>
 
         <!-- Currency -->
-        <div class="f">
-          <div class="lbl">Currency</div>
-          <div class="ctl">
+        <div class="inv-field">
+          <div class="inv-label">Currency</div>
+          <div class="">
             <select formControlName="currency">
               <option value="ALL">All</option>
               <option *ngFor="let c of currencies" [value]="c">
@@ -183,9 +179,9 @@
         </div>
 
         <!-- Cancelled Status -->
-        <div class="f">
-          <div class="lbl">Cancelled Status</div>
-          <div class="ctl">
+        <div class="inv-field">
+          <div class="inv-label">Cancelled Status</div>
+          <div class="">
             <select formControlName="cancelledStatus">
               <option
                 *ngFor="let s of cancelledStatuses"
@@ -198,209 +194,110 @@
         </div>
 
         <!-- Inquiry -->
-        <div class="f">
-          <div class="lbl"></div>
+        <div class="f action">
+          <div class="lbl">&nbsp;</div>
           <div class="ctl">
-            <br />
-            <button
-              type="button"
-              class="btn primary"
-              (click)="inquiry()"
-            >
-              <span class="ico refresh"></span>
-              Inquiry
+            <button type="button" class="ac-btn ac-btn-primary" (click)="inquiry()"> Inquiry
             </button>
           </div>
         </div>
       </fieldset>
     </form>
   </div>
-
+<div class="report-card">
+    <div class="report-head">
+    <div class="rh-title">Debtor Collection Report</div>
+    <div class="rh-company">{{ companyName }}</div>
+    <div class="rh-period">{{ periodLabel }}</div>
+  </div>
+  <ng-container *ngIf="viewMode() === 'list'">
   <!-- ========== NORMAL VIEW ========== -->
   <div class="gridwrap" *ngIf="!showGrouped()">
     <table>
       <thead>
         <tr>
-          <th class="toggle"></th>
-
-          <th (click)="onHeaderSort('debtorCode')">
+          <th class="l" (click)="onHeaderSort('debtorCode')">
             Debtor Code
-            <span
-              *ngIf="sortKey() === 'debtorCode'"
-              class="arrow"
-            >
+            <span *ngIf="sortKey() === 'debtorCode'" class="arrow">
               {{ sortDir() === 'asc' ? '▲' : '▼' }}
             </span>
           </th>
 
-          <th (click)="onHeaderSort('debtorName')">
+          <th class="l" (click)="onHeaderSort('debtorName')">
             Company Name
-            <span
-              *ngIf="sortKey() === 'debtorName'"
-              class="arrow"
-            >
+            <span *ngIf="sortKey() === 'debtorName'" class="arrow">
               {{ sortDir() === 'asc' ? '▲' : '▼' }}
             </span>
           </th>
 
-          <th (click)="onHeaderSort('debtorType')">
+          <th class="l" (click)="onHeaderSort('debtorType')">
             Debtor Type
-            <span
-              *ngIf="sortKey() === 'debtorType'"
-              class="arrow"
-            >
+            <span *ngIf="sortKey() === 'debtorType'" class="arrow">
               {{ sortDir() === 'asc' ? '▲' : '▼' }}
             </span>
           </th>
 
-          <th (click)="onHeaderSort('phone')">
+          <th class="l" (click)="onHeaderSort('phone')">
             Phone
-            <span
-              *ngIf="sortKey() === 'phone'"
-              class="arrow"
-            >
+            <span *ngIf="sortKey() === 'phone'" class="arrow">
               {{ sortDir() === 'asc' ? '▲' : '▼' }}
             </span>
           </th>
 
-          <th (click)="onHeaderSort('currency')">
+          <th class="l" (click)="onHeaderSort('currency')">
             Currency
-            <span
-              *ngIf="sortKey() === 'currency'"
-              class="arrow"
-            >
+            <span *ngIf="sortKey() === 'currency'" class="arrow">
               {{ sortDir() === 'asc' ? '▲' : '▼' }}
             </span>
           </th>
 
           <th class="r" (click)="onHeaderSort('totalPrePayment')">
             PrePayment
-            <span
-              *ngIf="sortKey() === 'totalPrePayment'"
-              class="arrow"
-            >
+            <span *ngIf="sortKey() === 'totalPrePayment'" class="arrow">
               {{ sortDir() === 'asc' ? '▲' : '▼' }}
             </span>
           </th>
 
           <th class="r" (click)="onHeaderSort('totalAmount')">
             Payment Amount
-            <span
-              *ngIf="sortKey() === 'totalAmount'"
-              class="arrow"
-            >
+            <span *ngIf="sortKey() === 'totalAmount'" class="arrow">
               {{ sortDir() === 'asc' ? '▲' : '▼' }}
             </span>
           </th>
 
           <th class="r" (click)="onHeaderSort('avgAge')">
             Average Age
-            <span
-              *ngIf="sortKey() === 'avgAge'"
-              class="arrow"
-            >
+            <span *ngIf="sortKey() === 'avgAge'" class="arrow">
               {{ sortDir() === 'asc' ? '▲' : '▼' }}
             </span>
           </th>
 
           <th class="r" (click)="onHeaderSort('avgPaymentDays')">
             Average Payment Days
-            <span
-              *ngIf="sortKey() === 'avgPaymentDays'"
-              class="arrow"
-            >
+            <span *ngIf="sortKey() === 'avgPaymentDays'" class="arrow">
               {{ sortDir() === 'asc' ? '▲' : '▼' }}
             </span>
           </th>
         </tr>
       </thead>
 
-      <tbody *ngFor="let r of rows()">
-        <!-- Level 1: Debtor -->
-        <tr class="debtor">
-          <td class="toggle">
-            <button
-              class="toggle-btn"
-              type="button"
-              (click)="toggleRow(r)"
-            >
-              {{ r.expanded ? '−' : '+' }}
-            </button>
+      <tbody>
+        <tr class="debtor" *ngFor="let r of rows()">
+          <td class="l">
+            <a href="#" class="link" (click)="openDetail(r); $event.preventDefault()">
+              {{ r.debtorCode }}
+            </a>
           </td>
-          <td>{{ r.debtorCode }}</td>
-          <td>{{ r.debtorName }}</td>
-          <td>{{ r.debtorType }}</td>
-          <td>{{ r.phone }}</td>
-          <td class="c">{{ r.currency }}</td>
-          <td class="r">
-            {{ r.totalPrePayment | number : '1.2-2' }}
-          </td>
-          <td class="r">
-            {{ r.totalAmount | number : '1.2-2' }}
-          </td>
-          <td class="r">
-            {{ r.avgAge | number : '1.0-0' }}
-          </td>
-          <td class="r">
-            {{ r.avgPaymentDays | number : '1.0-0' }}
-          </td>
-        </tr>
-
-        <!-- Level 2: Details -->
-        <tr class="detail-row" *ngIf="r.expanded">
-          <td [attr.colspan]="10">
-            <div class="detail-wrap full">
-              <table class="grid detail-yellow">
-                <thead>
-                  <tr>
-                    <th>Doc No</th>
-                    <th>Doc Date</th>
-                    <th>Doc Type</th>
-                    <th>Description</th>
-                    <th>Currency</th>
-                    <th>Cheque No</th>
-                    <th class="r">PrePayment</th>
-                    <th class="r">Amount</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr *ngFor="let d of r.details">
-                    <td>{{ d.docNo }}</td>
-                    <td>{{ d.docDate }}</td>
-                    <td class="c">{{ d.docType }}</td>
-                    <td>{{ d.description }}</td>
-                    <td class="c">{{ d.currency }}</td>
-                    <td>{{ d.chequeNo }}</td>
-                    <td class="r">
-                      {{ d.prePayment | number : '1.2-2' }}
-                    </td>
-                    <td class="r">
-                      {{ d.amount | number : '1.2-2' }}
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-          </td>
+          <td class="l">{{ r.debtorName }}</td>
+          <td class="l">{{ r.debtorType }}</td>
+          <td class="l">{{ r.phone }}</td>
+          <td class="l">{{ r.currency }}</td>
+          <td class="r">{{ r.totalPrePayment | number : '1.2-2' }}</td>
+          <td class="r">{{ r.totalAmount | number : '1.2-2' }}</td>
+          <td class="r">{{ r.avgAge | number : '1.0-0' }}</td>
+          <td class="r">{{ r.avgPaymentDays | number : '1.0-0' }}</td>
         </tr>
       </tbody>
-<!--
-      <tfoot class="sum-row">
-        <tr>
-          <td colspan="6" class="r"><strong>Total</strong></td>
-          <td class="r">
-            <strong>
-              {{ totals().prePayment | number : '1.2-2' }}
-            </strong>
-          </td>
-          <td class="r">
-            <strong>
-              {{ totals().amount | number : '1.2-2' }}
-            </strong>
-          </td>
-          <td colspan="2"></td>
-        </tr>
-      </tfoot> -->
     </table>
   </div>
 
@@ -409,12 +306,11 @@
     <table>
       <thead>
         <tr>
-          <th class="toggle"></th>
-          <th>Debtor Code</th>
-          <th>Company Name</th>
-          <th>Debtor Type</th>
-          <th>Phone</th>
-          <th>Currency</th>
+          <th class="l">Debtor Code</th>
+          <th class="l">Company Name</th>
+          <th class="l">Debtor Type</th>
+          <th class="l">Phone</th>
+          <th class="l">Currency</th>
           <th class="r">PrePayment</th>
           <th class="r">Payment Amount</th>
           <th class="r">Average Age</th>
@@ -425,7 +321,7 @@
       <ng-container *ngFor="let g of groups()">
         <tbody class="group-head">
           <tr>
-            <td colspan="10">
+            <td colspan="9">
               <strong>
                 {{ fg.value.groupBy === 'area' ? 'Area' : 'Debtor Type' }}:
                 {{ g.key }}
@@ -435,91 +331,65 @@
           </tr>
         </tbody>
 
-        <tbody *ngFor="let r of g.items">
-          <tr class="debtor">
-            <td class="toggle">
-              <button
-                class="toggle-btn"
-                type="button"
-                (click)="toggleRow(r)"
-              >
-                {{ r.expanded ? '−' : '+' }}
-              </button>
+        <tbody>
+          <tr class="debtor" *ngFor="let r of g.items">
+            <td class="l">
+              <a href="#" class="link" (click)="openDetail(r); $event.preventDefault()">
+                {{ r.debtorCode }}
+              </a>
             </td>
-            <td>{{ r.debtorCode }}</td>
             <td>{{ r.debtorName }}</td>
             <td>{{ r.debtorType }}</td>
             <td>{{ r.phone }}</td>
             <td class="c">{{ r.currency }}</td>
-            <td class="r">
-              {{ r.totalPrePayment | number : '1.2-2' }}
-            </td>
-            <td class="r">
-              {{ r.totalAmount | number : '1.2-2' }}
-            </td>
-            <td class="r">
-              {{ r.avgAge | number : '1.0-0' }}
-            </td>
-            <td class="r">
-              {{ r.avgPaymentDays | number : '1.0-0' }}
-            </td>
-          </tr>
-
-          <tr class="detail-row" *ngIf="r.expanded">
-            <td [attr.colspan]="10">
-              <div class="detail-wrap full">
-                <table class="grid detail-yellow">
-                  <thead>
-                    <tr>
-                      <th>Doc No</th>
-                      <th>Doc Date</th>
-                      <th>Doc Type</th>
-                      <th>Description</th>
-                      <th>Currency</th>
-                      <th>Cheque No</th>
-                      <th class="r">PrePayment</th>
-                      <th class="r">Amount</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr *ngFor="let d of r.details">
-                      <td>{{ d.docNo }}</td>
-                      <td>{{ d.docDate }}</td>
-                      <td class="c">{{ d.docType }}</td>
-                      <td>{{ d.description }}</td>
-                      <td class="c">{{ d.currency }}</td>
-                      <td>{{ d.chequeNo }}</td>
-                      <td class="r">
-                        {{ d.prePayment | number : '1.2-2' }}
-                      </td>
-                      <td class="r">
-                        {{ d.amount | number : '1.2-2' }}
-                      </td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
-            </td>
+            <td class="r">{{ r.totalPrePayment | number : '1.2-2' }}</td>
+            <td class="r">{{ r.totalAmount | number : '1.2-2' }}</td>
+            <td class="r">{{ r.avgAge | number : '1.0-0' }}</td>
+            <td class="r">{{ r.avgPaymentDays | number : '1.0-0' }}</td>
           </tr>
         </tbody>
       </ng-container>
-
-      <!-- <tfoot class="sum-row">
-        <tr>
-          <td colspan="6" class="r"><strong>Total</strong></td>
-          <td class="r">
-            <strong>
-              {{ totals().prePayment | number : '1.2-2' }}
-            </strong>
-          </td>
-          <td class="r">
-            <strong>
-              {{ totals().amount | number : '1.2-2' }}
-            </strong>
-          </td>
-          <td colspan="2"></td>
-        </tr>
-      </tfoot> -->
     </table>
   </div>
+</ng-container>
+
+<!-- ========== DETAIL VIEW ========== -->
+<ng-container *ngIf="viewMode() === 'detail' && selected() as r">
+  <div class="gridwrap">
+    <div class="detail-toolbar">
+      <a href="#" class="back-link" (click)="backToList(); $event.preventDefault()">←</a>
+      <div class="detail-title">
+        <strong>{{ r.debtorCode }}</strong> — {{ r.debtorName }} ({{ r.currency }})
+      </div>
+    </div>
+
+    <table class="grid detail-yellow">
+      <thead>
+        <tr>
+          <th class="l">Doc No</th>
+          <th class="l">Doc Date</th>
+          <th class="l">Doc Type</th>
+          <th class="l">Description</th>
+          <th class="l">Currency</th>
+          <th class="l">Cheque No</th>
+          <th class="r">PrePayment</th>
+          <th class="r">Amount</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let d of r.details">
+          <td class="l">{{ d.docNo }}</td>
+          <td class="l">{{ d.docDate }}</td>
+          <td class="l">{{ d.docType }}</td>
+          <td class="l">{{ d.description }}</td>
+          <td class="l">{{ d.currency }}</td>
+          <td class="l">{{ d.chequeNo }}</td>
+          <td class="r">{{ d.prePayment | number : '1.2-2' }}</td>
+          <td class="r">{{ d.amount | number : '1.2-2' }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</ng-container>
+</div>
 </div>
