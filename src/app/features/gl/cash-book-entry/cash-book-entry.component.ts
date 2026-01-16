@@ -2,7 +2,7 @@ import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AmountInputDirective } from '../../../_share/directives';
-
+import { LucideIconsModule } from '../../../_share/lucide-icons';
 type EntryType = 'Receipt' | 'Payment';
 type VoucherKind = 'Receipt' | 'Payment';
 
@@ -36,12 +36,14 @@ interface DetailRow {
 @Component({
   selector: 'app-cash-book-entry',
   standalone: true,
-  imports: [CommonModule, FormsModule, AmountInputDirective],
+  imports: [CommonModule, FormsModule, AmountInputDirective, LucideIconsModule],
   templateUrl: './cash-book-entry.component.html',
   styleUrls: ['./cash-book-entry.component.scss'],
 })
 export class CashBookEntryComponent {
   // ===== Listing (data mẫu) =====
+  page = 1;
+  pageSize = 8;
   rows: ListRow[] = [
     {
       id: 'OR-202511-0001',
@@ -142,12 +144,14 @@ export class CashBookEntryComponent {
     remark: '',
     methods: [] as MethodRow[],
     details: [] as DetailRow[],
-    postDetailToGL: true,
+    postDetailToGL: false,
+    continueNew: false,
   };
 
   openVoucher(type: EntryType) {
     this.choiceOpen = false;
     this.voucherOpen = true;
+    this.editingId = null;
     Object.assign(this.voucher, {
       type,
       docNo: '',
@@ -159,10 +163,19 @@ export class CashBookEntryComponent {
       rate: 1,
       remark: '',
       methods: [
-        { method: this.paymentMethods[0], amount: 0, bankCharge: 0 },
+        {
+          method: this.paymentMethods[0],
+          chequeNo: '',
+          amount: 0,
+          bankCharge: 0,
+          paymentBy: this.derivePaymentBy(this.paymentMethods[0]),
+          isRchq: false,
+          rchqDate: '',
+        },
       ] as MethodRow[],
       details: [] as DetailRow[],
-      postDetailToGL: true,
+      postDetailToGL: false,
+      continueNew: false,
     });
   }
   closeVoucher() {
@@ -226,11 +239,19 @@ export class CashBookEntryComponent {
 
   // ===== Methods / Details rows =====
   addMethod() {
-    this.voucher.methods.push({
-      method: this.paymentMethods[0],
+    const method = this.paymentMethods[0];
+    const row: MethodRow = {
+      method,
+      chequeNo: '',
       amount: 0,
       bankCharge: 0,
-    });
+      paymentBy: this.derivePaymentBy(method),
+      isRchq: false,
+      rchqDate: '',
+    };
+
+    this.voucher.methods.push(row);
+    this.syncMethodRow(row);
   }
   confirmRowOpen = false as boolean;
   confirmRowCtx: { kind: 'method' | 'detail'; index: number } | null = null;
@@ -335,7 +356,22 @@ export class CashBookEntryComponent {
     } else {
       this.rows.unshift(row);
     }
+    const keepNew = !this.editingId && !!this.voucher.continueNew; // chỉ áp dụng khi Create (không phải Edit)
 
+    if (keepNew) {
+      const type = this.voucher.type as EntryType;
+
+      // mở lại form New cùng loại voucher
+      this.openVoucher(type);
+
+      // tuỳ chọn: giữ lại 1 vài field cho nhập nhanh (bạn muốn giữ cái gì thì giữ)
+      // ví dụ giữ Receive From/Pay To:
+      // this.voucher.payerPayee = row.payerPayee;
+
+      return;
+    }
+
+    // bình thường: đóng form
     this.voucherOpen = false;
     this.editingId = null;
   }
@@ -368,11 +404,49 @@ export class CashBookEntryComponent {
 
   // ===== New / Edit =====
   editingId: string | null = null;
+  get isEditMode(): boolean {
+    return !!this.editingId;
+  }
 
+  private derivePaymentBy(method: string): string {
+    const s = String(method || '').trim();
+    // CHEQUE-MBB -> CHEQUE (giống hình bạn gửi)
+    const first = s.split('-')[0]?.trim();
+    return first || s;
+  }
+
+  private syncMethodRow(m: MethodRow) {
+    // auto fill Payment By
+    m.paymentBy = this.derivePaymentBy(m.method);
+
+    // Add new: disable/clear RCHQ
+    if (!this.isEditMode) {
+      m.isRchq = false;
+      m.rchqDate = '';
+    } else {
+      // Edit mode: đảm bảo không undefined
+      m.isRchq = !!m.isRchq;
+      m.rchqDate = m.rchqDate || '';
+    }
+  }
+
+  onPaymentMethodChange(i: number) {
+    const m = this.voucher.methods[i];
+    if (!m) return;
+    this.syncMethodRow(m);
+  }
+
+  onRchqChanged(i: number) {
+    const m = this.voucher.methods[i];
+    if (!m) return;
+    // nếu tắt RCHQ thì clear date
+    if (!m.isRchq) m.rchqDate = '';
+  }
   openNew(kind: VoucherKind = 'Receipt') {
     this.voucher = this.makeEmptyVoucher(kind);
     this.voucherOpen = true;
     this.editingId = null;
+    this.voucher.methods.forEach((m) => this.syncMethodRow(m));
   }
 
   // ✅ Sửa lỗi: fallback nếu row.voucher không có
@@ -392,6 +466,7 @@ export class CashBookEntryComponent {
 
     this.voucher = v;
     this.voucherOpen = true;
+    this.voucher.methods.forEach((m) => this.syncMethodRow(m));
     this.editingId = row.id;
     this.recalcTotals?.();
   }
@@ -414,7 +489,8 @@ export class CashBookEntryComponent {
       currency: 'MYR',
       rate: 1,
       remark: '',
-      postDetailToGL: true,
+      postDetailToGL: false,
+      continueNew: false,
       methods: [
         {
           method: this.paymentMethods[0],
@@ -433,4 +509,31 @@ export class CashBookEntryComponent {
   private suggestDocNo(): string {
     return this.nextDocNo(this.voucher.type as EntryType);
   }
+  showAddRowMenu = false;
+  toggleAddRowMenu() {
+    this.showAddRowMenu = !this.showAddRowMenu;
+  }
+
+  closeAddRowMenu() {
+    this.showAddRowMenu = false;
+  }
+  addRows(count: number) {
+    for (let i = 0; i < count; i++) {
+      this.addDetail();
+    }
+  }
+  showAddMethodMenu = false;
+  toggleAddMethodMenu() {
+    this.showAddMethodMenu = !this.showAddMethodMenu;
+  }
+
+  closeAddMethodMenu() {
+    this.showAddMethodMenu = false;
+  }
+  addMethods(count: number) {
+    for (let i = 0; i < count; i++) {
+      this.addMethod();
+    }
+  }
+
 }

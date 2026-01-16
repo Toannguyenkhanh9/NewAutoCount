@@ -2220,3 +2220,70 @@ tfoot td{
   fieldset.filters{ grid-template-columns: repeat(2, minmax(180px, 1fr)); }
   .f.action{ grid-column: 1 / -1; }
 }
+/* overlay (nền mờ) – cho phép canh giữa + vẫn xem được nếu màn hình thấp */
+.dialog {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,.35);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  overflow: auto; /* quan trọng: nếu viewport thấp vẫn cuộn được */
+}
+
+/* panel */
+.dialog-panel-xl {
+  width: min(1100px, 96vw);
+  max-height: calc(100dvh - 80px); /* dùng dvh để ổn định hơn */
+  display: flex;
+  flex-direction: column;
+
+  overflow: hidden;   /* quan trọng: chặn body tràn ra ngoài panel */
+  background: #fff;
+}
+
+/* header */
+.dialog-title {
+  flex: 0 0 auto;
+}
+
+/* body: phần này sẽ scroll */
+.dialog-body {
+  flex: 1 1 auto;
+  min-height: 0;      /* quan trọng: để overflow hoạt động trong flex */
+  overflow: auto;     /* bật scrollbar khi dài */
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* footer */
+.dialog-actions {
+  flex: 0 0 auto;
+  /* nếu muốn footer luôn “dính” ở dưới khi scroll */
+  position: sticky;
+  bottom: 0;
+  background: #fff;
+  border-top: 1px solid #e6eef8;
+  padding: 12px 16px;
+}
+.ac-card-inv {
+  width: 100%;
+  max-width: 100%;
+  /* margin: 8px 0; */
+}
+
+.account-type-footer-inv {
+  /* margin-top: 10px; */
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 12px;
+}
+.list-shell {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  /* chiều cao tổng khu list (trừ thanh tiêu đề/toolbar) */
+  max-height: calc(100vh - 210px);
+}

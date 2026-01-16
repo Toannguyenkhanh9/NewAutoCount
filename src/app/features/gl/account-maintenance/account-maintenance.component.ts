@@ -33,7 +33,11 @@ interface FlatRow {
   depth: number;
   visible: boolean;
 }
-
+interface ListRow {
+  node: AccountNode;
+  typeId: string;
+  typeDesc: string; // desc của cấp 1
+}
 interface PaymentMethod {
   name: string;
   journalType: 'BANK' | 'CASH' | 'DEPOSIT';
@@ -116,7 +120,77 @@ export class AccountMaintenanceComponent {
 
   // hàng đang chọn trong grid
   selectedNodeId: string | null = null;
+// Multi-select (bulk delete)
+selectedIds = new Set<string>();
+bulkDeleteNodes: AccountNode[] = [];
 
+get selectedCount(): number { return this.selectedIds.size; }
+get hasSelection(): boolean { return this.selectedIds.size > 0; }
+isChecked(n: AccountNode): boolean { return this.selectedIds.has(n.id); }
+
+private _setChecked(id: string, checked: boolean) {
+  const next = new Set(this.selectedIds);
+  if (checked) next.add(id);
+  else next.delete(id);
+  this.selectedIds = next;
+}
+
+toggleChecked(n: AccountNode, checked: boolean) {
+  if (!this.canDelete(n)) return;
+  this._setChecked(n.id, checked);
+}
+
+// click row để toggle chọn (optional)
+toggleRowClick(n: AccountNode) {
+  if (!this.canDelete(n)) return;
+  this._setChecked(n.id, !this.selectedIds.has(n.id));
+}
+
+clearSelection() {
+  this.selectedIds = new Set<string>();
+}
+
+get selectedNodes(): AccountNode[] {
+  if (this.selectedIds.size === 0) return [];
+  const map = new Map<string, AccountNode>();
+for (const n of this.allNodes()) map.set(n.id, n);
+  return Array.from(this.selectedIds)
+    .map((id) => map.get(id))
+    .filter((x): x is AccountNode => !!x);
+}
+
+get allSelectableChecked(): boolean {
+  const selectableIds = this.listRows
+    .filter((r) => this.canDelete(r.node))
+    .map((r) => r.node.id);
+  return selectableIds.length > 0 && selectableIds.every((id) => this.selectedIds.has(id));
+}
+
+toggleSelectAll(ev: Event) {
+  const checked = (ev.target as HTMLInputElement).checked;
+  const selectableIds = this.listRows
+    .filter((r) => this.canDelete(r.node))
+    .map((r) => r.node.id);
+
+  const next = new Set(this.selectedIds);
+  for (const id of selectableIds) {
+    if (checked) next.add(id);
+    else next.delete(id);
+  }
+  this.selectedIds = next;
+}
+
+askBulkDelete() {
+  const nodes = this.selectedNodes.filter((n) => this.canDelete(n));
+  if (nodes.length === 0) return;
+  this.bulkDeleteNodes = nodes;
+  this.ui.confirmBulkDeleteOpen = true;
+}
+
+cancelBulkDelete() {
+  this.ui.confirmBulkDeleteOpen = false;
+  this.bulkDeleteNodes = [];
+}
   // UI flags
   ui = {
     // popups
@@ -136,6 +210,8 @@ export class AccountMaintenanceComponent {
     confirmDeleteOpen: false,
     confirmFixedLinkOpen: false,
     confirmRemoveMethodOpen: false,
+    addMenuOpen: false,
+    confirmBulkDeleteOpen: false,
   };
 
   // context cho create menu
@@ -490,6 +566,37 @@ export class AccountMaintenanceComponent {
     }
     return rows;
   }
+get listRows(): ListRow[] {
+  const q = String(this.activeFilter ?? '').trim().toLowerCase();
+
+  const out: ListRow[] = [];
+
+  const pushIfMatch = (root: AccountNode, n: AccountNode) => {
+    if (n.kind === 'type') return;
+
+    if (q) {
+      const s = `${n.desc ?? ''} ${n.code ?? ''} ${n.specialCode ?? ''}`.toLowerCase();
+      if (!s.includes(q)) return;
+    }
+
+    out.push({ node: n, typeId: root.id, typeDesc: root.desc });
+  };
+
+  const walk = (root: AccountNode, n: AccountNode) => {
+    pushIfMatch(root, n);
+    for (const ch of n.children ?? []) walk(root, ch);
+  };
+
+  for (const root of this.roots ?? []) {
+    if (this.selectedType !== 'ALL' && root.id !== this.selectedType) continue;
+    for (const ch of root.children ?? []) walk(root, ch);
+  }
+
+  return out;
+}
+selectNode(node: AccountNode) {
+  this.selectedNodeId = node.id;
+}
   private walk(node: AccountNode, depth: number, out: FlatRow[]) {
     out.push({ node, depth, visible: true });
     if (!node.children || !node.expanded) return;
@@ -556,17 +663,23 @@ export class AccountMaintenanceComponent {
   }
 
   // ===== search =====
-  doFind() {
-    this.findHits = [];
-    this.findIndex = -1;
-    if (!this.findText.trim()) return;
-    const q = this.findText.toLowerCase();
-    for (const r of this.flat) {
-      const s = (r.node.desc + ' ' + (r.node.code ?? '')).toLowerCase();
-      if (s.includes(q)) this.findHits.push(r);
-    }
-    this.findNext();
-  }
+activeFilter = '';
+
+doFind() {
+  this.activeFilter = (this.findText || '').trim();
+
+  // optional: cuộn tới dòng đầu tiên sau khi filter
+  setTimeout(() => {
+    const first = this.listRows[0]?.node;
+    if (!first) return;
+    document.getElementById(`row-${first.id}`)?.scrollIntoView({ block: 'center' });
+  });
+}
+
+clearFind() {
+  this.findText = '';
+  this.activeFilter = '';
+}
   @HostListener('document:keydown', ['$event'])
   onKey(e: KeyboardEvent) {
     if (e.key === 'F3') {
@@ -574,7 +687,25 @@ export class AccountMaintenanceComponent {
       this.findNext();
     }
   }
-  findNext() {
+
+
+    @HostListener('document:click')
+  onDocClick() {
+    this.ui.addMenuOpen = false;
+  }
+
+  toggleAddMenu(ev: MouseEvent) {
+    ev.stopPropagation();
+    this.ui.addMenuOpen = !this.ui.addMenuOpen;
+  }
+
+  selectType(id: string) {
+    this.selectedType = id;
+    this.selectedNodeId = null;
+    this.ui.addMenuOpen = false;
+  }
+
+    findNext() {
     if (this.findHits.length === 0) return;
     this.findIndex = (this.findIndex + 1) % this.findHits.length;
     const target = this.findHits[this.findIndex].node;
@@ -693,6 +824,8 @@ export class AccountMaintenanceComponent {
     parent.children.push(node);
     parent.expanded = true;
     this.ui.newNormalOpen = false;
+    this.openSuccess(`Create account successfully.`);
+
   }
 
   // ===== Fixed Asset pair =====
@@ -766,6 +899,7 @@ export class AccountMaintenanceComponent {
     });
 
     this.ui.fixedAssetOpen = false;
+    this.openSuccess(`Create Fixed Asset Account successfully.`);
   }
 
   // ===== Bank/Cash/Deposit =====
@@ -917,6 +1051,7 @@ export class AccountMaintenanceComponent {
     });
     parent.expanded = true;
     this.ui.bankCashOpen = false;
+    this.openSuccess(`Create Bank Account successfully.`);
   }
 
   // ===== Debtor / Creditor Control =====
@@ -926,7 +1061,7 @@ export class AccountMaintenanceComponent {
       code: '',
       currency: 'MYR',
       cashflow: 'Operating Activities',
-      desc: 'DEBTOR CONTROL',
+      desc: '',
       desc2: '',
     };
     this.debtorAccNoDup = false;
@@ -957,6 +1092,7 @@ export class AccountMaintenanceComponent {
     });
     p.expanded = true;
     this.ui.debtorCtrlOpen = false;
+    this.openSuccess(`Create Debtor Control successfully.`);
   }
   debtorAccNoDup = false;
 
@@ -1009,7 +1145,7 @@ export class AccountMaintenanceComponent {
       code: '',
       currency: 'MYR',
       cashflow: 'Operating Activities',
-      desc: 'CREDITOR CONTROL (NORTHERN)',
+      desc: '',
       desc2: '',
     };
     this.creditorAccNoDup = false;
@@ -1048,6 +1184,7 @@ export class AccountMaintenanceComponent {
     });
     p.expanded = true;
     this.ui.creditorCtrlOpen = false;
+    this.openSuccess(`Create Creditor Control successfully.`);
   }
 
   // ===== Stock =====
@@ -1081,16 +1218,16 @@ export class AccountMaintenanceComponent {
     this.stock.balance.parentId = ca;
 
     // reset mặc định nhẹ nhàng
-    this.stock.open.code = '600-0000';
-    this.stock.open.desc = 'OPENING STOCK';
+    this.stock.open.code = '';
+    this.stock.open.desc = '';
     this.stock.open.desc2 = '';
 
-    this.stock.close.code = '699-0000';
-    this.stock.close.desc = 'CLOSING STOCK';
+    this.stock.close.code = '';
+    this.stock.close.desc = '';
     this.stock.close.desc2 = '';
 
-    this.stock.balance.code = '333-0000';
-    this.stock.balance.desc = 'BALANCE SHEET STOCK';
+    this.stock.balance.code = '';
+    this.stock.balance.desc = '';
     this.stock.balance.desc2 = '';
 
     this.ui.stockOpen = true;
@@ -1156,6 +1293,7 @@ export class AccountMaintenanceComponent {
     );
 
     this.ui.stockOpen = false;
+    this.openSuccess(`Create Stock Control successfully.`);
   }
   retainedAccNoDup = false;
   // ===== Retained Earning =====
@@ -1163,8 +1301,8 @@ export class AccountMaintenanceComponent {
     const reType = this.roots.find((r) => r.desc === 'RETAINED EARNING');
     this.retained = {
       parentId: parentId ?? reType?.id ?? null,
-      code: '150-0000',
-      desc: 'RETAINED EARNING',
+      code: '',
+      desc: '',
       desc2: '',
       currency: 'MYR',
       cashflow: 'Operating Activities',
@@ -1201,6 +1339,7 @@ export class AccountMaintenanceComponent {
     });
     p.expanded = true;
     this.ui.retainedOpen = false;
+    this.openSuccess(`Create Retained Earning successfully.`);
   }
 
   // ===== Edit / Delete =====
@@ -1235,6 +1374,7 @@ export class AccountMaintenanceComponent {
       this.moveNode(n.id, this.edit.parentId);
     }
     this.ui.editOpen = false;
+    this.openSuccess(`Edit Account successfully.`);
   }
 
   canDelete(node: AccountNode): boolean {
@@ -1283,7 +1423,19 @@ export class AccountMaintenanceComponent {
     this.ui.fixedLinksOpen = true;
   }
 
-  print() {
+  
+  // ===== toolbar (xero-like) =====
+  import() {
+    // TODO: wire to real import flow
+    alert('Import: TODO');
+  }
+
+  export() {
+    // TODO: wire to real export flow
+    alert('Export: TODO');
+  }
+
+print() {
     // tùy bạn sau này muốn in “Chart of Account” như thế nào
     // tạm thời gọi print của trình duyệt
     if (typeof window !== 'undefined' && 'print' in window) window.print();
@@ -1435,5 +1587,46 @@ export class AccountMaintenanceComponent {
     if (this.pendingMethodIndex === null) return;
     this.removePaymentMethod(this.pendingMethodIndex);
     this.closeConfirmRemoveMethod();
+  }
+  private removeNodeById(id: string): boolean {
+  const removeFrom = (arr: AccountNode[]): boolean => {
+    const idx = arr.findIndex((x) => x.id === id);
+    if (idx >= 0) { arr.splice(idx, 1); return true; }
+    for (const a of arr) {
+      if (a.children?.length && removeFrom(a.children)) return true;
+    }
+    return false;
+  };
+  return removeFrom(this.roots);
+}
+
+confirmBulkDelete() {
+  if (!this.bulkDeleteNodes?.length) return;
+  const ids = this.bulkDeleteNodes.map((n) => n.id);
+  for (const id of ids) this.removeNodeById(id);
+
+  this.ui.confirmBulkDeleteOpen = false;
+  this.bulkDeleteNodes = [];
+  this.clearSelection();
+  this.rebuildFlat();
+  this.openSuccess(`Deleted account successfully.`);
+}
+private rebuildFlat() {
+  // ép Angular refresh lại list sau khi mutate tree (hữu ích nếu bạn đang dùng OnPush / table render)
+  this.roots = [...this.roots];
+}
+amountClass(v?: number) {
+  const n = Number(v ?? 0);
+  return n < 0 ? 'amt-neg' : n > 0 ? 'amt-pos' : 'amt-zero';
+}
+showSuccess = false;
+  successMsg = '';
+
+  private openSuccess(msg: string) {
+    this.successMsg = msg;
+    this.showSuccess = true;
+  }
+  closeSuccess() {
+    this.showSuccess = false;
   }
 }

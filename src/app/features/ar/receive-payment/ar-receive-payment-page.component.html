@@ -25,12 +25,7 @@
             <span class="ico eye"></span>
             Edit
           </button>
-                              <button
-            type="button"
-            class="ac-btn ac-btn-danger"
-            [disabled]="!selected"
-            (click)="askDelete()"
-          >
+          <button type="button" class="ac-btn ac-btn-danger" [disabled]="!selected" (click)="askDelete()">
             <span class="ico trash"></span>
             Delete
           </button>
@@ -40,7 +35,7 @@
 
       <!-- List grid -->
       <div class="list-shell">
-        <div class="ac-card ac-card-no-padding main-grid">
+        <div class="ac-card-inv ac-card-no-padding main-grid">
           <div class="ac-tablewrap">
             <table class="ac-table">
               <thead>
@@ -82,31 +77,31 @@
             </table>
           </div>
         </div>
-       <div class="account-type-footer">
-        <div class="account-type-rec">
-          Total Records: 3
+        <div class="account-type-footer-inv">
+          <div class="account-type-rec">
+            Total Records: 3
+          </div>
+
+          <div class="account-type-pager">
+            <button class="ac-btn ac-btn-ghost account-type-pg-btn" [disabled]="page === 1" (click)="page = 1">
+              &laquo;
+            </button>
+            <button class="ac-btn ac-btn-ghost account-type-pg-btn" [disabled]="page === 1" (click)="page = page - 1">
+              &lsaquo;
+            </button>
+
+            <span class="account-type-pg-label">
+              Page {{ page }} / {{ 1 }}
+            </span>
+
+            <button class="ac-btn ac-btn-ghost account-type-pg-btn" [disabled]="page === 1" (click)="page = page + 1">
+              &rsaquo;
+            </button>
+            <button class="ac-btn ac-btn-ghost account-type-pg-btn" [disabled]="page === 1" (click)="page = 1">
+              &raquo;
+            </button>
+          </div>
         </div>
-
-        <div class="account-type-pager">
-          <button class="ac-btn ac-btn-ghost account-type-pg-btn" [disabled]="page === 1" (click)="page = 1">
-            &laquo;
-          </button>
-          <button class="ac-btn ac-btn-ghost account-type-pg-btn" [disabled]="page === 1" (click)="page = page - 1">
-            &lsaquo;
-          </button>
-
-          <span class="account-type-pg-label">
-            Page {{ page }} / {{ 1 }}
-          </span>
-
-          <button class="ac-btn ac-btn-ghost account-type-pg-btn" [disabled]="page === 1" (click)="page = page + 1">
-            &rsaquo;
-          </button>
-          <button class="ac-btn ac-btn-ghost account-type-pg-btn" [disabled]="page === 1" (click)="page = 1">
-            &raquo;
-          </button>
-        </div>
-       </div>
         <!-- Detail pane -->
         <div class="ac-card ac-card-no-padding cn-detail-pane" *ngIf="selected">
           <div class="pp-head">
@@ -238,14 +233,14 @@
                 <input type="date" class="ac-form-control" formControlName="date" />
               </div>
             </label>
-</div>
-            <!-- Description (wide) -->
-            <label class="inv-field wide">
-              <span class="inv-label">Description</span>
-              <div class="inv-contact-input">
-                <input class="ac-form-control" formControlName="description" />
-              </div>
-            </label>
+          </div>
+          <!-- Description (wide) -->
+          <label class="inv-field wide">
+            <span class="inv-label">Description</span>
+            <div class="inv-contact-input">
+              <input class="ac-form-control" formControlName="description" />
+            </div>
+          </label>
 
           <br />
 
@@ -297,8 +292,7 @@
                         [disabled]="formMode !== 'edit'" />
                     </td>
                     <td class="col-del">
-                      <button type="button" class="ac-btn ac-btn-icon-danger" (click)="removeMethod(i)"
-                      >
+                      <button type="button" class="ac-btn ac-btn-icon-danger" (click)="removeMethod(i)">
                         🗑
                       </button>
                     </td>
@@ -367,8 +361,7 @@
               <div class="title sm knock-title">
                 Knock Off Invoices / Debit Notes
               </div>
-              <button class="ac-btn ac-btn-primary" type="button" (click)="autoAllocate()"
-                [disabled]="!canAllocate">
+              <button class="ac-btn ac-btn-primary" type="button" (click)="autoAllocate()" [disabled]="!canAllocate">
                 Auto allocate
               </button>
             </div>
@@ -459,8 +452,7 @@
                       " (input)="onPayChanged(i)" (blur)="onPayBlur(i)" />
                   </td>
                   <td class="c">
-                    <input type="checkbox" [checked]="(+fg.value.pay || 0) > 0" (change)="toggleAlloc(i, $event)"
-                      />
+                    <input type="checkbox" [checked]="(+fg.value.pay || 0) > 0" (change)="toggleAlloc(i, $event)" />
                   </td>
                 </tr>
               </tbody>
@@ -475,7 +467,7 @@
           </button>
 
           <!-- <ng-container *ngIf="hasAnyChequeMethod"> -->
-            <ng-container>
+          <ng-container>
             <button type="button" class="ac-btn ac-btn-primary" (click)="askSave()" [disabled]="
                 unappliedAmount !== 0 ||
                 rpForm.invalid ||
@@ -560,7 +552,7 @@
       </div>
     </div>
   </div>
-    <div class="dialog" *ngIf="showDebtorPicker">
+  <div class="dialog" *ngIf="showDebtorPicker">
     <div class="dialog-panel ac-card-no-padding ac-dialog-panel-lg">
       <div class="ac-dialog-header">
         <span>Select Debtor</span>

@@ -23,7 +23,6 @@
 
 .form{ display:grid; grid-template-columns: 180px 1fr; gap:10px 12px; align-items:center; }
 .form.two{ grid-template-columns: 150px 1fr 120px 1fr; }
-.inp{ width:100%; padding:8px 10px; border:1px solid #e5e5e5; border-radius:8px; background:#fff; }
 .inline{ display:flex; gap:10px; align-items:center; }
 .hint{ color:#999; font-size:12px; }
 .req{ color:#fa541c; }
@@ -34,7 +33,6 @@
 .totals{ display:flex; gap:8px; align-items:center; }
 
 table.mini th, table.mini td{ padding:8px; }
-.chk{ display:flex; align-items:center; gap:8px; color:#666; }
 
 .choice{ display:grid; grid-template-columns: 1fr 1fr; gap:16px; padding:18px; background:#fff; }
 .choice-col{ background:#f6ffed; border:1px dashed #b7eb8f; border-radius:12px; padding:14px; display:flex; flex-direction:column; gap:10px; }
@@ -177,11 +175,6 @@ table.mini th, table.mini td{ padding:8px; }
   align-items: center;
 }
 
-.totals-grid .value {
-  display: flex;
-  flex-direction: column;   /* lỗi nằm dưới số */
-  align-items: flex-end;    /* canh phải cho khớp style hiện tại */
-}
 
 .pill {
   padding: 6px 10px;

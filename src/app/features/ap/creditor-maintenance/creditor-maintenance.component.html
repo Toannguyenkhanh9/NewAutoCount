@@ -19,9 +19,8 @@
           <button class="ac-btn ac-btn-danger" [disabled]="!selected" (click)="onDeleteDebtor()">Delete</button>
         </div>
       </div>
-    </div>
-
-    <div class="ac-card ac-card-no-padding">
+      <div class="list-shell">
+    <div class="ac-card-inv  ac-card-no-padding">
       <div class="ac-tablewrap">
         <table class="ac-table">
           <thead>
@@ -50,7 +49,8 @@
           </tbody>
         </table>
       </div>
-          <div class="account-type-footer">
+    </div>
+              <div class="account-type-footer-inv">
       <div class="account-type-rec">
         Total Records: 3
       </div>
@@ -92,6 +92,8 @@
       </div>
     </div>
     </div>
+    </div>
+
   </ng-container>
   <!-- ================= FORM MODE ================= -->
   <ng-container *ngIf="showForm">

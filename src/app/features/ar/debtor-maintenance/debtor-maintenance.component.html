@@ -19,78 +19,65 @@
           <button class="ac-btn ac-btn-danger" [disabled]="!selected" (click)="onDeleteDebtor()">Delete</button>
         </div>
       </div>
-    </div>
+      <div class="list-shell">
+        <div class="ac-card-inv ac-card-no-padding">
+          <div class="ac-tablewrap">
+            <table class="ac-table">
+              <thead>
+                <tr>
+                  <th class="ac-text-left" (click)="setSort('debtorAccount')">Code</th>
+                  <th class="ac-text-left">Customer Name</th>
+                  <th class="ac-text-left">Company/SSM ID</th>
+                  <th class="ac-text-left">Phone</th>
+                  <th class="ac-text-left">Customer's TIN</th>
+                  <th class="ac-text-left">Active</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let r of filteredRows()" (click)="select(r)" [class.ac-row-selected]="selected === r">
+                  <td>{{ r.debtorAccount }}</td>
+                  <td>{{ r.companyName }}</td>
+                  <td>{{ r.type }}</td>
+                  <td>{{ r.phone }}</td>
+                  <td>{{ r.customerTin }}</td>
+                  <td><input type="checkbox" [checked]="r.active" disabled /></td>
+                </tr>
 
-    <div class="ac-card ac-card-no-padding">
-      <div class="ac-tablewrap">
-        <table class="ac-table">
-          <thead>
-            <tr>
-              <th class="ac-text-left" (click)="setSort('debtorAccount')">Code</th>
-              <th class="ac-text-left">Customer Name</th>
-              <th class="ac-text-left">Company/SSM ID</th>
-              <th class="ac-text-left">Phone</th>
-              <th class="ac-text-left">Customer's TIN</th>
-              <th class="ac-text-left">Active</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr *ngFor="let r of filteredRows()" (click)="select(r)" [class.ac-row-selected]="selected === r">
-              <td>{{ r.debtorAccount }}</td>
-              <td>{{ r.companyName }}</td>
-              <td>{{ r.type }}</td>
-              <td>{{ r.phone }}</td>
-              <td>{{ r.customerTin }}</td>
-              <td><input type="checkbox" [checked]="r.active" disabled /></td>
-            </tr>
+                <tr *ngIf="!filteredRows().length">
+                  <td colspan="6" class="ac-text-center ac-text-muted">No data</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
 
-            <tr *ngIf="!filteredRows().length">
-              <td colspan="6" class="ac-text-center ac-text-muted">No data</td>
-            </tr>
-          </tbody>
-        </table>
+        </div>
+        <div class="account-type-footer-inv">
+          <div class="account-type-rec">
+            Total Records: 3
+          </div>
+
+          <div class="account-type-pager">
+            <button class="ac-btn ac-btn-ghost account-type-pg-btn" [disabled]="page === 1" (click)="page = 1">
+              &laquo;
+            </button>
+            <button class="ac-btn ac-btn-ghost account-type-pg-btn" [disabled]="page === 1" (click)="page = page - 1">
+              &lsaquo;
+            </button>
+
+            <span class="account-type-pg-label">
+              Page {{ page }} / 1
+            </span>
+
+            <button class="ac-btn ac-btn-ghost account-type-pg-btn" [disabled]="page === 1" (click)="page = page + 1">
+              &rsaquo;
+            </button>
+            <button class="ac-btn ac-btn-ghost account-type-pg-btn" [disabled]="page === 1" (click)="page = 1">
+              &raquo;
+            </button>
+          </div>
+        </div>
       </div>
-          <div class="account-type-footer">
-      <div class="account-type-rec">
-        Total Records: 3
-      </div>
 
-      <div class="account-type-pager">
-        <button
-          class="ac-btn ac-btn-ghost account-type-pg-btn"
-          [disabled]="page === 1"
-          (click)="page = 1"
-        >
-          &laquo;
-        </button>
-        <button
-          class="ac-btn ac-btn-ghost account-type-pg-btn"
-          [disabled]="page === 1"
-          (click)="page = page - 1"
-        >
-          &lsaquo;
-        </button>
-
-        <span class="account-type-pg-label">
-          Page {{ page }} / 1
-        </span>
-
-        <button
-          class="ac-btn ac-btn-ghost account-type-pg-btn"
-          [disabled]="page === 1"
-          (click)="page = page + 1"
-        >
-          &rsaquo;
-        </button>
-        <button
-          class="ac-btn ac-btn-ghost account-type-pg-btn"
-          [disabled]="page === 1"
-          (click)="page = 1"
-        >
-          &raquo;
-        </button>
-      </div>
-    </div>
     </div>
   </ng-container>
   <!-- ================= FORM MODE ================= -->
@@ -398,10 +385,9 @@
                   </label>
 
                   <!-- Checkbox: Block new invoices... -->
-                  <div class="credit-limit-row" >
-                    <label class="ac-checkbox-row credit-limit-block" >
-                      <input type="checkbox" formControlName="blockInvoicesWhenLimitReached"
-                       />
+                  <div class="credit-limit-row">
+                    <label class="ac-checkbox-row credit-limit-block">
+                      <input type="checkbox" formControlName="blockInvoicesWhenLimitReached" />
                       <span>Block new invoices when credit limit is reached</span>
                     </label>
                   </div>
@@ -431,28 +417,20 @@
           Cancel
         </button>
         <button class="btn primary" type="button" (click)="saveDebtor()" [disabled]="debtorForm.invalid">
-                      {{
-            formMode === 'new'
-            ? 'Create'
-            : 'Save'
-            }}
+          {{
+          formMode === 'new'
+          ? 'Create'
+          : 'Save'
+          }}
         </button>
       </div>
     </div>
   </ng-container>
   <div class="ac-dialog-backdrop" *ngIf="showSuccess">
-    <div
-      class="ac-card-no-padding ac-dialog-panel-sm ac-dialog-success"
-      role="dialog"
-      aria-modal="true"
-    >
+    <div class="ac-card-no-padding ac-dialog-panel-sm ac-dialog-success" role="dialog" aria-modal="true">
       <div class="ac-dialog-header ac-dialog-success-header">
         <span>Success</span>
-        <button
-          class="ac-dialog-close"
-          (click)="closeSuccess()"
-          aria-label="Close"
-        >
+        <button class="ac-dialog-close" (click)="closeSuccess()" aria-label="Close">
           ×
         </button>
       </div>
@@ -462,57 +440,41 @@
         </p>
       </div>
       <div class="ac-dialog-footer">
-        <button
-          class="ac-btn ac-btn-primary"
-          type="button"
-          (click)="closeSuccess()"
-        >
+        <button class="ac-btn ac-btn-primary" type="button" (click)="closeSuccess()">
           OK
         </button>
       </div>
     </div>
   </div>
-<div class="ac-dialog-backdrop" *ngIf="showDeleteDebtorConfirm">
-  <div class="ac-card-no-padding ac-dialog-panel-sm" role="dialog" aria-modal="true">
-    <div class="ac-dialog-header">
-      Delete Debtor &nbsp;<button
-        class="ac-dialog-close"
-        (click)="closeDeleteDebtorConfirm()"
-        aria-label="Close"
-      >
-        ×
-      </button>
-    </div>
+  <div class="ac-dialog-backdrop" *ngIf="showDeleteDebtorConfirm">
+    <div class="ac-card-no-padding ac-dialog-panel-sm" role="dialog" aria-modal="true">
+      <div class="ac-dialog-header">
+        Delete Debtor &nbsp;<button class="ac-dialog-close" (click)="closeDeleteDebtorConfirm()" aria-label="Close">
+          ×
+        </button>
+      </div>
 
-    <div class="ac-dialog-body">
-      <p>
-        Are you sure you want to delete
-        <b>{{ selected?.debtorAccount }}</b>
-        ?
-      </p>
-    </div>
+      <div class="ac-dialog-body">
+        <p>
+          Are you sure you want to delete
+          <b>{{ selected?.debtorAccount }}</b>
+          ?
+        </p>
+      </div>
 
-    <div class="ac-dialog-footer">
-      <button class="ac-btn ac-btn-ghost" (click)="closeDeleteDebtorConfirm()">
-        Cancel
-      </button>
-      <button class="ac-btn ac-btn-danger" (click)="deleteDebtor()">Delete</button>
+      <div class="ac-dialog-footer">
+        <button class="ac-btn ac-btn-ghost" (click)="closeDeleteDebtorConfirm()">
+          Cancel
+        </button>
+        <button class="ac-btn ac-btn-danger" (click)="deleteDebtor()">Delete</button>
+      </div>
     </div>
   </div>
-</div>
   <div class="ac-dialog-backdrop" *ngIf="showSuccess">
-    <div
-      class="ac-card-no-padding ac-dialog-panel-sm ac-dialog-success"
-      role="dialog"
-      aria-modal="true"
-    >
+    <div class="ac-card-no-padding ac-dialog-panel-sm ac-dialog-success" role="dialog" aria-modal="true">
       <div class="ac-dialog-header ac-dialog-success-header">
         <span>Success</span>
-        <button
-          class="ac-dialog-close"
-          (click)="closeSuccess()"
-          aria-label="Close"
-        >
+        <button class="ac-dialog-close" (click)="closeSuccess()" aria-label="Close">
           ×
         </button>
       </div>
@@ -522,11 +484,7 @@
         </p>
       </div>
       <div class="ac-dialog-footer">
-        <button
-          class="ac-btn ac-btn-primary"
-          type="button"
-          (click)="closeSuccess()"
-        >
+        <button class="ac-btn ac-btn-primary" type="button" (click)="closeSuccess()">
           OK
         </button>
       </div>
