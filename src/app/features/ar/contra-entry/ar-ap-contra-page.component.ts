@@ -74,7 +74,7 @@ type PaidLine = {
     FormsModule,
     ReactiveFormsModule,
     AmountInputDirective,
-    LucideIconsModule
+    LucideIconsModule,
   ],
   templateUrl: './ar-ap-contra-page.component.html',
   styleUrls: ['./ar-ap-contra-page.component.scss'],
@@ -94,16 +94,10 @@ export class ArApContraPageComponent {
     return list.find((x) => x.code === code)?.name ?? '';
   }
   get debtorName(): string {
-    return this.nameByCode(
-      this.contraForm.get('debtor')?.value,
-      this.debtorOptions
-    );
+    return this.nameByCode(this.contraForm.get('debtor')?.value, this.debtorOptions);
   }
   get creditorName(): string {
-    return this.nameByCode(
-      this.contraForm.get('creditor')?.value,
-      this.creditorOptions
-    );
+    return this.nameByCode(this.contraForm.get('creditor')?.value, this.creditorOptions);
   }
   journalTypes: JournalType[] = [
     {
@@ -154,15 +148,11 @@ export class ArApContraPageComponent {
     }, // ví dụ
   ];
   private chargeFeeOf(methodValue: string): number {
-    return (
-      this.paymentMethods.find((m) => m.value === methodValue)?.chargeFee ?? 0
-    );
+    return this.paymentMethods.find((m) => m.value === methodValue)?.chargeFee ?? 0;
   }
   // helper: lấy text Payment By cho 1 method
   private payByOf(methodValue: string): string {
-    return (
-      this.paymentMethods.find((m) => m.value === methodValue)?.payBy || ''
-    );
+    return this.paymentMethods.find((m) => m.value === methodValue)?.payBy || '';
   }
   debtors: DebtorRow[] = [
     {
@@ -205,7 +195,6 @@ export class ArApContraPageComponent {
       phone: '03-9988776',
     },
   ];
-
 
   openDocsByDebtor = new Map<string, KnockRow[]>([
     [
@@ -346,12 +335,12 @@ export class ArApContraPageComponent {
     let arr = !k
       ? this.rows
       : this.rows.filter(
-        (r) =>
-          r.contraNo.toLowerCase().includes(k) ||
-          r.debtor.toLowerCase().includes(k) ||
-          r.debtorName.toLowerCase().includes(k) ||
-          (r.description || '').toLowerCase().includes(k)
-      );
+          (r) =>
+            r.contraNo.toLowerCase().includes(k) ||
+            r.debtor.toLowerCase().includes(k) ||
+            r.debtorName.toLowerCase().includes(k) ||
+            (r.description || '').toLowerCase().includes(k),
+        );
     arr = [...arr].sort((a, b) => {
       const va = String(a[this.sortBy] ?? '').toLowerCase();
       const vb = String(b[this.sortBy] ?? '').toLowerCase();
@@ -369,8 +358,7 @@ export class ArApContraPageComponent {
     return this.filtered.slice(s, s + this.pageSize);
   }
   setSort(k: keyof ContraRow) {
-    if (this.sortBy === k)
-      this.sortDir = this.sortDir === 'asc' ? 'desc' : 'asc';
+    if (this.sortBy === k) this.sortDir = this.sortDir === 'asc' ? 'desc' : 'asc';
     else {
       this.sortBy = k;
       this.sortDir = 'asc';
@@ -466,10 +454,7 @@ export class ArApContraPageComponent {
     }
     this.selected = r;
     this.detailItems = this.paidByCN.get(r.contraNo) ?? [];
-    this.detailPaidTotal = this.detailItems.reduce(
-      (s, it) => s + (it.paid || 0),
-      0
-    );
+    this.detailPaidTotal = this.detailItems.reduce((s, it) => s + (it.paid || 0), 0);
     this.detailOpen = true;
   }
   doConfirmSave() {
@@ -593,15 +578,16 @@ export class ArApContraPageComponent {
     this.showContraForm = true;
     this.formMode = 'new';
     this.setReadOnly(false);
+     const nextNo = this.getNextContraNo();
     // seed như hình để bạn test nhanh
     this.contraForm.reset({
       debtor: '300-B001',
       creditor: '400-B001',
       journalType: 'BANK-B',
       ref2: '',
-      ref: '',
+       ref: `REF-${nextNo}`,
       contraAmt: 0,
-      contraNo: '',
+       contraNo: nextNo,
       date: this.todayISO(),
       description: 'CONTRA',
       proceedWithNew: false,
@@ -615,7 +601,7 @@ export class ArApContraPageComponent {
         no: 'INV 0801',
         orgAmt: 5000,
         outstanding: 3500,
-      })
+      }),
     );
     this.arFA.push(
       this.doc({
@@ -624,7 +610,7 @@ export class ArApContraPageComponent {
         no: 'I-000001',
         orgAmt: 9.9,
         outstanding: 9.9,
-      })
+      }),
     );
     this.arFA.push(
       this.doc({
@@ -633,7 +619,7 @@ export class ArApContraPageComponent {
         no: 'I-000002',
         orgAmt: 4440,
         outstanding: 3550.09,
-      })
+      }),
     );
     this.arFA.push(
       this.doc({
@@ -642,7 +628,7 @@ export class ArApContraPageComponent {
         no: 'I-000005',
         orgAmt: 2400,
         outstanding: 2150,
-      })
+      }),
     );
 
     this.apFA.push(
@@ -652,7 +638,7 @@ export class ArApContraPageComponent {
         no: '123456',
         orgAmt: 4400,
         outstanding: 4400,
-      })
+      }),
     );
     this.apFA.push(
       this.doc({
@@ -661,7 +647,7 @@ export class ArApContraPageComponent {
         no: '2524234',
         orgAmt: 2000,
         outstanding: 2000,
-      })
+      }),
     );
     this.apFA.push(
       this.doc({
@@ -670,7 +656,7 @@ export class ArApContraPageComponent {
         no: '85233',
         orgAmt: 3000,
         outstanding: 3000,
-      })
+      }),
     );
     this.recalcContra();
     this.refreshDisabled('ar');
@@ -686,14 +672,10 @@ export class ArApContraPageComponent {
     return arr.controls.reduce((s, g) => s + (+g.get('pay')!.value || 0), 0);
   }
   unappliedAR() {
-    return +(
-      (this.contraForm.get('contraAmt')!.value || 0) - this.sumPay('ar')
-    ).toFixed(2);
+    return +((this.contraForm.get('contraAmt')!.value || 0) - this.sumPay('ar')).toFixed(2);
   }
   unappliedAP() {
-    return +(
-      (this.contraForm.get('contraAmt')!.value || 0) - this.sumPay('ap')
-    ).toFixed(2);
+    return +((this.contraForm.get('contraAmt')!.value || 0) - this.sumPay('ap')).toFixed(2);
   }
 
   clampPay(ctrl: AbstractControl, which: 'ar' | 'ap') {
@@ -725,10 +707,7 @@ export class ArApContraPageComponent {
     if (checked) {
       const org = +(g.get('orgAmt')?.value ?? 0);
       const cur = +(g.get('pay')?.value ?? 0);
-      const remaining =
-        (this.contraForm.get('contraAmt')?.value ?? 0) -
-        this.sumPay(which) +
-        cur;
+      const remaining = (this.contraForm.get('contraAmt')?.value ?? 0) - this.sumPay(which) + cur;
       g.get('pay')?.setValue(Math.min(org, remaining), { emitEvent: false });
     } else {
       g.get('pay')?.setValue(0, { emitEvent: false });
@@ -738,13 +717,10 @@ export class ArApContraPageComponent {
   }
   autoAllocate(which: 'ar' | 'ap') {
     const arr = which === 'ar' ? this.arFA : this.apFA;
-    const picked = arr.controls.filter(
-      (c) => !!(c as FormGroup).get('alloc')?.value
-    );
+    const picked = arr.controls.filter((c) => !!(c as FormGroup).get('alloc')?.value);
     const list = picked.length ? picked : arr.controls;
 
-    let remaining =
-      (this.contraForm.get('contraAmt')?.value ?? 0) - this.sumPay(which);
+    let remaining = (this.contraForm.get('contraAmt')?.value ?? 0) - this.sumPay(which);
 
     for (const c of list) {
       if (remaining <= 0) break;
@@ -756,8 +732,7 @@ export class ArApContraPageComponent {
       g.get('pay')?.setValue(can, { emitEvent: false });
       this.clampPay(g, which); // sẽ update outstanding
 
-      remaining =
-        (this.contraForm.get('contraAmt')?.value ?? 0) - this.sumPay(which);
+      remaining = (this.contraForm.get('contraAmt')?.value ?? 0) - this.sumPay(which);
     }
 
     // Đồng bộ checkbox: pay > 0 thì tick, ngược lại bỏ tick
@@ -770,8 +745,7 @@ export class ArApContraPageComponent {
   }
 
   autoFill(which: 'ar' | 'ap') {
-    let remaining =
-      (this.contraForm.get('contraAmt')!.value || 0) - this.sumPay(which);
+    let remaining = (this.contraForm.get('contraAmt')!.value || 0) - this.sumPay(which);
     const arr = which === 'ar' ? this.arFA : this.apFA;
     for (const fg of arr.controls) {
       if (remaining <= 0) break;
@@ -779,15 +753,12 @@ export class ArApContraPageComponent {
       const cur = +fg.get('pay')!.value || 0;
       const can = Math.min(out, remaining + cur);
       fg.get('pay')!.setValue(+can.toFixed(2), { emitEvent: false });
-      remaining =
-        (this.contraForm.get('contraAmt')!.value || 0) - this.sumPay(which);
+      remaining = (this.contraForm.get('contraAmt')!.value || 0) - this.sumPay(which);
     }
   }
   buildOrNoSuggestions() {
     // text đang gõ
-    const raw = String(
-      this.contraForm.get('contraNo')?.value || ''
-    ).toUpperCase();
+    const raw = String(this.contraForm.get('contraNo')?.value || '').toUpperCase();
 
     // prefix luôn là OR- (hoặc bạn cho đổi nếu muốn)
     const prefix = 'JV-';
@@ -803,41 +774,29 @@ export class ArApContraPageComponent {
     // 10 gợi ý liên tiếp: OR-xxxxx, OR-xxxxx+1, ...
     const generated = Array.from(
       { length: 10 },
-      (_, i) => `${prefix}${(start + i).toString().padStart(5, '0')}`
+      (_, i) => `${prefix}${(start + i).toString().padStart(5, '0')}`,
     );
 
     // Thêm vài số đã tồn tại (gần đây) ở danh sách ngoài để tiện chọn
-    const recentlyUsed = [...new Set(this.rows.map((r) => r.contraNo))].slice(
-      0,
-      5
-    );
+    const recentlyUsed = [...new Set(this.rows.map((r) => r.contraNo))].slice(0, 5);
 
     // Hợp nhất + loại trùng
     const set = new Set<string>([...generated, ...recentlyUsed]);
     this.orNoSuggestions = [...set];
   }
   recalcContra() {
-    for (let i = 0; i < this.arFA.length; i++)
-      this.clampPay(this.arFA.at(i), 'ar');
-    for (let i = 0; i < this.apFA.length; i++)
-      this.clampPay(this.apFA.at(i), 'ap');
+    for (let i = 0; i < this.arFA.length; i++) this.clampPay(this.arFA.at(i), 'ar');
+    for (let i = 0; i < this.apFA.length; i++) this.clampPay(this.apFA.at(i), 'ap');
     this.refreshDisabled('ar');
     this.refreshDisabled('ap');
   }
 
   saveContra() {
-    if (
-      this.contraForm.invalid ||
-      this.unappliedAR() !== 0 ||
-      this.unappliedAP() !== 0
-    )
-      return;
+    if (this.contraForm.invalid || this.unappliedAR() !== 0 || this.unappliedAP() !== 0) return;
 
     // TODO: gọi API lưu; tạm thời chỉ show success và đóng form
-    if (this.formMode === 'edit')
-      this.successMsg = 'Edit contra entry successfully.';
-    else
-      this.successMsg = 'Contra Entry saved successfully.';
+    if (this.formMode === 'edit') this.successMsg = 'Edit contra entry successfully.';
+    else this.successMsg = 'Contra Entry saved successfully.';
     this.showSuccess = true;
     const keepDesc = this.contraForm.get('description')!.value;
 
@@ -909,8 +868,7 @@ export class ArApContraPageComponent {
       if (shouldDisable) {
         if (payCtl.enabled) payCtl.disable({ emitEvent: false });
         // khi hết tiền: dòng chưa tick thì ko cho tick thêm
-        if (!checked && allocCtl.enabled)
-          allocCtl.disable({ emitEvent: false });
+        if (!checked && allocCtl.enabled) allocCtl.disable({ emitEvent: false });
       } else {
         if (payCtl.disabled) payCtl.enable({ emitEvent: false });
         if (allocCtl.disabled) allocCtl.enable({ emitEvent: false });
@@ -923,10 +881,7 @@ export class ArApContraPageComponent {
   }
   sumOutstanding(which: 'ar' | 'ap'): number {
     const arr = which === 'ar' ? this.arFA : this.apFA;
-    return arr.controls.reduce(
-      (s, g) => s + (+g.get('outstanding')!.value || 0),
-      0
-    );
+    return arr.controls.reduce((s, g) => s + (+g.get('outstanding')!.value || 0), 0);
   }
   get meetsOutstandingRule(): boolean {
     return this.sumOutstanding('ar') === 0 || this.sumOutstanding('ap') === 0;
@@ -953,14 +908,11 @@ export class ArApContraPageComponent {
     ar: { key: 'type' | 'date' | 'no' | 'orgAmt'; dir: 'asc' | 'desc' };
     ap: { key: 'type' | 'date' | 'no' | 'orgAmt'; dir: 'asc' | 'desc' };
   } = {
-      ar: { key: 'date', dir: 'asc' },
-      ap: { key: 'date', dir: 'asc' },
-    };
+    ar: { key: 'date', dir: 'asc' },
+    ap: { key: 'date', dir: 'asc' },
+  };
 
-  private sortVal(
-    g: FormGroup,
-    key: 'type' | 'date' | 'no' | 'orgAmt'
-  ): number | string {
+  private sortVal(g: FormGroup, key: 'type' | 'date' | 'no' | 'orgAmt'): number | string {
     const raw = g.get(key === 'orgAmt' ? 'orgAmt' : key)?.value;
     if (key === 'orgAmt') return +raw || 0;
     if (key === 'date') return new Date(raw || '1970-01-01').getTime();
@@ -970,8 +922,7 @@ export class ArApContraPageComponent {
   sortKnock(which: 'ar' | 'ap', key: 'type' | 'date' | 'no' | 'orgAmt') {
     const state = this.knSort[which];
     // toggle hướng nếu bấm lại đúng cột, ngược lại reset asc
-    state.dir =
-      state.key === key ? (state.dir === 'asc' ? 'desc' : 'asc') : 'asc';
+    state.dir = state.key === key ? (state.dir === 'asc' ? 'desc' : 'asc') : 'asc';
     state.key = key;
 
     const fa = which === 'ar' ? this.arFA : this.apFA;
@@ -1003,12 +954,12 @@ export class ArApContraPageComponent {
     this.debtorFiltered = !q
       ? [...src]
       : src.filter(
-        (d) =>
-          (d.debtorAccount || '').toLowerCase().includes(q) ||
-          (d.companyName || '').toLowerCase().includes(q) ||
-          (d.billAddress || '').toLowerCase().includes(q) ||
-          (d.phone || '').toLowerCase().includes(q)
-      );
+          (d) =>
+            (d.debtorAccount || '').toLowerCase().includes(q) ||
+            (d.companyName || '').toLowerCase().includes(q) ||
+            (d.billAddress || '').toLowerCase().includes(q) ||
+            (d.phone || '').toLowerCase().includes(q),
+        );
   }
 
   pickDebtor(d: DebtorRow) {
@@ -1019,7 +970,6 @@ export class ArApContraPageComponent {
     this.showDebtorPicker = false;
     this.onDebtorChanged();
   }
-
 
   showCreditorPicker = false;
   creditorQuery = '';
@@ -1037,12 +987,12 @@ export class ArApContraPageComponent {
     this.creditorFiltered = !q
       ? [...src]
       : src.filter(
-        (c) =>
-          (c.creditorAccount || '').toLowerCase().includes(q) ||
-          (c.companyName || '').toLowerCase().includes(q) ||
-          (c.billAddress || '').toLowerCase().includes(q) ||
-          (c.phone || '').toLowerCase().includes(q)
-      );
+          (c) =>
+            (c.creditorAccount || '').toLowerCase().includes(q) ||
+            (c.companyName || '').toLowerCase().includes(q) ||
+            (c.billAddress || '').toLowerCase().includes(q) ||
+            (c.phone || '').toLowerCase().includes(q),
+        );
   }
 
   pickCreditor(c: CreditorRow) {
@@ -1068,4 +1018,57 @@ export class ArApContraPageComponent {
     const code = (this.contraForm.get('creditor')?.value || '') as string;
     // TODO: load A/P outstanding docs by creditor
   }
+  private readonly JV_PREFIX = 'JV-';
+  private readonly JV_PAD = 5; // JV-00001 => 5 digits
+  private readonly JV_START = 1;
+  private readonly JV_SEQ_KEY = 'contra_last_seq';
+
+  private parseJvNo(v: string): number | null {
+    const s = String(v || '')
+      .trim()
+      .toUpperCase();
+    const m = /^JV-(\d+)$/.exec(s);
+    return m ? Number(m[1]) : null;
+  }
+
+  private getNextContraNo(): string {
+    // max trong list hiện có
+    let maxNo = 0;
+    for (const r of this.rows ?? []) {
+      const n = this.parseJvNo(r.contraNo);
+      if (n != null && n > maxNo) maxNo = n;
+    }
+
+    // max theo localStorageoStorage
+    const saved = Number(localStorage.getItem(this.JV_SEQ_KEY) || 0);
+    if (saved > maxNo) maxNo = saved;
+
+    const next = maxNo > 0 ? maxNo + 1 : this.JV_START;
+
+    localStorage.setItem(this.JV_SEQ_KEY, String(next));
+    return `${this.JV_PREFIX}${String(next).padStart(this.JV_PAD, '0')}`;
+  }
+  private seedContraNoIfEmpty() {
+  const ctrl = this.contraForm.get('contraNo');
+  const cur = String(ctrl?.value || '').trim();
+  if (!cur) ctrl?.setValue(this.getNextContraNo(), { emitEvent: false });
+}
+
+private seedRefIfEmpty() {
+  const refCtl = this.contraForm.get('ref');
+  const cur = String(refCtl?.value || '').trim();
+  if (cur) return;
+
+  const cn = String(this.contraForm.get('contraNo')?.value || '').trim();
+
+  // Option A: ref = contraNo
+  // refCtl?.setValue(cn, { emitEvent: false });
+
+  // Option B: ref có prefix riêng
+  refCtl?.setValue(cn ? `REF-${cn}` : '', { emitEvent: false });
+
+  // (Nếu muốn ref2 luôn)
+  // const ref2Ctl = this.contraForm.get('ref2');
+  // if (!String(ref2Ctl?.value || '').trim()) ref2Ctl?.setValue('AUTO', { emitEvent: false });
+}
 }

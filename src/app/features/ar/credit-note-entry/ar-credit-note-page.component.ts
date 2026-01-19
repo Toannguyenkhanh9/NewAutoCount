@@ -749,7 +749,7 @@ private updateLocksForRow(i: number) {
   private resetFormForNew() {
     const jtDefault = this.journalTypes?.[0]?.typeCode ?? '';
     this.rpForm.reset({
-      docNo: '',
+      docNo: this.getNextDocNo(),
       docDate: this.today(),
       debtor: '',
       debtorName: '',
@@ -1262,5 +1262,39 @@ isSelDisabled(i: number): boolean {
     );
     this.detailOpen = true;
   }
+// ===== Auto numbering for Credit Note (docNo) =====
+private readonly CN_PREFIX = 'CN-';
+private readonly CN_PAD = 6;                 // CN-000001 => 6 digits
+private readonly CN_START = 1;               // bắt đầu từ 1 nếu chưa có
+private readonly CN_SEQ_KEY = 'apcn_last_seq';
 
+private parseCnNo(v: string): number | null {
+  const s = String(v || '').trim().toUpperCase();
+  const m = /^CN-(\d+)$/.exec(s);
+  return m ? Number(m[1]) : null;
+}
+
+private getNextDocNo(): string {
+  // max trong list hiện có
+  let maxNo = 0;
+  for (const r of (this.rows ?? [])) {
+    const n = this.parseCnNo(r.receiptNo);
+    if (n != null && n > maxNo) maxNo = n;
+  }
+
+  // max theo localStorage (tránh trùng nếu list chưa refresh)
+  const saved = Number(localStorage.getItem(this.CN_SEQ_KEY) || 0);
+  if (saved > maxNo) maxNo = saved;
+
+  const next = maxNo > 0 ? maxNo + 1 : this.CN_START;
+
+  localStorage.setItem(this.CN_SEQ_KEY, String(next));
+  return `${this.CN_PREFIX}${String(next).padStart(this.CN_PAD, '0')}`;
+}
+
+private seedDocNoIfEmpty() {
+  const ctrl = this.rpForm.get('docNo');
+  const cur = String(ctrl?.value || '').trim();
+  if (!cur) ctrl?.setValue(this.getNextDocNo(), { emitEvent: false });
+}
 }

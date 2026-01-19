@@ -106,7 +106,7 @@ export class ArReceivePaymentPageComponent {
         paymentBy: this.payByOf(method),
         bankCharge: this.chargeFeeOf(method),
       },
-      { emitEvent: false }
+      { emitEvent: false },
     );
 
     // Đổi method => xoá hết phân bổ bên dưới
@@ -288,7 +288,7 @@ export class ArReceivePaymentPageComponent {
             r.receiptNo.toLowerCase().includes(k) ||
             r.debtor.toLowerCase().includes(k) ||
             r.debtorName.toLowerCase().includes(k) ||
-            (r.description || '').toLowerCase().includes(k)
+            (r.description || '').toLowerCase().includes(k),
         );
     arr = [...arr].sort((a, b) => {
       const va = String(a[this.sortBy] ?? '').toLowerCase();
@@ -376,7 +376,7 @@ export class ArReceivePaymentPageComponent {
         isRCHQ: [{ value: false, disabled: true }],
         rchqDate: [{ value: '', disabled: true }],
       },
-      { validators: this.feeNotExceedAmountValidator } // 👈 thêm dòng này
+      { validators: this.feeNotExceedAmountValidator }, // 👈 thêm dòng này
     );
   }
 
@@ -434,8 +434,8 @@ export class ArReceivePaymentPageComponent {
         this.createKnockRow({
           ...x,
           sel: (x.pay ?? 0) > 0 || (x.discAmt ?? 0) > 0,
-        })
-      )
+        }),
+      ),
     );
     this.updateAllLocks();
   }
@@ -526,7 +526,7 @@ export class ArReceivePaymentPageComponent {
     fg: FormGroup,
     rawPay: number,
     rawDisc: number,
-    excludeIndex = -1
+    excludeIndex = -1,
   ) {
     const org = +fg.get('orgAmt')!.value || 0;
     const remain = this.remainingForAllocation(excludeIndex);
@@ -623,8 +623,8 @@ export class ArReceivePaymentPageComponent {
           Math.min(
             disc, // bù tối đa bằng phần disc trước đó
             unappliedAvail, // và không vượt số tiền còn lại chưa phân bổ
-            org - pay0 // và cũng không vượt trần org
-          )
+            org - pay0, // và cũng không vượt trần org
+          ),
         );
         newPay = +(pay0 + canAdd).toFixed(2);
       }
@@ -698,7 +698,7 @@ export class ArReceivePaymentPageComponent {
           currency: p.currency ?? 'MYR',
           description: p.description ?? s.description ?? '',
         },
-        { emitEvent: false }
+        { emitEvent: false },
       );
 
       // methods
@@ -719,7 +719,7 @@ export class ArReceivePaymentPageComponent {
             isRCHQ: !!m.isRCHQ,
             rchqDate: m.rchqDate ?? '',
           },
-          { emitEvent: false }
+          { emitEvent: false },
         );
         this.methodsFA.push(fg);
         this.wireMethodRow(fg);
@@ -752,7 +752,7 @@ export class ArReceivePaymentPageComponent {
           currency: 'MYR',
           description: s.description || '',
         },
-        { emitEvent: false }
+        { emitEvent: false },
       );
 
       // gợi ý payment amount = tổng đã thanh toán (nếu muốn)
@@ -763,7 +763,7 @@ export class ArReceivePaymentPageComponent {
           paymentBy: this.payByOf(m0.get('method')!.value),
           bankCharge: this.chargeFeeOf(m0.get('method')!.value),
         },
-        { emitEvent: false }
+        { emitEvent: false },
       );
 
       this.loadKnockRows(s.debtor);
@@ -782,7 +782,7 @@ export class ArReceivePaymentPageComponent {
   private resetFormForNew() {
     this.rpForm.reset({
       debtor: '',
-      officialNo: '',
+      officialNo: this.getNextOfficialNo(),
       date: this.todayYMD(),
       currency: 'MYR',
       description: '',
@@ -930,7 +930,7 @@ export class ArReceivePaymentPageComponent {
         pay: pay.toFixed(2),
         outstanding,
       },
-      { emitEvent: false }
+      { emitEvent: false },
     );
 
     this.recalcTotals();
@@ -1021,7 +1021,7 @@ export class ArReceivePaymentPageComponent {
     // 10 gợi ý liên tiếp: OR-xxxxx, OR-xxxxx+1, ...
     const generated = Array.from(
       { length: 10 },
-      (_, i) => `${prefix}${(start + i).toString().padStart(5, '0')}`
+      (_, i) => `${prefix}${(start + i).toString().padStart(5, '0')}`,
     );
 
     // Thêm vài số đã tồn tại (gần đây) ở danh sách ngoài để tiện chọn
@@ -1126,7 +1126,7 @@ export class ArReceivePaymentPageComponent {
           pay: 0,
           outstanding: org,
         },
-        { emitEvent: false }
+        { emitEvent: false },
       );
     });
     this.recalcTotals();
@@ -1291,37 +1291,73 @@ export class ArReceivePaymentPageComponent {
             (d.debtorAccount || '').toLowerCase().includes(q) ||
             (d.companyName || '').toLowerCase().includes(q) ||
             (d.billAddress || '').toLowerCase().includes(q) ||
-            (d.phone || '').toLowerCase().includes(q)
+            (d.phone || '').toLowerCase().includes(q),
         );
   }
-pickDebtor(d: DebtorRow) {
-  const code = d?.debtorAccount || '';
-  const ctrl = this.rpForm?.get('debtor');
-  if (ctrl) {
-    ctrl.setValue(code, { emitEvent: true });
-    ctrl.markAsDirty();
-    ctrl.markAsTouched();
-  } else {
-    this.rpForm.patchValue({ debtor: code });
+  pickDebtor(d: DebtorRow) {
+    const code = d?.debtorAccount || '';
+    const ctrl = this.rpForm?.get('debtor');
+    if (ctrl) {
+      ctrl.setValue(code, { emitEvent: true });
+      ctrl.markAsDirty();
+      ctrl.markAsTouched();
+    } else {
+      this.rpForm.patchValue({ debtor: code });
+    }
+
+    // đóng popup
+    this.showDebtorPicker = false;
+
+    // gọi lại logic giống như user chọn trong dropdown (change)
+    this.onDebtorChanged();
   }
-
-  // đóng popup
-  this.showDebtorPicker = false;
-
-  // gọi lại logic giống như user chọn trong dropdown (change)
-  this.onDebtorChanged();
-}
-onDebtorPicked(d: DebtorRow) {
-  // helper: sync debtor value + các field liên quan (nếu cần)
-  // NOTE: không gọi onDebtorChanged() ở đây để tránh loop
-  this.rpForm.patchValue(
-    { debtor: d?.debtorAccount || '' },
-    { emitEvent: false }
-  );
-}
+  onDebtorPicked(d: DebtorRow) {
+    // helper: sync debtor value + các field liên quan (nếu cần)
+    // NOTE: không gọi onDebtorChanged() ở đây để tránh loop
+    this.rpForm.patchValue({ debtor: d?.debtorAccount || '' }, { emitEvent: false });
+  }
   isInvalid(name: string): boolean {
     const c = this.rpForm?.get(name);
     return !!(c && c.invalid && (c.touched || this.submitted));
   }
   submitted = false;
+  private readonly OR_PREFIX = 'OR-';
+  private readonly OR_PAD = 5; // OR-10025 => 5 digits
+  private readonly OR_START = 10000; // nếu chưa có số nào thì bắt đầu 10000
+  private readonly OR_SEQ_KEY = 'arp_or_last_seq';
+
+  private parseOrNo(v: string): number | null {
+    const s = String(v || '')
+      .trim()
+      .toUpperCase();
+    const m = /^OR-(\d+)$/.exec(s);
+    return m ? Number(m[1]) : null;
+  }
+
+  private getNextOfficialNo(): string {
+    // lấy max từ rows
+    let maxNo = 0;
+    for (const r of this.rows ?? []) {
+      const n = this.parseOrNo(r.receiptNo);
+      if (n != null && n > maxNo) maxNo = n;
+    }
+
+    // lấy max từ localStorage để không bị trùng nếu list chưa kịp refresh
+    const saved = Number(localStorage.getItem(this.OR_SEQ_KEY) || 0);
+    if (saved > maxNo) maxNo = saved;
+
+    // nếu chưa có gì thì seed từ OR_START, còn có rồi thì +1
+    const next = maxNo > 0 ? maxNo + 1 : this.OR_START;
+
+    // persist
+    localStorage.setItem(this.OR_SEQ_KEY, String(next));
+
+    return `${this.OR_PREFIX}${String(next).padStart(this.OR_PAD, '0')}`;
+  }
+
+  private seedOfficialNoIfEmpty() {
+    const ctrl = this.rpForm.get('officialNo');
+    const cur = String(ctrl?.value || '').trim();
+    if (!cur) ctrl?.setValue(this.getNextOfficialNo(), { emitEvent: false });
+  }
 }

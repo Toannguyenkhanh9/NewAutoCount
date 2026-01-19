@@ -112,13 +112,7 @@ export class CashBookEntryComponent {
   typeFilter: 'All' | EntryType = 'All';
   q = '';
 
-  cashBooks = [
-    'CHEQUE-MBB',
-    'CHEQUE-FBB',
-    'CASH IN HAND',
-    'MBB JALAN',
-    'FBB CHERAS',
-  ];
+  cashBooks = ['CHEQUE-MBB', 'CHEQUE-FBB', 'CASH IN HAND', 'MBB JALAN', 'FBB CHERAS'];
   paymentMethods = ['CHEQUE-MBB', 'CHEQUE-FBB', 'CASH', 'DIRECT BANK IN', 'TT'];
 
   // ===== New choice modal =====
@@ -177,6 +171,8 @@ export class CashBookEntryComponent {
       postDetailToGL: false,
       continueNew: false,
     });
+    this.seedDocNoIfEmpty();
+    this.seedSecondDocNoIfEmpty();
   }
   closeVoucher() {
     this.voucherOpen = false;
@@ -235,6 +231,7 @@ export class CashBookEntryComponent {
     this.rows = this.rows.filter((r) => r.id !== this.selected!.id);
     this.selected = null;
     this.confirmListOpen = false;
+    this.openSuccess(`Deleted Cash Book Entry successfully.`);
   }
 
   // ===== Methods / Details rows =====
@@ -283,10 +280,7 @@ export class CashBookEntryComponent {
 
   // ===== Totals =====
   voucherTotal() {
-    return this.voucher.methods.reduce(
-      (s, m) => s + (+m.amount || 0) - (+m.bankCharge || 0),
-      0
-    );
+    return this.voucher.methods.reduce((s, m) => s + (+m.amount || 0) - (+m.bankCharge || 0), 0);
   }
   detailsTotal() {
     return this.voucher.details.reduce((s, d) => s + (+d.amount || 0), 0);
@@ -295,8 +289,7 @@ export class CashBookEntryComponent {
     return this.voucherTotal() * (this.voucher.rate || 1);
   }
   onCurChange() {
-    this.voucher.rate =
-      this.voucher.currency === 'MYR' ? 1 : this.voucher.rate || 1;
+    this.voucher.rate = this.voucher.currency === 'MYR' ? 1 : this.voucher.rate || 1;
   }
   recalcTotals() {
     /* bindings compute */
@@ -318,9 +311,7 @@ export class CashBookEntryComponent {
 
   // Đủ điều kiện bật nút Save?
   canSaveVoucher(): boolean {
-    const hasPayer = !!(
-      this.voucher.payerPayee && this.voucher.payerPayee.trim()
-    );
+    const hasPayer = !!(this.voucher.payerPayee && this.voucher.payerPayee.trim());
     return hasPayer && this.totalsMatched;
   }
 
@@ -332,14 +323,12 @@ export class CashBookEntryComponent {
     if (!this.amountsEqual(totalPayment, netTotal)) {
       this.errors.mismatch = 'Total Payment must equal Net Total.';
     }
-    if (this.errors.payerPayee || this.errors.docNo || this.errors.mismatch)
-      return;
+    if (this.errors.payerPayee || this.errors.docNo || this.errors.mismatch) return;
 
     const local = this.localTotal();
 
     const row: ListRow = {
-      id:
-        this.editingId ?? (crypto as any).randomUUID?.() ?? String(Date.now()),
+      id: this.editingId ?? (crypto as any).randomUUID?.() ?? String(Date.now()),
       type: this.voucher.type,
       docNo: this.voucher.docNo || this.suggestDocNo(),
       docDate: this.voucher.docDate,
@@ -383,9 +372,7 @@ export class CashBookEntryComponent {
   nextDocNo(type: EntryType) {
     const prefix = type === 'Receipt' ? 'OR' : 'PV';
     const y = new Date().toISOString().slice(0, 7).replace('-', '');
-    const seq = (this.rows.filter((r) => r.type === type).length + 1)
-      .toString()
-      .padStart(4, '0');
+    const seq = (this.rows.filter((r) => r.type === type).length + 1).toString().padStart(4, '0');
     return `${prefix}-${y}-${seq}`;
   }
 
@@ -446,6 +433,8 @@ export class CashBookEntryComponent {
     this.voucher = this.makeEmptyVoucher(kind);
     this.voucherOpen = true;
     this.editingId = null;
+    this.seedDocNoIfEmpty();
+    this.seedSecondDocNoIfEmpty();
     this.voucher.methods.forEach((m) => this.syncMethodRow(m));
   }
 
@@ -535,5 +524,99 @@ export class CashBookEntryComponent {
       this.addMethod();
     }
   }
+  showSuccess = false;
+  successMsg = '';
 
+  private openSuccess(msg: string) {
+    this.successMsg = msg;
+    this.showSuccess = true;
+  }
+  closeSuccess() {
+    this.showSuccess = false;
+  }
+  // ===== Auto numbering for Cash Book Entry =====
+  private readonly DOC_PAD = 4;
+  private docSeqKey(type: EntryType, yyyymm: string) {
+    const prefix = type === 'Receipt' ? 'OR' : 'PV';
+    return `cashbook_seq_${prefix}_${yyyymm}`; // ví dụ: cashbook_seq_OR_202511
+  }
+
+  private parseDocNo(v: string): { prefix: 'OR' | 'PV'; yyyymm: string; seq: number } | null {
+    const s = String(v || '')
+      .trim()
+      .toUpperCase();
+    const m = /^(OR|PV)-(\d{6})-(\d{4})$/.exec(s);
+    if (!m) return null;
+    return { prefix: m[1] as any, yyyymm: m[2], seq: Number(m[3]) };
+  }
+
+  private currentYYYYMM(fromDate?: string): string {
+    // ưu tiên theo docDate đang chọn để đúng tháng chứng từ
+    const d = fromDate ? new Date(fromDate) : new Date();
+    const y = d.getFullYear();
+    const m = String(d.getMonth() + 1).padStart(2, '0');
+    return `${y}${m}`;
+  }
+
+  private nextDocNoByType(type: EntryType, docDate?: string): string {
+    const prefix = type === 'Receipt' ? 'OR' : 'PV';
+    const yyyymm = this.currentYYYYMM(docDate);
+
+    // 1) max trong rows (cùng prefix + cùng yyyymm)
+    let maxSeq = 0;
+    for (const r of this.rows ?? []) {
+      const p = this.parseDocNo(r.docNo);
+      if (!p) continue;
+      if (p.prefix === prefix && p.yyyymm === yyyymm && p.seq > maxSeq) maxSeq = p.seq;
+    }
+
+    // 2) max trong localStorage
+    const key = this.docSeqKey(type, yyyymm);
+    const saved = Number(localStorage.getItem(key) || 0);
+    if (saved > maxSeq) maxSeq = saved;
+
+    // 3) next
+    const next = maxSeq + 1;
+    localStorage.setItem(key, String(next));
+
+    return `${prefix}-${yyyymm}-${String(next).padStart(this.DOC_PAD, '0')}`;
+  }
+
+  private seedDocNoIfEmpty() {
+    const cur = String(this.voucher.docNo || '').trim();
+    if (cur) return;
+
+    this.voucher.docNo = this.nextDocNoByType(this.voucher.type as EntryType, this.voucher.docDate);
+  }
+
+  private seedSecondDocNoIfEmpty() {
+    const cur = String(this.voucher.secondDocNo || '').trim();
+    if (cur) return;
+
+    // Option A (mặc định): secondDocNo = docNo
+    this.voucher.secondDocNo = this.voucher.docNo || '';
+
+    // Option B: secondDocNo = "CHQ-" + docNo
+    // this.voucher.secondDocNo = this.voucher.docNo ? `CHQ-${this.voucher.docNo}` : '';
+  }
+  onDocDateOrTypeChanged() {
+    // chỉ auto cập nhật nếu user chưa tự nhập docNo
+    // (rule: nếu docNo đang rỗng hoặc đúng format chuẩn theo tháng cũ thì cho cập nhật)
+    const cur = String(this.voucher.docNo || '').trim();
+    const parsed = this.parseDocNo(cur);
+
+    const shouldAuto = !cur || (parsed && (parsed.prefix === 'OR' || parsed.prefix === 'PV')); // docNo đang theo format hệ thống
+
+    if (shouldAuto && !this.isEditMode) {
+      this.voucher.docNo = ''; // clear để seed lại
+      this.seedDocNoIfEmpty();
+
+      // secondDocNo nếu đang auto theo docNo thì cập nhật theo
+      const s2 = String(this.voucher.secondDocNo || '').trim();
+      if (!s2 || s2 === cur || s2 === `CHQ-${cur}`) {
+        this.voucher.secondDocNo = '';
+        this.seedSecondDocNoIfEmpty();
+      }
+    }
+  }
 }
