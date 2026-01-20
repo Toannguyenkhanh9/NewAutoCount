@@ -362,7 +362,11 @@ export class CashBookEntryComponent {
 
     // bình thường: đóng form
     this.voucherOpen = false;
-    this.editingId = null;
+    if (this.editingId)
+      this.openSuccess(`Save Cash Book Entry successfully.`);
+    else
+      this.openSuccess(`Create Cash Book Entry successfully.`);
+        this.editingId = null;
   }
 
   // ===== Utils =====
