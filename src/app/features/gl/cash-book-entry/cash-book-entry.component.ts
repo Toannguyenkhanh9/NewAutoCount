@@ -223,6 +223,7 @@ export class CashBookEntryComponent {
 
   // ===== Delete (list) =====
   confirmListOpen = false;
+  confirmListAddnewOpen = false;
   askDelete() {
     if (this.selected) this.confirmListOpen = true;
   }
@@ -362,8 +363,9 @@ export class CashBookEntryComponent {
 
     // bình thường: đóng form
     this.voucherOpen = false;
+    this.confirmListAddnewOpen = false;
     if (this.editingId)
-      this.openSuccess(`Save Cash Book Entry successfully.`);
+      this.openSuccess(`Update Cash Book Entry ` + this.editingId + ` successfully.`);
     else
       this.openSuccess(`Create Cash Book Entry successfully.`);
         this.editingId = null;
@@ -622,5 +624,8 @@ export class CashBookEntryComponent {
         this.seedSecondDocNoIfEmpty();
       }
     }
+  }
+  confirmSave (){
+    this.confirmListAddnewOpen = true;
   }
 }
