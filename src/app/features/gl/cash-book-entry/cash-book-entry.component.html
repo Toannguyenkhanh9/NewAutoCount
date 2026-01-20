@@ -392,7 +392,7 @@
   <div class="ac-dialog-backdrop" *ngIf="confirmListAddnewOpen">
     <div class="ac-card-no-padding ac-dialog-panel-sm">
       <div class="ac-dialog-header">
-        Confirm Save
+        Confirm
         <button class="ac-dialog-close" (click)="confirmListOpen = false" aria-label="Close">
           x
         </button>
@@ -400,15 +400,15 @@
       <div class="ac-dialog-body">
         {{
         !isEditMode
-        ? 'Are you sure you want to create this Cash Book Entry'
-        : 'Are you sure you want to update this Cash Book Entry'
+        ? 'Are you sure you want to create this Cash Book Entry ?'
+        : 'Are you sure you want to update this Cash Book Entry ?'
         }}
       </div>
       <div class="ac-dialog-footer">
         <button class="ac-btn ac-btn-ghost" (click)="confirmListAddnewOpen = false">
           Cancel
         </button>
-        <button class="ac-btn ac-btn-danger" (click)="saveVoucher()">Save</button>
+        <button class="ac-btn ac-btn-primary" (click)="saveVoucher()">ok</button>
       </div>
     </div>
   </div>
