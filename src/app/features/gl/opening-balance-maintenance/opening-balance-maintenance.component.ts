@@ -19,6 +19,8 @@ export interface ObRow {
   styleUrls: ['./opening-balance-maintenance.component.scss'],
 })
 export class OpeningBalanceMaintenanceComponent {
+  page = 1;
+  pageSize = 8;
   // tìm kiếm
   q = '';
 
@@ -37,11 +39,11 @@ export class OpeningBalanceMaintenanceComponent {
 
   // dữ liệu mẫu Opening Balance
   rows: ObRow[] = [
-    { accountCode: '1000-000', accountName: 'Cash on Hand',        asOf: '2025-01-01', openingDebit: 5000,  openingCredit: 0,     remark: '' },
-    { accountCode: '1010-000', accountName: 'Cash at Bank - Main', asOf: '2025-01-01', openingDebit: 20000, openingCredit: 0,     remark: 'B/F' },
-    { accountCode: '1100-000', accountName: 'Accounts Receivable', asOf: '2025-01-01', openingDebit: 15000, openingCredit: 0,     remark: '' },
-    { accountCode: '2000-000', accountName: 'Accounts Payable',    asOf: '2025-01-01', openingDebit: 0,     openingCredit: 12000, remark: '' },
-    { accountCode: '3000-000', accountName: 'Share Capital',       asOf: '2025-01-01', openingDebit: 0,     openingCredit: 8000,  remark: '' },
+    { accountCode: '1000-000', accountName: 'Cash on Hand', asOf: '2025-01-01', openingDebit: 5000, openingCredit: 0, remark: '' },
+    { accountCode: '1010-000', accountName: 'Cash at Bank - Main', asOf: '2025-01-01', openingDebit: 20000, openingCredit: 0, remark: 'B/F' },
+    { accountCode: '1100-000', accountName: 'Accounts Receivable', asOf: '2025-01-01', openingDebit: 15000, openingCredit: 0, remark: '' },
+    { accountCode: '2000-000', accountName: 'Accounts Payable', asOf: '2025-01-01', openingDebit: 0, openingCredit: 12000, remark: '' },
+    { accountCode: '3000-000', accountName: 'Share Capital', asOf: '2025-01-01', openingDebit: 0, openingCredit: 8000, remark: '' },
   ];
 
   // chọn dòng
@@ -80,9 +82,9 @@ export class OpeningBalanceMaintenanceComponent {
   }
 
   netOf(r: ObRow) { return (r.openingDebit || 0) - (r.openingCredit || 0); }
-  totalDebit()  { return this.filtered().reduce((t, r) => t + (r.openingDebit  || 0), 0); }
+  totalDebit() { return this.filtered().reduce((t, r) => t + (r.openingDebit || 0), 0); }
   totalCredit() { return this.filtered().reduce((t, r) => t + (r.openingCredit || 0), 0); }
-  totalNet()    { return this.filtered().reduce((t, r) => t + this.netOf(r), 0); }
+  totalNet() { return this.filtered().reduce((t, r) => t + this.netOf(r), 0); }
 
   // toolbar actions
   onNew() { this.isEdit = false; this.form = this.empty(); this.openModal(); }
@@ -96,6 +98,9 @@ export class OpeningBalanceMaintenanceComponent {
     if (!this.selected) return;
     this.rows = this.rows.filter(r => r !== this.selected);
     this.selected = null;
+    this.showDeleteConfirm = false;
+
+    this.openSuccess(`Deleted successfully.`);
   }
   onImport() { alert('Demo: Import not implemented.'); }
   onExport() { alert('Demo: Export not implemented.'); }
@@ -142,5 +147,41 @@ export class OpeningBalanceMaintenanceComponent {
       this.rows = [...this.rows, { ...this.form }];
     }
     this.closeModal();
+    this.openSuccess(this.isEdit ? `Save successfully.` : 'Create successfully.');
+  }
+  showSuccess = false;
+  successMsg = '';
+  private openSuccess(msg: string) {
+    this.successMsg = msg;
+    this.showSuccess = true;
+  }
+  closeSuccess() {
+    this.showSuccess = false;
+  }
+  showDeleteConfirm = false;
+  cancelDelete() {
+    this.showDeleteConfirm = false;
+  }
+  askDelete() {
+    if (!this.selected) return;
+    this.showDeleteConfirm = true;
+  }
+  showSaveConfirm = false;
+  confirmMsg = '';
+  askSave() {
+    // có thể gọi validate trước nếu muốn, nhưng vì nút đã disabled theo canSave() nên thường không cần
+    this.confirmMsg = this.isEdit
+      ? 'Are you sure you want to update this Opening Balance Maintenance ?'
+      : 'Are you sure you want to create this Opening Balance Maintenance ?';
+    this.showSaveConfirm = true;
+  }
+
+  cancelConfirmSave() {
+    this.showSaveConfirm = false;
+  }
+
+  doConfirmSave() {
+    this.showSaveConfirm = false;
+    this.save(); // gọi save thật
   }
 }

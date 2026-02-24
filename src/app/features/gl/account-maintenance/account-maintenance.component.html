@@ -36,8 +36,8 @@
       </div>
 
       <div class="search">
-        <input type="text" [(ngModel)]="findText" placeholder="Search description/ acc no..."
-          (keyup.enter)="doFind()" (ngModelChange)="activeFilter=$event" />
+        <input type="text" [(ngModel)]="findText" placeholder="Search description/ acc no..." (keyup.enter)="doFind()"
+          (ngModelChange)="activeFilter=$event" />
       </div>
     </div>
   </div>
@@ -544,7 +544,7 @@
                 </td>
                 <td class="c">
                   <button type="button" class="ac-btn ac-btn-icon-danger"
-                    (click)="askRemoveMethod(i); $event.stopPropagation()">
+                    (click)="removePaymentMethod(i); $event.stopPropagation()">
                     🗑
                   </button>
                 </td>

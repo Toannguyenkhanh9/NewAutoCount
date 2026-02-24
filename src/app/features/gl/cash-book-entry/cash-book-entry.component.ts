@@ -628,4 +628,16 @@ export class CashBookEntryComponent {
   confirmSave (){
     this.confirmListAddnewOpen = true;
   }
+  removeMethod(i: number) {
+  if (i < 0 || i >= this.voucher.methods.length) return;
+  this.voucher.methods.splice(i, 1);
+  this.recalcTotals();
+}
+
+removeDetail(i: number) {
+  if (i < 0 || i >= this.voucher.details.length) return;
+  this.voucher.details.splice(i, 1);
+  this.recalcTotals();
+}
+
 }
