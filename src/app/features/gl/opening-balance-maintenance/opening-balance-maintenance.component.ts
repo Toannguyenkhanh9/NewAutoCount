@@ -103,13 +103,15 @@ onInlineAmountChange(which: 'debit' | 'credit') {
 }
 
 saveRowEdit(r: ObRow) {
-  r.openingDebit = Number(this.editDraft.openingDebit) || 0;
-  r.openingCredit = Number(this.editDraft.openingCredit) || 0;
+  // mở confirm trước khi save thật
+  this.pendingInlineRow = r;
+  this.pendingInlineDraft = {
+    openingDebit: Number(this.editDraft.openingDebit) || 0,
+    openingCredit: Number(this.editDraft.openingCredit) || 0,
+  };
 
-  this.editingRowCode = null;
-  this.editDraft = { openingDebit: 0, openingCredit: 0 };
-
-  this.openSuccess(`Saved ${r.accountCode} successfully.`);
+  this.confirmMsg = `Are you sure you want to update Opening Balance for ${r.accountCode} ?`;
+  this.showSaveConfirm = true;
 }
 
   // chọn dòng
@@ -242,12 +244,35 @@ saveRowEdit(r: ObRow) {
     this.showSaveConfirm = true;
   }
 
-  cancelConfirmSave() {
-    this.showSaveConfirm = false;
+cancelConfirmSave() {
+  this.showSaveConfirm = false;
+  this.pendingInlineRow = null;
+  this.pendingInlineDraft = null;
+}
+
+doConfirmSave() {
+  this.showSaveConfirm = false;
+
+  // Ưu tiên xử lý inline edit trên grid trước
+  if (this.pendingInlineRow && this.pendingInlineDraft) {
+    this.pendingInlineRow.openingDebit = Number(this.pendingInlineDraft.openingDebit) || 0;
+    this.pendingInlineRow.openingCredit = Number(this.pendingInlineDraft.openingCredit) || 0;
+
+    const code = this.pendingInlineRow.accountCode;
+
+    // reset trạng thái edit row
+    this.pendingInlineRow = null;
+    this.pendingInlineDraft = null;
+    this.editingRowCode = null;
+    this.editDraft = { openingDebit: 0, openingCredit: 0 };
+
+    this.openSuccess(`Update Opening Balance ${code} successfully.`);
+    return;
   }
 
-  doConfirmSave() {
-    this.showSaveConfirm = false;
-    this.save(); // gọi save thật
-  }
+  // fallback cho modal save cũ (nếu vẫn còn dùng)
+  this.save();
+}
+  pendingInlineRow: ObRow | null = null;
+pendingInlineDraft: { openingDebit: number; openingCredit: number } | null = null;
 }

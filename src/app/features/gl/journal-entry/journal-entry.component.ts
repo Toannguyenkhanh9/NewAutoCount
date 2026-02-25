@@ -44,6 +44,7 @@ export class JournalEntryComponent {
   proceedWithNew = false;
   page = 1;
   pageSize = 8;
+    q = '';
   // ================== LIST ==================
   rows: ListRow[] = [
     {

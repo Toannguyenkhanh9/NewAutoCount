@@ -10,6 +10,7 @@
           </div>
         </div>
         <div class="ac-page-toolbar">
+                  <input class="ac-form-control ac-page-search" [(ngModel)]="q" placeholder="Search type / journal voucher no. ..." />
           <button class="ac-btn ac-btn-primary" (click)="openNew()">New</button>
           <button class="ac-btn" [disabled]="!selected" (click)="openEdit(selected!)">
             Edit

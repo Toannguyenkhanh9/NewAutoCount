@@ -11,7 +11,7 @@
 
 
       <div class="ac-page-toolbar">
-        <input class="ac-form-control" [(ngModel)]="q" placeholder="Search account code / name / remark..." />
+        <input class="ac-form-control ac-page-search" [(ngModel)]="q" placeholder="Search account code / name / remark..." />
         <!-- <button class="ac-btn ac-btn-primary" (click)="onNew()">New</button>
         <button class="ac-btn" [disabled]="!selected" (click)="onEdit()"><span class="ico edit"></span>Edit</button>
         <button class="ac-btn ac-btn-danger" [disabled]="!selected" (click)="askDelete()"><span
@@ -34,7 +34,6 @@
       <th class="l">Account Name</th>
       <th class="r" style="width:180px">Opening Debit</th>
       <th class="r" style="width:180px">Opening Credit</th>
-      <th class="l">Remark</th>
       <th class="c" style="width:150px">Action</th>
     </tr>
   </thead>
@@ -77,9 +76,6 @@
                  (ngModelChange)="onInlineAmountChange('credit')"/>
         </ng-template>
       </td>
-
-      <td class="l">{{ r.remark }}</td>
-
       <!-- Action -->
       <td class="c" (click)="$event.stopPropagation()">
         <ng-container *ngIf="!isRowEditing(r); else editingActions">
@@ -104,7 +100,7 @@
 
   <tfoot>
     <tr>
-      <td colspan="2" class="text-end"><b>Totals</b></td>
+      <td colspan="1" class="text-end"><b>Totals</b></td>
       <td class="text-end"><b>{{ totalDebit() | number:'1.2-2' }}</b></td>
       <td class="text-end"><b>{{ totalCredit() | number:'1.2-2' }}</b></td>
       <td></td>
