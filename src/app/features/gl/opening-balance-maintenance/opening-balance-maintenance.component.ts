@@ -37,14 +37,80 @@ export class OpeningBalanceMaintenanceComponent {
     { code: '6000-000', name: 'Operating Expenses' },
   ];
 
-  // dữ liệu mẫu Opening Balance
-  rows: ObRow[] = [
-    { accountCode: '1000-000', accountName: 'Cash on Hand', asOf: '2025-01-01', openingDebit: 5000, openingCredit: 0, remark: '' },
-    { accountCode: '1010-000', accountName: 'Cash at Bank - Main', asOf: '2025-01-01', openingDebit: 20000, openingCredit: 0, remark: 'B/F' },
-    { accountCode: '1100-000', accountName: 'Accounts Receivable', asOf: '2025-01-01', openingDebit: 15000, openingCredit: 0, remark: '' },
-    { accountCode: '2000-000', accountName: 'Accounts Payable', asOf: '2025-01-01', openingDebit: 0, openingCredit: 12000, remark: '' },
-    { accountCode: '3000-000', accountName: 'Share Capital', asOf: '2025-01-01', openingDebit: 0, openingCredit: 8000, remark: '' },
-  ];
+private openingSeed: ObRow[] = [
+  { accountCode: '1000-000', accountName: 'Cash on Hand', asOf: '2025-01-01', openingDebit: 5000, openingCredit: 0, remark: '' },
+  { accountCode: '1010-000', accountName: 'Cash at Bank - Main', asOf: '2025-01-01', openingDebit: 20000, openingCredit: 0, remark: 'B/F' },
+  { accountCode: '1100-000', accountName: 'Accounts Receivable', asOf: '2025-01-01', openingDebit: 15000, openingCredit: 0, remark: '' },
+  { accountCode: '2000-000', accountName: 'Accounts Payable', asOf: '2025-01-01', openingDebit: 0, openingCredit: 12000, remark: '' },
+  { accountCode: '3000-000', accountName: 'Share Capital', asOf: '2025-01-01', openingDebit: 0, openingCredit: 8000, remark: '' },
+];
+
+// dữ liệu grid (list tất cả account code)
+rows: ObRow[] = [];
+
+constructor() {
+  this.rows = this.buildRowsFromAccounts();
+}
+private buildRowsFromAccounts(): ObRow[] {
+  const seedMap = new Map(this.openingSeed.map(x => [x.accountCode, x]));
+
+  return this.accounts.map(a => {
+    const ob = seedMap.get(a.code);
+    return {
+      accountCode: a.code,
+      accountName: a.name,
+      asOf: ob?.asOf || '2025-01-01',
+      openingDebit: Number(ob?.openingDebit || 0),
+      openingCredit: Number(ob?.openingCredit || 0),
+      remark: ob?.remark || '',
+    };
+  });
+}
+editingRowCode: string | null = null;
+editDraft: { openingDebit: number; openingCredit: number } = {
+  openingDebit: 0,
+  openingCredit: 0,
+};
+isRowEditing(r: ObRow): boolean {
+  return this.editingRowCode === r.accountCode;
+}
+
+startRowEdit(r: ObRow) {
+  this.editingRowCode = r.accountCode;
+  this.editDraft = {
+    openingDebit: Number(r.openingDebit || 0),
+    openingCredit: Number(r.openingCredit || 0),
+  };
+}
+
+cancelRowEdit() {
+  this.editingRowCode = null;
+  this.editDraft = { openingDebit: 0, openingCredit: 0 };
+}
+
+onInlineAmountChange(which: 'debit' | 'credit') {
+  if (which === 'debit') {
+    this.editDraft.openingDebit = Number(this.editDraft.openingDebit) || 0;
+    if (this.editDraft.openingDebit > 0) {
+      this.editDraft.openingCredit = 0;
+    }
+  } else {
+    this.editDraft.openingCredit = Number(this.editDraft.openingCredit) || 0;
+    if (this.editDraft.openingCredit > 0) {
+      this.editDraft.openingDebit = 0;
+    }
+  }
+}
+
+saveRowEdit(r: ObRow) {
+  r.openingDebit = Number(this.editDraft.openingDebit) || 0;
+  r.openingCredit = Number(this.editDraft.openingCredit) || 0;
+
+  this.editingRowCode = null;
+  this.editDraft = { openingDebit: 0, openingCredit: 0 };
+
+  this.openSuccess(`Saved ${r.accountCode} successfully.`);
+}
 
   // chọn dòng
   selected: ObRow | null = null;

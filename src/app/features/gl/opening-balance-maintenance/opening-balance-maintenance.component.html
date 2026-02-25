@@ -12,10 +12,10 @@
 
       <div class="ac-page-toolbar">
         <input class="ac-form-control" [(ngModel)]="q" placeholder="Search account code / name / remark..." />
-        <button class="ac-btn ac-btn-primary" (click)="onNew()">New</button>
+        <!-- <button class="ac-btn ac-btn-primary" (click)="onNew()">New</button>
         <button class="ac-btn" [disabled]="!selected" (click)="onEdit()"><span class="ico edit"></span>Edit</button>
         <button class="ac-btn ac-btn-danger" [disabled]="!selected" (click)="askDelete()"><span
-            class="ico trash"></span>Delete</button>
+            class="ico trash"></span>Delete</button> -->
         <!-- <button class="ac-btn ac-btn-primary" (click)="onImport()">Import</button>
         <button class="ac-btn ac-btn-primary" (click)="onExport()">Export</button> -->
         <!-- <button class="ac-btn ac-btn-primary" (click)="onRefresh()">Refresh</button>
@@ -27,41 +27,92 @@
       <div class="ac-card-inv ac-card-no-padding">
         <!-- Grid -->
         <div class="ac-tablewrap">
-          <table class="ac-table">
-            <thead>
-              <tr>
-                <th class="l">Account Code</th>
-                <th class="l">Account Name</th>
-                <th class="l">As of</th>
-                <th class="r" style="width:150px">Opening Debit</th>
-                <th class="r" style="width:150px">Opening Credit</th>
-                <th class="r" style="width:150px">Net (Dr - Cr)</th>
-                <th class="l">Remark</th>
-              </tr>
-            </thead>
+<table class="ac-table">
+  <thead>
+    <tr>
+      <th class="l">Account Code</th>
+      <th class="l">Account Name</th>
+      <th class="r" style="width:180px">Opening Debit</th>
+      <th class="r" style="width:180px">Opening Credit</th>
+      <th class="l">Remark</th>
+      <th class="c" style="width:150px">Action</th>
+    </tr>
+  </thead>
 
-            <tbody>
-              <tr *ngFor="let r of filtered(); trackBy: trackByCode" (click)="pick(r)" [class.active]="isPicked(r)">
-                <td class="l">{{ r.accountCode }}</td>
-                <td class="l">{{ r.accountName }}</td>
-                <td class="l">{{ r.asOf }}</td>
-                <td class="r">{{ r.openingDebit | number:'1.2-2' }}</td>
-                <td class="r">{{ r.openingCredit | number:'1.2-2' }}</td>
-                <td class="r" [class.neg]="netOf(r) < 0">{{ netOf(r) | number:'1.2-2' }}</td>
-                <td class="l">{{ r.remark }}</td>
-              </tr>
-            </tbody>
+  <tbody>
+    <tr *ngFor="let r of filtered(); trackBy: trackByCode"
+        (click)="pick(r)"
+        [class.active]="isPicked(r)"
+        [class.editing]="isRowEditing(r)">
 
-            <tfoot>
-              <tr>
-                <td colspan="3" class="text-end"><b>Totals</b></td>
-                <td class="text-end"><b>{{ totalDebit() | number:'1.2-2' }}</b></td>
-                <td class="text-end"><b>{{ totalCredit() | number:'1.2-2' }}</b></td>
-                <td class="text-end" [class.neg]="totalNet() < 0"><b>{{ totalNet() | number:'1.2-2' }}</b></td>
-                <td></td>
-              </tr>
-            </tfoot>
-          </table>
+      <td class="l">{{ r.accountCode }}</td>
+      <td class="l">{{ r.accountName }}</td>
+
+      <!-- Opening Debit -->
+      <td class="r" (click)="$event.stopPropagation()">
+        <ng-container *ngIf="!isRowEditing(r); else debitEditTpl">
+          {{ r.openingDebit | number:'1.2-2' }}
+        </ng-container>
+        <ng-template #debitEditTpl>
+          <input class="ac-form-control text-end"
+                 type="number"
+                 min="0"
+                 step="0.01"
+                 [(ngModel)]="editDraft.openingDebit"
+                 (ngModelChange)="onInlineAmountChange('debit')"/>
+        </ng-template>
+      </td>
+
+      <!-- Opening Credit -->
+      <td class="r" (click)="$event.stopPropagation()">
+        <ng-container *ngIf="!isRowEditing(r); else creditEditTpl">
+          {{ r.openingCredit | number:'1.2-2' }}
+        </ng-container>
+        <ng-template #creditEditTpl>
+          <input class="ac-form-control text-end"
+                 type="number"
+                 min="0"
+                 step="0.01"
+                 [(ngModel)]="editDraft.openingCredit"
+                 (ngModelChange)="onInlineAmountChange('credit')"/>
+        </ng-template>
+      </td>
+
+      <td class="l">{{ r.remark }}</td>
+
+      <!-- Action -->
+      <td class="c" (click)="$event.stopPropagation()">
+        <ng-container *ngIf="!isRowEditing(r); else editingActions">
+          <button class="ac-btn ac-btn-primary" type="button" (click)="startRowEdit(r)">
+            Edit
+          </button>
+        </ng-container>
+
+        <ng-template #editingActions>
+          <div style="display:flex; gap:6px; justify-content:center;">
+            <button class="ac-btn ac-btn-primary" type="button" (click)="saveRowEdit(r)">
+              Save
+            </button>
+            <button class="ac-btn ac-btn-ghost" type="button" (click)="cancelRowEdit()">
+              Cancel
+            </button>
+          </div>
+        </ng-template>
+      </td>
+    </tr>
+  </tbody>
+
+  <tfoot>
+    <tr>
+      <td colspan="2" class="text-end"><b>Totals</b></td>
+      <td class="text-end"><b>{{ totalDebit() | number:'1.2-2' }}</b></td>
+      <td class="text-end"><b>{{ totalCredit() | number:'1.2-2' }}</b></td>
+      <td></td>
+      <td></td>
+    </tr>
+  </tfoot>
+</table>
+
         </div>
       </div>
       <div class="account-type-footer-inv">
