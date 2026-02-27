@@ -3,11 +3,11 @@
     <div class="titlebar">
       <div class="panel-title">Company Profile</div>
       <div class="toolbar">
-        <button class="btn" (click)="edit()" [disabled]="isEdit">Edit</button>
-        <button class="btn btn-save" (click)="save()" [disabled]="!isEdit">
+        <button class="ac-btn ac-btn-primary" (click)="edit()" [disabled]="isEdit">Edit</button>
+        <button class="ac-btn ac-btn-primary" (click)="save()" [disabled]="!isEdit">
           Save
         </button>
-        <button class="btn" (click)="cancel()" [disabled]="!isEdit">
+        <button class="ac-btn ac-btn-danger" (click)="cancel()" [disabled]="!isEdit">
           Cancel
         </button>
       </div>
@@ -30,7 +30,7 @@
               </div>
 
               <div>
-                <label class="lbl">Registration No.</label>
+                <label>Registration No.</label>
                 <input
                   class="inp mono"
                   [(ngModel)]="form.regNo"
@@ -38,7 +38,7 @@
                 />
               </div>
               <div>
-                <label class="lbl">Tax Reg. No. (GST/SST/VAT)</label>
+                <label>Tax Reg. No. (GST/SST/VAT)</label>
                 <input
                   class="inp mono"
                   [(ngModel)]="form.taxRegNo"
@@ -63,7 +63,7 @@
                   <div class="color-btn-wrap" [class.disabled]="!isEdit">
                     <button
                       type="button"
-                      class="btn small primary color-pick"
+                      class="ac-btn ac-btn-primary"
                       [disabled]="!isEdit"
                     >
                       Color
@@ -206,7 +206,7 @@
 
               <div class="logo-actions">
                 <label
-                  class="btn small primary upload-btn"
+                  class="ac-btn ac-btn-primary"
                   [class.disabled]="!isEdit"
                 >
                   Upload
@@ -223,7 +223,7 @@
                 </label>
 
                 <button
-                  class="btn small danger"
+                  class="ac-btn ac-btn-danger"
                   (click)="clearLogo()"
                   [disabled]="!isEdit || !form.logoDataUrl"
                 >
@@ -252,14 +252,14 @@
               </div>
 
               <!-- Toolbar + Editor của Quill -->
-              <quill-editor
+              <!-- <quill-editor
                 theme="snow"
                 [modules]="quillModules"
                 [readOnly]="!isEdit"
                 (onEditorCreated)="onQuillReady($event)"
                 (onContentChanged)="onQuillChangeHtml($event.html)"
               >
-              </quill-editor>
+              </quill-editor> -->
             </div>
           </div>
 
