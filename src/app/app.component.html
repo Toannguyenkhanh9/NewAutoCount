@@ -50,11 +50,10 @@
       </button>
 
       <mat-divider class="company-menu-divider"></mat-divider>
-
-      <!-- 5️⃣ Create New Account Book -->
-      <button mat-menu-item class="company-menu-item-create" [routerLink]="['/book/create-account-book']">
+      <button mat-menu-item class="company-menu-item-create" [routerLink]="['/settings/company-profile']"
+        [queryParams]="{ mode: 'new' }">
         <mat-icon>add_business</mat-icon>
-        <span>Add New Company &nbsp; &nbsp; &nbsp;</span>
+        <span>Add New Company</span>
       </button>
     </mat-menu>
 

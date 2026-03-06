@@ -66,6 +66,7 @@ export class TopNavComponent {
       icon: 'bar_chart',
       children: [
         { label: 'Account Maintenance', path: '/general-ledger/account-maintenance' },
+        { label: 'Account Type Maintenance', path: '/general-ledger/account-type-maintenance' },
         { label: 'Cash Book Entry', path: '/general-ledger/cash-book-entry' },
         { label: 'Journal Entry', path: '/general-ledger/journal-entry' },
         { label: 'Opening Balance Maintenance', path: '/general-ledger/opening-balance-maintenance' },
@@ -76,7 +77,8 @@ export class TopNavComponent {
         { label: 'Journal of Transaction Report', path: '/general-ledger/journal-of-transaction-report' },
         { label: 'Trial Balance Report', path: '/general-ledger/trial-balance-report' },
         { label: 'Profit and Loss Statement', path: '/general-ledger/profit-and-loss-statement' },
-        { label: 'Balance Sheet Statement', path: '/general-ledger/balance-sheet-statement' },
+        { label: 'Document Numbering Format Maintenance', path: '/general-ledger/document-numbering-format-maintenance' },
+        { label: 'Last Year Balance Maintenance', path: '/general-ledger/last-year-balance-maintenance' },
       ],
     },
   ];

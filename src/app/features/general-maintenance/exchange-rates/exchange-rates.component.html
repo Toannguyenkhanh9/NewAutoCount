@@ -1,0 +1,127 @@
+<div class="page">
+  <div class="">
+
+    <div class="options">
+      <fieldset class="filters">
+        <!-- <div class="inv-field">
+          <div class="inv-label">From</div>
+          <div class="">
+            <select class="sel" [ngModel]="fromMonth()" (ngModelChange)="fromMonth.set($event)">
+              @for (m of months; track m.value) { <option [value]="m.value">{{ m.label }}</option> }
+            </select>
+            <select class="sel year" [ngModel]="fromYear()" (ngModelChange)="fromYear.set($event)">
+              @for (y of years; track y) { <option [value]="y">{{ y }}</option> }
+            </select>
+          </div>
+        </div>
+        <div class="inv-field">
+          <div class="inv-label">To</div>
+          <div class="">
+            <select class="sel" [ngModel]="toMonth()" (ngModelChange)="toMonth.set($event)">
+              @for (m of months; track m.value) { <option [value]="m.value">{{ m.label }}</option> }
+            </select>
+            <select class="sel year" [ngModel]="toYear()" (ngModelChange)="toYear.set($event)">
+              @for (y of years; track y) { <option [value]="y">{{ y }}</option> }
+            </select>
+          </div>
+        </div> -->
+        <div class="inv-field">
+          <div class="inv-label">For Session</div>
+          <div class="">
+            <select class="sel small" [ngModel]="session()" (ngModelChange)="session.set($event)">
+              <option value="0900">0900</option>
+              <option value="1130">1130</option>
+              <option value="1200">1200</option>
+              <option value="1700">1700</option>
+            </select>
+          </div>
+        </div>
+        <div class="inv-field">
+          <div class="inv-label">Rate Type</div>
+          <div class="">
+            <select class="sel" [ngModel]="rateType()" (ngModelChange)="rateType.set($event)">
+              <option value="middle_rate">Middle Rate</option>
+              <option value="buying_rate">Buying Rate</option>
+              <option value="selling_rate">Selling Rate</option>
+            </select>
+          </div>
+        </div>
+        <div class="inv-field">
+          <div class="inv-label">Quotation</div>
+          <div class="">
+            <select class="sel" [ngModel]="quote()" (ngModelChange)="quote.set($event)">
+              <option value="rm">Ringgit/Foreign Currency</option>
+              <option value="fc">Foreign Currency/Ringgit</option>
+            </select>
+          </div>
+        </div>
+        <div class="f action">
+          <div class="lbl">&nbsp;</div>
+          <div class="ctl">
+            <button  class="ac-btn ac-btn-primary" (click)="search()">Search</button>&nbsp;
+            <button  class="ac-btn ac-btn-primary" (click)="exportCsv()">Export to CSV</button>
+          </div>
+        </div>
+        <div class="f action">
+          <div class="lbl">&nbsp;</div>
+          <div class="ctl">
+            <button  class="ac-btn ac-btn-primary">Import from CSV</button>
+          </div>
+        </div>
+        <div class="f action">
+          <div class="lbl">&nbsp;</div>
+          <div class="ctl">
+          
+          </div>
+        </div>
+      </fieldset>
+    </div>
+    <div class="report-card">
+      <div class="report-head">
+        <div class="rh-title">Currency Maintenance</div>
+        <div class="ex-desc">
+          Rates from the Interbank Foreign Exchange Market in Kuala Lumpur as at 0900, 1200 and 1700.
+          Rates at 1130 are the best counter rates offered by selected commercial banks.
+          Not all currencies and rate types are available.
+        </div>
+        @if (meta()) {
+        <div class="meta">Last updated: {{ meta()?.last_updated }} | Session: {{ meta()?.session }} | Quote: {{
+          meta()?.quote }}</div>
+        }
+        @if (error()) {
+        <div class="err">{{ error() }}</div>
+        }
+      </div>
+      @if (loading()) {
+      <div class="loading">Loading...</div>
+      } @else {
+      <div class="tables">
+        @for (cols of columnsByGroup(); track $index) {
+        <div class="gridwrap">
+          <table>
+            <thead>
+              <tr>
+                <th class="date-col"></th>
+                @for (c of cols; track c.key) {
+                <th>{{ c.label }}</th>
+                }
+              </tr>
+            </thead>
+
+            <tbody>
+              @for (r of rows(); track r.date) {
+              <tr>
+                <td class="date-col">{{ r.dateLabel }}</td>
+                @for (c of cols; track c.key) {
+                <td class="num">{{ fmtValue(r.values[c.key]) }}</td>
+                }
+              </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+        }
+      </div>
+      }
+    </div>
+  </div>

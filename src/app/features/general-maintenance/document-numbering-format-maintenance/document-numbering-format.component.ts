@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-
+import { LucideIconsModule } from '../../../_share/lucide-icons';
 type YesNo = 'Yes' | 'No';
 
 interface DocType {
@@ -35,7 +35,7 @@ interface FormatDef {
 @Component({
   selector: 'app-document-numbering-format-pro',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, LucideIconsModule],
   templateUrl: './document-numbering-format.component.html',
   styleUrls: ['./document-numbering-format.component.scss'],
 })
@@ -138,7 +138,6 @@ export class DocumentNumberingFormatProComponent {
   }
 
   // ====== modal New/Edit ======
-  showModal = false;
   isEdit = false;
   form: FormatDef = this.blankForm();
 
@@ -185,8 +184,8 @@ export class DocumentNumberingFormatProComponent {
       prefix === 'IV'
         ? 'INV-<00000>'
         : prefix === 'JV'
-        ? 'JV-<000000>'
-        : `${prefix}-<00000>`;
+          ? 'JV-<000000>'
+          : `${prefix}-<00000>`;
 
     // ==== NEW: tự tạo list year với năm hiện tại ====
     const y = new Date().getFullYear();
@@ -199,7 +198,7 @@ export class DocumentNumberingFormatProComponent {
 
     this.updateDigitsFromFormat();
     this.updateSample();
-    this.showModal = true;
+    this.isFormView = true;
   }
 
   openEdit(row: FormatDef) {
@@ -228,7 +227,7 @@ export class DocumentNumberingFormatProComponent {
 
     this.updateDigitsFromFormat();
     this.updateSample();
-    this.showModal = true;
+    this.isFormView = true;
   }
 
   // ===== helpers cho danh sách năm
@@ -351,6 +350,7 @@ export class DocumentNumberingFormatProComponent {
     if (!this.deleteTarget) return;
     this.formats = this.formats.filter((f) => f.id !== this.deleteTarget!.id);
     this.closeDeleteConfirm();
+    this.openSuccess("Delete successfully");
   }
   delete(row: FormatDef) {
     if (!confirm(`Delete format "${row.name}"?`)) return;
@@ -489,10 +489,10 @@ export class DocumentNumberingFormatProComponent {
       if (this.formats.some((f) => f.id === id)) {
         alert(
           'Name ' +
-            '"' +
-            this.form.name +
-            '"' +
-            ' already exists in the system, please create a new name.'
+          '"' +
+          this.form.name +
+          '"' +
+          ' already exists in the system, please create a new name.'
         );
         return;
       }
@@ -506,8 +506,8 @@ export class DocumentNumberingFormatProComponent {
       // Nếu NEW và isDefault = true -> enforce sau khi có id
       if (row.isDefault) this.enforceUniqueDefault(row.docTypeId, row.id);
     }
-    this.showModal = false;
-        const msg = this.isEdit
+    this.isFormView = false;
+    const msg = this.isEdit
       ? 'Updated successfully.'
       : 'Created successfully.';
     this.openSuccess(msg);
@@ -649,5 +649,26 @@ export class DocumentNumberingFormatProComponent {
   }
   closeSuccess() {
     this.showSuccess = false;
+  }
+  isFormView = false;
+  closeForm() {
+    this.isFormView = false;
+  }
+  showSaveConfirm = false;
+  confirmMsg = '';
+
+  askSave() {
+    this.confirmMsg =
+      this.isEdit === true
+        ? 'Are you sure you want to update this Document Numbering Format?'
+        : 'Are you sure you want to create this Document Numbering Format?';
+    this.showSaveConfirm = true;
+  }
+  doConfirmSave() {
+    this.showSaveConfirm = false;
+    this.save(); // gọi hàm save() bạn đã có; sẽ hiện Success như trước
+  }
+  cancelConfirmSave() {
+    this.showSaveConfirm = false;
   }
 }

@@ -47,6 +47,8 @@ import { ArReceivePaymentPageComponent } from './features/ar/receive-payment/ar-
 import { ManageAccountBookComponent } from './features/book/manage-account-book/manage-account-book.component';
 import { SettingsPageComponent } from './features/settings/settings-page/settings-page.component';
 import { CreateAccountBookPageComponent } from './features/book/create-account-book/create-account-book-page.component';
+import { MsicCodesComponent } from './features/settings/msic-code/msic-code.component';
+import { ExchangeRatesComponent } from './features/general-maintenance/exchange-rates/exchange-rates.component';
 export const routes: Routes = [
   { path: 'login', component: LoginPageComponent, title: 'Login' },
 
@@ -92,12 +94,7 @@ export const routes: Routes = [
         component: SettingsPageComponent,
         title: 'Settings',
       },
-      {
-        path: 'account-type-maintenance',
-        component: AccountTypeMaintenanceComponent,
-        title: 'Account Type Maintenance',
-        data: { breadcrumb: 'Account Type Maintenance' },
-      },
+
       {
         path: 'company-profile',
         component: CompanyProfileComponent,
@@ -123,22 +120,22 @@ export const routes: Routes = [
         data: { breadcrumb: 'Debtor Type Maintenance' },
       },
       {
-        path: 'document-numbering-format-maintenance',
-        component: DocumentNumberingFormatProComponent,
-        title: 'Document Numbering Format Maintenance',
-        data: { breadcrumb: 'Document Numbering Format Maintenance' },
-      },
-      {
         path: 'journal-type-maintenance',
         component: JournalTypeMaintenanceComponent,
         title: 'Journal Type Maintenance',
         data: { breadcrumb: 'Journal Type Maintenance' },
       },
       {
-        path: 'last-year-balance-maintenance',
-        component: LastYearBalanceMaintenanceComponent,
-        title: 'Last Year Balance Maintenance',
-        data: { breadcrumb: 'Last Year Balance Maintenance' },
+        path: 'msic-code',
+        component: MsicCodesComponent,
+        title: 'MSIC Code & Business Activities',
+        data: { breadcrumb: 'MSIC Code & Business Activities' },
+      },
+      {
+        path: 'exchange-rates',
+        component: ExchangeRatesComponent,
+        title: 'Currency Maintenance',
+        data: { breadcrumb: 'Currency Maintenance' },
       },
     ],
   },
@@ -226,6 +223,24 @@ export const routes: Routes = [
         component: ViewTransactionSummaryComponent,
         title: 'View Transaction Summary',
         data: { breadcrumb: 'View Transaction Summary' },
+      },
+      {
+        path: 'last-year-balance-maintenance',
+        component: LastYearBalanceMaintenanceComponent,
+        title: 'Last Year Balance Maintenance',
+        data: { breadcrumb: 'Last Year Balance Maintenance' },
+      },
+      {
+        path: 'account-type-maintenance',
+        component: AccountTypeMaintenanceComponent,
+        title: 'Account Type Maintenance',
+        data: { breadcrumb: 'Account Type Maintenance' },
+      },
+      {
+        path: 'document-numbering-format-maintenance',
+        component: DocumentNumberingFormatProComponent,
+        title: 'Document Numbering Format Maintenance',
+        data: { breadcrumb: 'Document Numbering Format Maintenance' },
       },
     ],
   },

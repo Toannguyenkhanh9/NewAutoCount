@@ -51,8 +51,9 @@
 .w-320 { width: 320px; } .w-110 { width: 110px; } .w-70 { width: 70px; }
 .text-end { text-align: right; } .text-right { text-align: right; }
 .mono { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
+.center {align-items: center; }
 
-.desc { display: flex; align-items: center; gap: 6px; }
+.desc { display: flex; align-items: center; gap: 6px;height: 35px; }
 .indent { display: inline-block; }
 .tw { border: none; background: transparent; cursor: pointer; font-size: 14px; line-height: 1; }
 .dot { color: #777; margin-right: 2px; }
@@ -92,10 +93,10 @@
 .panel .grid{ margin-top: 8px; }
 /* Hàng cha (group) nổi bật, nền nhạt, chữ đậm */
 tr.group-row {
-  background: #f6faf6;
+  // background: #f6faf6;
   font-weight: 600;
 
-  .desc { color: #1f6e43; }
+  .desc { color: #0078d4; }
   .group-cell {
     opacity: .6;
     background: #f2f5f2;
@@ -115,12 +116,12 @@ tr.group-row {
 input.amt {
   text-align: right;
   &.neg { color: #c62828; }  /* đỏ */
-  &.pos { color: #2e7d32; }  /* xanh */
+  &.pos { color: #0078d4; }  /* xanh */
 }
 
 /* Tổng cột cũng tô màu */
 .total .neg { color: #c62828; }
-.total .pos { color: #2e7d32; }
+.total .pos { color: #0078d4; }
  /* tạo khoảng cách nhỏ xuống bảng */
  .panel-foot {
   display: flex;
@@ -181,7 +182,7 @@ input.amt {
 }
 .group-row .desc { font-weight: 700; }
 .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace; }
-.pos { color: #1c7c3b; }
+.pos { color: #0078d4; }
 .neg { color: #c2410c; }
 
 

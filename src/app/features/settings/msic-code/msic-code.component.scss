@@ -1,0 +1,148 @@
+.msic-page {
+  padding: 24px;
+  background: #ffffff;
+  color: #111;
+}
+
+.msic-header {
+  margin-bottom: 14px;
+}
+
+.msic-title {
+  font-size: 24px;
+  font-weight: 600;
+  letter-spacing: 0.2px;
+  padding-bottom: 10px;
+}
+
+.msic-subtitle {
+  font-size: 13px;
+  letter-spacing: 1px;
+  color: #666666;
+}
+
+.msic-card {
+  border: 1px solid #e7e7e7;
+  border-radius: 6px;
+  background: #fff;
+}
+
+.msic-toolbar {
+//   padding: 12px 12px;
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.msic-input {
+  flex: 1;
+  min-width: 240px;
+  border: 1px solid #dcdcdc;
+  //border-radius: 6px;
+  padding: 10px 12px;
+  outline: none;
+}
+
+.msic-input:focus {
+  border-color: #bdbdbd;
+}
+
+.msic-select {
+  width: 420px;
+  max-width: 100%;
+  border: 1px solid #dcdcdc;
+ //border-radius: 6px;
+  padding: 10px 12px;
+  outline: none;
+  background: #fff;
+  height: 40px;
+}
+
+.msic-loading {
+  padding: 18px 12px;
+  color: #555;
+}
+
+.msic-table-wrap {
+  max-height: calc(100vh - 220px);
+  overflow: auto;
+ 
+}
+
+.msic-table {
+  width: 1000px;
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+.msic-table thead th {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  background: #f3f3f3;
+  color: #333;
+  font-weight: 800;
+  font-size: 13px;
+  letter-spacing: 0.4px;
+  text-transform: uppercase;
+  border-bottom: 1px solid #e5e5e5;
+}
+
+.msic-table th,
+.msic-table td {
+  text-align: left;
+  padding: 14px 16px;
+  border-bottom: 1px solid #efefef;
+  vertical-align: top;
+}
+
+.col-code {
+  width: 220px;
+  white-space: nowrap;
+}
+
+.msic-table tbody tr:hover {
+  background: #fafafa;
+}
+
+.category-row {
+  background: #f7f7f7;
+}
+
+.category-code,
+.category-desc {
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.category-desc {
+  color: #222;
+}
+.ac-tablewrap {
+  max-height: calc(100vh - 220px);
+  overflow: auto;           // scroll dọc ok
+  overflow-x: hidden;       // chặn scroll ngang (tuỳ bạn)
+}
+
+.ac-table {
+  width: 100%;              // ✅ bỏ 1000px
+  table-layout: fixed;      // ✅ giữ layout ổn định + wrap tốt
+  border-collapse: separate;
+  border-spacing: 0;
+}
+.col-code {
+  width: 180px;        // hoặc 220px tuỳ bạn
+  white-space: nowrap; // code không xuống hàng
+}
+
+.ac-table td,
+.ac-table th {
+  overflow-wrap: anywhere;  // ✅ xuống hàng với chuỗi dài
+  word-break: break-word;   // fallback
+}
+
+.ac-table td:nth-child(2),
+.ac-table th:nth-child(2) {
+  white-space: normal;      // ✅ description wrap
+}

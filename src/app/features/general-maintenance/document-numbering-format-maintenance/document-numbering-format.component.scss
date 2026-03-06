@@ -5,7 +5,7 @@
 .layout{display:grid;grid-template-columns:320px 1fr;gap:12px}
 .left{border:1px solid #eef2f6;border-radius:12px;padding:10px}
 .right{border:1px solid #eef2f6;border-radius:12px;padding:10px}
-.hint{color:#64748b;margin-bottom:8px}
+.hint{margin-bottom:8px}
 .tree .cat{margin-bottom:8px}
 .cat-row{cursor:pointer;padding:6px 8px;border-radius:8px;background:#f7fafc;border:1px solid #eef2f6}
 .types{padding-left:12px;margin-top:6px}
@@ -19,7 +19,7 @@
 .text-end{text-align:right}
 .grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px}
 label{display:flex;flex-direction:column;gap:6px}
-.inp{height:34px;border:1px solid #e5e7eb;border-radius:8px;padding:0 10px}
+
 .inp.mono{font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace}
 .row{display:flex;align-items:center;gap:12px}
 .chk{display:flex;align-items:center;gap:8px}
@@ -30,7 +30,7 @@ label{display:flex;flex-direction:column;gap:6px}
 .months{display:grid;grid-template-columns:1fr 1fr;gap:8px}
 .mrow{display:grid;grid-template-columns:1fr 120px;gap:8px;align-items:center}
 .inp.small{height:30px}
-.muted{color:#64748b}
+.muted{}
 .mb8{margin-bottom:8px}
 .mt8{margin-top:8px}
 .btn.xsmall.link { padding: 2px 6px; border: 0; background: transparent; color: var(--brand-600); cursor: pointer; }
@@ -326,5 +326,45 @@ label{display:flex;flex-direction:column;gap:6px}
 /* checkbox & label */
 .inline-check input{ margin: 0 8px 0 0; }
 .inline-check label{ cursor: pointer; white-space: nowrap; }
+:host{
+  --xero-600: #0B66E4;
+  --xero-700: #0859C6;
+  --xero-50:  #EAF2FF;
+  --xero-100: #D8E8FF;
+  --xero-line:#E6EEF9;
+}
 
+/* nút primary kiểu Xero */
+:host ::ng-deep .ac-btn-primary,
+.btn.primary{
+  background: var(--xero-600) !important;
+  border-color: var(--xero-600) !important;
+  color:#fff !important;
+}
+:host ::ng-deep .ac-btn-primary:hover,
+.btn.primary:hover{
+  background: var(--xero-700) !important;
+  border-color: var(--xero-700) !important;
+}
+
+/* highlight chọn DocType */
+.type-row.active{
+  background: var(--xero-50) !important;
+  border: 1px solid var(--xero-100) !important;
+}
+
+/* panel tháng đổi xanh */
+.month-panel{
+  border: 1px solid var(--xero-100) !important;
+  background: #F5F9FF !important;
+}
+.year-box{ border-color: var(--xero-100) !important; }
+.ytools{ border-bottom-color: var(--xero-100) !important; }
+.icon{ border-color: var(--xero-100) !important; }
+.yrow.sel{ background: var(--xero-50) !important; }
+
+/* form page spacing */
+.form-page{
+  padding: 12px 4px 6px;
+}
 

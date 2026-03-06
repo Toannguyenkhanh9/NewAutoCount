@@ -1,147 +1,172 @@
 <div class="page">
-  <!-- Title + Save / Cancel -->
-  <div class="titlebar">
-    <h1>Last Year Balance Maintenance</h1>
-
-    <div class="toolbar">
-      <button class="btn" (click)="onCancel()">Cancel</button>
-      <button class="btn primary" (click)="onSave()">Save</button>
+  <div class="options">
+    <div class="filters">
+      <div class="inv-field">
+        <div class="inv-label">Fiscal Year</div>
+        <div class="">
+          <select class="inp fy" [(ngModel)]="selectedYear" (ngModelChange)="onYearChange($event)">
+            <option *ngFor="let y of years" [ngValue]="y">{{ y }}</option>
+          </select>
+        </div>
+      </div>
+      <div class="inv-field">
+        <div class="inv-label">&nbsp;</div>
+        <div class="">
+          <button class="ac-btn ac-btn-primary" (click)="inquiry()">Inquiry</button>
+        </div>
+      </div>
+      <div class="inv-field">
+        <div class="inv-label">&nbsp;</div>
+        <div class="">
+          <button class="ac-btn ac-btn-primary" >Import from CSV</button>
+        </div>
+      </div>
     </div>
+
   </div>
-
-  <div class="panel">
-    <!-- Tool line đặt TRONG panel, ngay trên grid -->
-    <!-- Ngay trên table -->
-    <div class="panel-tools">
-      <span class="fy-label">Fiscal Year:</span>
-      <select
-        class="inp fy"
-        [(ngModel)]="selectedYear"
-        (ngModelChange)="onYearChange($event)"
-      >
-        <option *ngFor="let y of years" [ngValue]="y">{{ y }}</option>
-      </select>
-      <button class="btn primary" (click)="inquiry()">Inquiry</button>
+  <div class="report-card">
+    <div class="report-head">
+      <div class="rh-title">Last Year Balance Maintenance</div>
     </div>
-
-    <table class="grid" *ngIf="showGrid">
-      <thead>
-        <tr>
-          <th class="w-320">Description</th>
-          <th class="w-110">Acc. No.</th>
-          <th class="w-70">Curr. Code</th>
-          <th class="w-110">Special Acc.</th>
-          <th
-            *ngFor="let m of [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]"
-            class="w-110 text-end"
-          >
-            {{
+    <div class="gridwrap">
+      <table *ngIf="showGrid">
+        <thead>
+          <tr>
+            <th class="w-320">Description</th>
+            <th class="w-110">Acc No.</th>
+            <th class="w-70">Curr Code</th>
+            <th class="w-110">Special Acc</th>
+            <th *ngFor="let m of [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]" class="w-110 text-end">
+              {{
               [
-                "Jan",
-                "Feb",
-                "Mar",
-                "Apr",
-                "May",
-                "Jun",
-                "Jul",
-                "Aug",
-                "Sep",
-                "Oct",
-                "Nov",
-                "Dec"
+              "Jan",
+              "Feb",
+              "Mar",
+              "Apr",
+              "May",
+              "Jun",
+              "Jul",
+              "Aug",
+              "Sep",
+              "Oct",
+              "Nov",
+              "Dec"
               ][m]
-            }}
-            Amount
-          </th>
-        </tr>
-      </thead>
-      <tbody>
-        <ng-container *ngFor="let r of rows">
-          <!-- NHÓM -->
-          <tr *ngIf="r.isGroup" class="group-row">
-            <td class="desc">
-              <span class="indent" [style.width.px]="r.level * 18"></span>
-              <button class="tw" (click)="toggle(r)">
-                {{ r.expanded ? "▾" : "▸" }}
-              </button>
-              {{ r.description }}
-            </td>
-            <td class="mono">{{ r.accNo }}</td>
-            <td>{{ r.curr }}</td>
-            <td>{{ r.special }}</td>
+              }}
+              Amt
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          <ng-container *ngFor="let r of rows">
+            <!-- NHÓM -->
+            <tr *ngIf="r.isGroup" class="group-row">
+              <td class="desc">
+                <span class="indent" [style.width.px]="r.level * 18"></span>
+                <button class="tw" (click)="toggle(r)">
+                  {{ r.expanded ? "▾" : "▸" }}
+                </button>
+                {{ r.description }}
+              </td>
+              <td class="mono">{{ r.accNo }}</td>
+              <td>{{ r.curr }}</td>
+              <td>{{ r.special }}</td>
 
-            <!-- Tổng cấp con trực tiếp hiển thị ngay trên hàng nhóm -->
-            <td
-              *ngFor="let m of [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]"
-              class="text-end mono"
-            >
-              <span
-                class="agg"
-                [ngClass]="{ neg: groupSum(r, m) < 0, pos: groupSum(r, m) > 0 }"
-              >
-                {{ format(groupSum(r, m)) }}
+              <!-- Tổng cấp con trực tiếp hiển thị ngay trên hàng nhóm -->
+              <td *ngFor="let m of [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]" class="text-end mono">
+                <span class="agg" [ngClass]="{ neg: groupSum(r, m) < 0, pos: groupSum(r, m) > 0 }">
+                  {{ format(groupSum(r, m)) }}
+                </span>
+              </td>
+            </tr>
+
+            <!-- LÁ -->
+            <tr *ngIf="!r.isGroup" class="leaf-row">
+              <td class="desc">
+                <span class="indent" [style.width.px]="r.level * 18"></span>
+                <span class="dot">•</span>
+                {{ r.description }}
+              </td>
+              <td class="mono center">{{ r.accNo }}</td>
+              <td class="center">{{ r.curr }}</td>
+              <td>{{ r.special }}</td>
+
+              <td *ngFor="let m of [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]" class="text-end">
+                <input class="amt" type="text" appAmount [decimals]="2" [allowNegative]="true"
+                  [(ngModel)]="r.amounts[m]" />
+              </td>
+            </tr>
+          </ng-container>
+        </tbody>
+
+        <tfoot>
+          <tr class="total">
+            <td colspan="4" class="text-right">Total</td>
+            <td *ngFor="let m of [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]" class="text-end mono">
+              <span [ngClass]="{ neg: colTotal(m) < 0, pos: colTotal(m) > 0 }">
+                {{ format(colTotal(m)) }}
               </span>
             </td>
           </tr>
+        </tfoot>
+      </table>
 
-          <!-- LÁ -->
-          <tr *ngIf="!r.isGroup" class="leaf-row">
-            <td class="desc">
-              <span class="indent" [style.width.px]="r.level * 18"></span>
-              <span class="dot">•</span>
-              {{ r.description }}
-            </td>
-            <td class="mono">{{ r.accNo }}</td>
-            <td>{{ r.curr }}</td>
-            <td>{{ r.special }}</td>
-
-            <td
-              *ngFor="let m of [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]"
-              class="text-end"
-            >
-              <input
-                class="amt"
-                type="text"
-                appAmount
-                [decimals]="2"
-                [allowNegative]="true"
-                [(ngModel)]="r.amounts[m]"
-              />
-            </td>
-          </tr>
-        </ng-container>
-      </tbody>
-
-      <tfoot>
-        <tr class="total">
-          <td colspan="4" class="text-right">Total</td>
-          <td
-            *ngFor="let m of [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]"
-            class="text-end mono"
-          >
-            <span [ngClass]="{ neg: colTotal(m) < 0, pos: colTotal(m) > 0 }">
-              {{ format(colTotal(m)) }}
-            </span>
-          </td>
-        </tr>
-      </tfoot>
-    </table>
-
-    <div class="panel-foot">
-      <label class="chk inline">
-        <input
-          type="checkbox"
-          [(ngModel)]="includeZero"
-          class="chkbox"
-          style="
+      <div class="panel-foot">
+        <label class="chk inline">
+          <input type="checkbox" [(ngModel)]="includeZero" class="chkbox" style="
             display: inline-block;
             width: auto;
             margin: 0;
             vertical-align: middle;
-          "
-        />
-        <span>Report Include Zero Balance</span>
-      </label>
+          " />
+          <span>Report Include Zero Balance</span>
+        </label>
+        <div class="ctl">
+          <button class="ac-btn ac-btn-ghost" (click)="onCancel()">Cancel</button>&nbsp;
+          <button class="ac-btn ac-btn-primary" (click)="openConfirmSave()">Save</button>
+        </div>
+      </div>
     </div>
   </div>
 </div>
+<div class="ac-dialog-backdrop" *ngIf="showSuccess">
+  <div class="ac-card-no-padding ac-dialog-panel-sm ac-dialog-success" role="dialog" aria-modal="true">
+    <div class="ac-dialog-header ac-dialog-success-header">
+      <span>Success</span>
+      <button class="ac-dialog-close" (click)="closeSuccess()" aria-label="Close">
+        ×
+      </button>
+    </div>
+    <div class="ac-dialog-body">
+      <p class="ac-dialog-success-text">
+        {{ successMsg }}
+      </p>
+    </div>
+    <div class="ac-dialog-footer">
+      <button class="ac-btn ac-btn-primary" type="button" (click)="closeSuccess()">
+        OK
+      </button>
+    </div>
+  </div>
+</div>
+  <div class="ac-dialog-backdrop" *ngIf="showSaveConfirm">
+    <div class="ac-card-no-padding ac-dialog-panel-sm" role="dialog" aria-modal="true">
+      <div class="ac-dialog-header">
+        <span>Confirm</span>
+        <button class="ac-dialog-close" (click)="cancelConfirmSave()" aria-label="Close">
+          ×
+        </button>
+      </div>
+      <div class="ac-dialog-body">
+        {{ confirmMsg }}
+      </div>
+      <div class="ac-dialog-footer">
+        <button class="ac-btn ac-btn-ghost" type="button" (click)="cancelConfirmSave()">
+          Cancel
+        </button>
+        <button class="ac-btn ac-btn-primary" type="button" (click)="doConfirmSave()">
+          OK
+        </button>
+      </div>
+    </div>
+  </div>

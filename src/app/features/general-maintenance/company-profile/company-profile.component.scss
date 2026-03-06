@@ -1,9 +1,9 @@
 /* =========================
    Company Profile — Blue (Xero-like)
-   Use with your existing markup (.cp-page, .panel, .group, .btn, .inp...)
+   Use with your existing markup (.ac-page, .panel, .group, .btn, .inp...)
    ========================= */
 
-.cp-page {
+.ac-page {
   /* tokens giống phong cách ac-page */
   --bg: #f5f7fb;
   --card: #ffffff;
@@ -449,10 +449,10 @@
   flex: 1 1 auto;
 }
 /* FIX overflow input */
-.cp-page,
-.cp-page * ,
-.cp-page *::before,
-.cp-page *::after {
+.ac-page,
+.ac-page * ,
+.ac-page *::before,
+.ac-page *::after {
   box-sizing: border-box;
 }
 
@@ -470,4 +470,286 @@
 /* tránh grid item bị “đẩy rộng” */
 .form-grid > * {
   min-width: 0;
+}
+/* ===== match debtor-maintenance shell ===== */
+
+
+/* panel giống debtor-form */
+.ac-page .panel {
+  display: flex;
+  flex-direction: column;
+  height: calc(100vh - 140px);
+  background: #fff;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+/* header */
+.ac-page .titlebar {
+  padding: 16px 32px 8px;
+  border-bottom: 1px solid #e5e7eb;
+  background: #f9fafb;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.ac-page .panel-title {
+  font-size: 24px;
+  font-weight: 600;
+  padding-bottom: 10px;
+  color: #111827;
+}
+
+/* body scroll 1 vùng */
+.cp-form-body {
+  flex: 1 1 auto;
+  overflow-y: auto;
+  background: #fff;
+  padding: 0;
+}
+
+/* layout: tabs left + content right */
+.cp-layout {
+  margin: 0 auto;
+  display: flex;
+  align-items: flex-start;
+}
+
+/* side tabs */
+.cp-tabs {
+  position: sticky;
+  top: 0;
+  align-self: flex-start;
+  display: flex;
+  flex-direction: column;
+  width: 300px;
+  padding-top: 15px;
+}
+
+.cp-tab {
+  width: 100%;
+  padding: 15px 16px;
+  border: 0;
+  background: transparent;
+  text-align: left;
+  font-size: 15px;
+  color: #374151;
+  cursor: pointer;
+  border-left: 3px solid transparent;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.cp-tab:hover {
+  background: #eef2ff;
+}
+
+.cp-tab.active {
+  font-weight: 600;
+  color: #1d4ed8;
+  border-left-color: #1d4ed8;
+  background: #e5f0ff;
+}
+
+.cp-tab-label { flex: 1 1 auto; }
+
+/* main content */
+.cp-main {
+  flex: 1 1 auto;
+  padding-left: 24px;
+  padding-right: 24px;
+  border-left: 1px solid #e5e7eb;
+  min-width: 0;
+}
+
+.cp-main-inner {
+  max-width: 720px;
+  margin: 0 auto;
+  padding-left: 95px;
+  padding-right:95px
+}
+
+/* sections divider giống debtor */
+.cp-main section {
+  margin: 0 0 28px;
+  padding-top: 24px;
+  border-top: 2px solid #e5e7eb;
+}
+.cp-main section:first-child {
+  border-top: none;
+  padding-top: 0;
+}
+
+.cp-main h3 {
+  font-weight: 600;
+  font-size: 15px;
+  margin-bottom: 10px;
+  color: #111827;
+}
+
+/* form grid giống debtor */
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  row-gap: 12px;
+}
+
+.col-span-2 { grid-column: 1 / -1; }
+
+/* labels & inputs */
+.lbl {
+  font-size: 13px;
+  color: #374151;
+  font-weight: 500;
+  margin-bottom: 6px;
+  display: block;
+}
+
+.inp, input, select, textarea {
+  border: 1px solid #d1d5db;
+  border-radius: 2px;
+  padding: 8px 10px;
+  font-size: 13px;
+  font-family: inherit;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.inp[readonly] { background: #f3f4f6; }
+
+textarea { min-height: 60px; resize: vertical; }
+
+.mono {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
+    "Liberation Mono", "Courier New", monospace;
+}
+
+/* remark row */
+.row-inline {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+.row-inline .inp { flex: 1 1 auto; }
+
+/* color overlay */
+.color-btn-wrap { position: relative; display: inline-flex; }
+.color-btn-wrap.disabled { opacity: 0.55; pointer-events: none; }
+.color-overlay { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
+
+/* logo */
+.logo-box {
+  border: 1px solid #d1d5db;
+  border-radius: 2px;
+  padding: 10px;
+  min-height: 140px;
+  display: grid;
+  place-items: center;
+}
+.logo-actions { margin-top: 10px; display: flex; gap: 8px; }
+
+/* footer */
+.ac-page .panel-foot {
+  position: sticky;
+  bottom: 0;
+  background: #f9fafb;
+  border-top: 1px solid #e5e7eb;
+  display: flex;
+  gap: 8px;
+  padding: 12px 32px;
+  z-index: 10;
+}
+.spacer { flex: 1 1 auto; }
+.muted { color: #6b7280; }
+
+/* responsive giống debtor */
+@media (max-width: 900px) {
+  .cp-layout { flex-direction: column; max-width: 100%; }
+  .cp-tabs {
+    position: static;
+    flex-direction: row;
+    width: auto;
+    border-bottom: 1px solid #e5e7eb;
+    overflow-x: auto;
+    padding-top: 0;
+  }
+  .cp-tab {
+    border-left: none;
+    border-bottom: 2px solid transparent;
+    white-space: nowrap;
+    padding: 10px 12px;
+  }
+  .cp-tab.active { border-bottom-color: #1d4ed8; background: transparent; }
+  .cp-main { border-left: none; }
+}
+.ac-page .panel-foot{
+  position: sticky;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: #f9fafb;
+  border-top: 1px solid #e5e7eb;
+  padding: 12px 32px;
+  z-index: 10;
+
+  display: flex;
+  align-items: center;
+  justify-content: flex-end; /* ✅ canh phải */
+}
+
+/* cụm nút */
+.ac-page .panel-foot .toolbar{
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end; /* ✅ canh phải */
+  margin-left: auto;         /* ✅ đẩy sang phải */
+}
+.cp-form-body { overflow-y: auto; }
+.panel { height: calc(100vh - 140px); }
+.panel { display:flex; flex-direction:column; height: calc(100vh - 140px); }
+.cp-form-body { flex: 1 1 auto; min-height: 0; overflow-y: auto; }
+.cp-main { min-width:0; } /* tránh layout bị tràn */
+.cp-field{ display:flex; flex-direction:column; gap:6px; }
+.cp-hint{ font-size:12px; color:#6b7280; line-height:1.5; }
+.cp-field-error{ font-size:12px; color:#b91c1c; }
+
+.inp.invalid{
+  border-color:#dc2626;
+  box-shadow: 0 0 0 1px #fecaca;
+}
+.chk-row{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  font-size:13px;
+  color:#374151;
+  font-weight:500;
+}
+
+.chk-row input[type="checkbox"]{
+  width:16px;
+  height:16px;
+}
+.field-disabled {
+  opacity: 0.65;
+}
+
+.field-disabled .inp {
+  background: #f3f4f6; /* giống readonly */
+  cursor: not-allowed;
+}
+.inp.invalid {
+  border-color: #dc2626;
+  box-shadow: 0 0 0 1px #fecaca;
+}
+
+.cp-field-error {
+  margin-top: 4px;
+  font-size: 12px;
+  color: #b91c1c;
 }

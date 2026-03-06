@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, HostListener } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-
+import { ActivatedRoute, Router,RouterLink } from '@angular/router';
 type AccKind = 'type' | 'normal' | 'special';
 
 interface FixedLinkRow {
@@ -59,9 +59,10 @@ type CashflowCat =
   selector: 'app-account-maintenance',
   templateUrl: './account-maintenance.component.html',
   styleUrls: ['./account-maintenance.component.scss'],
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule,RouterLink],
 })
 export class AccountMaintenanceComponent {
+  
   private readonly ACC_NO_RE = /^[0-9]{3}-[A-Z0-9]{4}$/; // dùng trong TS
   accPattern = '^\\d{3}-[A-Za-z0-9]{4}$'; // bind cho [pattern] trong HTML
   newNormalAccNoDup = false;

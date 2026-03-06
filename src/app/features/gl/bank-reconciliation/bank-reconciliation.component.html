@@ -1,169 +1,105 @@
-<div class="page">
-  <!-- Header / Toolbar -->
-  <div class="titlebar">
-    <h1>Bank Reconciliation</h1>
+<div class="page" (click)="closeMenu()">
+  <!-- Xero-like header card -->
 
-    <div class="toolbar">
-      <select class="inp" [(ngModel)]="bankAccount">
-        <option *ngFor="let b of bankAccounts" [value]="b">{{ b }}</option>
-      </select>
 
-      <label class="cap">Statement End Date</label>
-      <input class="inp" type="date" [(ngModel)]="statementEndDate" />
-
-      <label class="cap">Statement Ending Balance</label>
-      <input class="inp num" type="number" step="0.01" [(ngModel)]="statementEndingBalance" />
-
-      <input class="search" [(ngModel)]="q" placeholder="Search doc no / description..." />
-      <select class="inp" [(ngModel)]="typeFilter">
-        <option>All</option>
-        <option>Receipt</option>
-        <option>Payment</option>
-      </select>
-
-      <button class="btn" (click)="onNew()">New</button>
-      <button class="btn" [disabled]="!selected" (click)="onEdit()">Edit</button>
-      <button class="btn danger" [disabled]="!selected" (click)="onDelete()">Delete</button>
-
-      <button class="btn" (click)="onRefresh()">Refresh</button>
-      <button class="btn" (click)="onPrint()">Print</button>
-    </div>
-  </div>
-
-  <!-- Content -->
-  <div class="content">
-    <!-- Left: List -->
-    <div class="card">
-      <div class="list-toolbar">
-        <div class="left">
-          <button class="btn ghost" (click)="clearAll()">Clear all</button>
-          <button class="btn ghost" (click)="unclearAll()">Unclear all</button>
-          <button class="btn ghost" (click)="autoClearUpToDate()">Auto-clear ≤ date</button>
-        </div>
-        <div class="right">
-          <div class="pill">Opening Book Balance: <b>{{ openingBookBalance | number:'1.2-2' }}</b></div>
+  <div class="options">
+    <div class="filters">
+      <div class="inv-field">
+        <div class="inv-label">Bank</div>
+        <div class="">
+          <select class="ac-form-control" [(ngModel)]="selectedAcc">
+            <option *ngFor="let a of accounts" [ngValue]="a.code">{{ a.code }} — {{ a.name }}</option>
+          </select>
         </div>
       </div>
-
-      <table class="grid">
+      <div class="inv-field">
+        <div class="inv-label">As of</div>
+        <div class="">
+          <input class="ac-form-control" type="date" [(ngModel)]="asOf" />
+        </div>
+      </div>
+      <label class="inv-field">
+        <span class="inv-label">&nbsp;</span>
+        <div class="inv-checkline">
+          <input type="checkbox" [(ngModel)]="includePos" />
+          <span>Include POS Transactions</span>
+        </div>
+      </label>
+      <div class="f action">
+        <div class="lbl">&nbsp;</div>
+        <div class="ctl">
+          <button type="button" class="ac-btn ac-btn-primary" (click)="setChart()">Set Chart</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="report-card">
+    <div class="report-head">
+      <div class="rh-title">Bank Reconciliation Statement</div>
+      <div class="rh-company">Reconcile bank statement vs General Ledger.</div>
+    </div>
+    <div class="gridwrap">
+      <table class="">
         <thead>
           <tr>
-            <th style="width:36px" class="text-center">✔</th>
-            <th style="width:150px">Doc No</th>
-            <th style="width:120px">Doc Date</th>
-            <th>Type</th>
-            <th>Description</th>
-            <th class="text-end" style="width:140px">Debit</th>
-            <th class="text-end" style="width:140px">Credit</th>
-            <th class="text-center" style="width:120px">Cleared Date</th>
+            <th class="l col-no">#</th>
+            <th class="l">Posting Date</th>
+            <th class="l">Payment Document Type</th>
+            <th class="l">Payment Document</th>
+            <th class="r col-amt">Debit</th>
+            <th class="r col-amt">Credit</th>
+            <th class="l">Against Account</th>
+            <th class="l col-ref">Reference</th>
           </tr>
         </thead>
 
         <tbody>
-          <tr *ngFor="let r of filtered(); trackBy: trackById"
-              (click)="pick(r)"
-              [class.active]="isPicked(r)">
-            <td class="text-center">
-              <input type="checkbox" [checked]="r.cleared" (click)="$event.stopPropagation()" (change)="toggleCleared(r)" />
-            </td>
-            <td class="monospace">{{ r.docNo }}</td>
-            <td>{{ r.docDate }}</td>
-            <td><span class="badge" [class.rcv]="r.type==='Receipt'" [class.pay]="r.type==='Payment'">{{ r.type }}</span></td>
-            <td class="cut">{{ r.description }}</td>
-            <td class="text-end">{{ r.amount > 0 ? (r.amount | number:'1.2-2') : '' }}</td>
-            <td class="text-end">{{ r.amount < 0 ? ((-r.amount) | number:'1.2-2') : '' }}</td>
-            <td class="text-center">{{ r.cleared ? (r.clearedDate || statementEndDate) : '' }}</td>
+          <ng-container *ngFor="let r of displayRows; let i = index; trackBy: trackById">
+            <!-- normal row -->
+            <tr *ngIf="r.kind === 'row'" class="row">
+              <td class="l col-no">{{ i + 1 }}</td>
+              <td class="l">{{ r.postingDate }}</td>
+              <td class="l">{{ r.docType }}</td>
+              <td class="l">
+                <a href="#" class="link" (click)="$event.preventDefault()">{{ r.docNo }}</a>
+              </td>
+              <td class="r col-amt">{{ r.debit | number:'1.2-2' }}</td>
+              <td class="r col-amt">{{ r.credit | number:'1.2-2' }}</td>
+              <td class="l">{{ r.againstAccount }}</td>
+              <td class="l col-ref">{{ r.reference || '' }}</td>
+            </tr>
+
+            <!-- summary row -->
+            <tr *ngIf="r.kind === 'summary'" class="sum-row">
+              <td class="c col-no"></td>
+              <td class="l sum-label" colspan="3">{{ r.label }}</td>
+              <td class="r col-amt"><b>{{ (r.debit || 0) | number:'1.2-2' }}</b></td>
+              <td class="r col-amt"><b>{{ (r.credit || 0) | number:'1.2-2' }}</b></td>
+              <td class="l" colspan="2"></td>
+            </tr>
+          </ng-container>
+
+          <tr *ngIf="filteredRows().length === 0">
+            <td colspan="8" class="muted" style="padding: 14px">No records</td>
           </tr>
         </tbody>
+
+        <!-- <tfoot>
+            <tr class="totals">
+              <td colspan="4" class="r"><b>Totals</b></td>
+              <td class="r"><b>{{ totalDebit | number:'1.2-2' }}</b></td>
+              <td class="r"><b>{{ totalCredit | number:'1.2-2' }}</b></td>
+              <td colspan="2"></td>
+            </tr>
+          </tfoot> -->
       </table>
 
-      <div class="footer">Records: {{ filtered().length }}</div>
-    </div>
 
-    <!-- Right: Summary -->
-    <div class="summary card">
-      <div class="sum-title">Reconciliation Summary</div>
-
-      <div class="row">
-        <div>Opening Book Balance</div>
-        <div class="num">{{ openingBookBalance | number:'1.2-2' }}</div>
-      </div>
-      <div class="row">
-        <div>Cleared Receipts</div>
-        <div class="num">{{ clearedReceipts() | number:'1.2-2' }}</div>
-      </div>
-      <div class="row">
-        <div>Cleared Payments</div>
-        <div class="num">({{ abs(clearedPayments()) | number:'1.2-2' }})</div>
-      </div>
-      <div class="row strong">
-        <div>Cleared Balance</div>
-        <div class="num">{{ clearedBalance() | number:'1.2-2' }}</div>
-      </div>
-
-      <hr />
-
-      <div class="row">
-        <div>Statement Ending Balance</div>
-        <div class="num">{{ statementEndingBalance | number:'1.2-2' }}</div>
-      </div>
-      <div class="row strong" [class.neg]="difference() !== 0">
-        <div>Difference</div>
-        <div class="num">{{ difference() | number:'1.2-2' }}</div>
-      </div>
-
-      <div class="note" *ngIf="difference() === 0">
-        ✓ Reconciled
-      </div>
-      <div class="note warn" *ngIf="difference() !== 0">
-        ⚠ Not reconciled. Adjust cleared transactions or ending balance/date.
+      <div class="br-footnote">
+        In the report, check whether <b>Balance as per bank</b> matches the Bank Account Statement.
+        If it mismatches, usually some entries have not updated the clearance date yet.
       </div>
     </div>
   </div>
-</div>
 
-<!-- Modal -->
-<div class="modal-layer" *ngIf="showModal">
-  <div class="modal-panel" role="dialog" aria-modal="true">
-    <div class="modal-header">
-      <div class="modal-title">{{ isEdit ? 'Edit Transaction' : 'New Transaction' }}</div>
-      <button class="x" (click)="closeModal()">✕</button>
-    </div>
-
-    <div class="modal-body">
-      <div class="form">
-        <label>Type</label>
-        <select class="inp" [(ngModel)]="form.type" (change)="normalizeAmount()">
-          <option>Receipt</option>
-          <option>Payment</option>
-        </select>
-
-        <label>Document No</label>
-        <input class="inp" [(ngModel)]="form.docNo" placeholder="e.g. CR-00001 / PV-00001" />
-
-        <label>Document Date</label>
-        <input class="inp" type="date" [(ngModel)]="form.docDate" />
-
-        <label>Description</label>
-        <input class="inp" [(ngModel)]="form.description" placeholder="Narration..." />
-
-        <label>Amount</label>
-        <input class="inp num" type="number" step="0.01" [(ngModel)]="form.amount" (input)="normalizeAmount()" />
-
-        <label>Cleared</label>
-        <div class="inline">
-          <input type="checkbox" [(ngModel)]="form.cleared" />
-          <span>Mark as cleared</span>
-        </div>
-
-        <label>Cleared Date</label>
-        <input class="inp" type="date" [(ngModel)]="form.clearedDate" [disabled]="!form.cleared" />
-      </div>
-    </div>
-
-    <div class="modal-footer">
-      <button class="btn ghost" (click)="closeModal()">Cancel</button>
-      <button class="btn primary" (click)="save()">Save</button>
-    </div>
-  </div>
 </div>

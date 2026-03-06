@@ -1,290 +1,399 @@
-<div class="cp-page">
+<div class="ac-page cp-page">
   <div class="panel">
     <div class="titlebar">
       <div class="panel-title">Company Profile</div>
-      <div class="toolbar">
-        <button class="ac-btn ac-btn-primary" (click)="edit()" [disabled]="isEdit">Edit</button>
-        <button class="ac-btn ac-btn-primary" (click)="save()" [disabled]="!isEdit">
-          Save
-        </button>
-        <button class="ac-btn ac-btn-danger" (click)="cancel()" [disabled]="!isEdit">
-          Cancel
-        </button>
-      </div>
+
     </div>
 
-    <div class="panel-body">
-      <div class="layout">
-        <!-- Left -->
-        <div class="col">
-          <div class="group">
-            <div class="group-title">Company Information</div>
-            <div class="form-grid">
-              <div class="col-span-2">
-                <label class="lbl">Company Name</label>
-                <input
-                  class="inp"
-                  [(ngModel)]="form.name"
-                  [readonly]="!isEdit"
-                />
-              </div>
+    <!-- BODY scroll giống debtor -->
+    <div class="panel-body cp-form-body" #formScroll (scroll)="onFormScroll()">
+      <div class="cp-layout">
+        <!-- ==== SIDE TABS ==== -->
+        <nav class="cp-tabs">
+          <button type="button" class="cp-tab" [class.active]="activeSection==='company'"
+            (click)="scrollToSection('company')">
+            <span class="cp-tab-label">Company Information</span>
+          </button>
 
-              <div>
-                <label>Registration No.</label>
-                <input
-                  class="inp mono"
-                  [(ngModel)]="form.regNo"
-                  [readonly]="!isEdit"
-                />
-              </div>
-              <div>
-                <label>Tax Reg. No. (GST/SST/VAT)</label>
-                <input
-                  class="inp mono"
-                  [(ngModel)]="form.taxRegNo"
-                  [readonly]="!isEdit"
-                />
-              </div>
+          <!-- ✅ NEW: 3 tabs ngay dưới Company Information -->
+          <button type="button" class="cp-tab" [class.active]="activeSection==='fiscal'"
+            (click)="scrollToSection('fiscal')">
+            <span class="cp-tab-label">Fiscal Year Settings</span>
+          </button>
 
-              <div>
-                <label class="lbl">Remark</label>
-                <div class="row-inline">
-                  <input
-                    class="inp mono"
-                    [(ngModel)]="form.remark"
-                    [readonly]="!isEdit"
-                    [ngStyle]="{
-                      'background-color': form.remarkColor || '',
-                      color: getContrast(form.remarkColor)
-                    }"
-                  />
+          <button type="button" class="cp-tab" [class.active]="activeSection==='accFormat'"
+            (click)="scrollToSection('accFormat')">
+            <span class="cp-tab-label">Account Code Format</span>
+          </button>
 
-                  <!-- Nút Color (input color đè lên) -->
-                  <div class="color-btn-wrap" [class.disabled]="!isEdit">
-                    <button
-                      type="button"
-                      class="ac-btn ac-btn-primary"
-                      [disabled]="!isEdit"
-                    >
-                      Color
-                    </button>
-                    <input
-                      type="color"
-                      class="color-overlay"
-                      [(ngModel)]="form.remarkColor"
-                      (input)="onRemarkColorChange()"
-                      [disabled]="!isEdit"
-                      aria-label="Pick remark color"
-                    />
+          <button type="button" class="cp-tab" [class.active]="activeSection==='sampleCoa'"
+            (click)="scrollToSection('sampleCoa')">
+            <span class="cp-tab-label">Sample Chart of Account</span>
+          </button>
+
+          <!-- các tab cũ -->
+          <button type="button" class="cp-tab" [class.active]="activeSection==='contact'"
+            (click)="scrollToSection('contact')">
+            <span class="cp-tab-label">Contact & Address</span>
+          </button>
+
+          <button type="button" class="cp-tab" [class.active]="activeSection==='delivery'"
+            (click)="scrollToSection('delivery')">
+            <span class="cp-tab-label">Delivery Info</span>
+          </button>
+
+          <button type="button" class="cp-tab" [class.active]="activeSection==='logo'"
+            (click)="scrollToSection('logo')">
+            <span class="cp-tab-label">Company Logo</span>
+          </button>
+        </nav>
+
+        <!-- ==== MAIN CONTENT ==== -->
+        <div class="cp-main">
+          <div class="cp-main-inner">
+
+            <!-- SECTION: Company Information -->
+            <section #companySection data-sec="company">
+              <h3>Company Information</h3>
+              <div class="form-grid">
+                <div class="col-span-2">
+                  <label class="lbl">Company Name <span class="required-tag">(required)</span></label>
+
+                  <input class="inp" [(ngModel)]="form.name" [readonly]="!isEdit" (blur)="companyNameTouched = true"
+                    [class.invalid]="companyNameInvalid" />
+
+                  <div class="cp-field-error" *ngIf="companyNameInvalid">
+                    Company name is required
+                  </div>
+                </div>
+
+                <div>
+                  <label class="lbl">Registration No.</label>
+                  <input class="inp mono" [(ngModel)]="form.regNo" [readonly]="!isEdit" />
+                </div>
+
+                <div class="col-span-2">
+                  <label class="chk-row">
+                    <input type="checkbox" [(ngModel)]="form.useSst" [disabled]="!isEdit"
+                      (ngModelChange)="onUseSstChanged($event)" />
+                    <span>Use Sales &amp; Services Tax</span>
+                  </label>
+                </div>
+
+                <!-- Tax Reg. No: luôn hiển thị, disable khi chưa tick hoặc không edit -->
+                <div [class.field-disabled]="!form.useSst || !isEdit">
+                  <label class="lbl">Tax Reg. No. (GST/SST/VAT)</label>
+                  <input class="inp mono" [(ngModel)]="form.taxRegNo" [readonly]="!isEdit || !form.useSst"
+                    [disabled]="!isEdit || !form.useSst" placeholder="Enter tax registration no..." />
+                </div>
+              </div>
+            </section>
+
+            <!-- ✅ NEW SECTION: Fiscal Year Settings -->
+            <section #fiscalSection data-sec="fiscal">
+              <h3>Fiscal Year Settings</h3>
+
+              <div class="form-grid">
+
+                <!-- Fiscal Year Start -->
+                <label class="cp-field">
+                  <span class="lbl">Start Date</span>
+
+                  <input type="date" class="inp" [disabled]="!isEdit" [(ngModel)]="form.fiscalYearStart"
+                    (ngModelChange)="onFiscalStartChange($event)" (blur)="fiscalStartTouched = true"
+                    [class.invalid]="fiscalStartInvalid" />
+
+                  <div class="cp-field-error" *ngIf="fiscalStartInvalid">
+                    Start date is required
+                  </div>
+
+                  <div class="cp-hint">
+                    Specify the start date of this account book.
+                  </div>
+                </label>
+
+                <!-- ✅ Fiscal Year End Date (NEW) -->
+                <!-- Fiscal Year End Date (editable + constraint <= 18 months) -->
+                <label class="cp-field">
+                  <span class="lbl">End Date</span>
+
+                  <input type="date" class="inp" [disabled]="!isEdit" [attr.min]="form.fiscalYearStart || null"
+                    [attr.max]="fiscalEndMaxIso || null" [(ngModel)]="form.fiscalYearEnd"
+                    (ngModelChange)="onFiscalEndChange($event)" (blur)="fiscalEndTouched = true"
+                    [class.invalid]="fiscalEndInvalid || fiscalRangeInvalid || fiscalEndTooLongInvalid" />
+
+                  <div class="cp-field-error" *ngIf="fiscalEndInvalid">
+                    End date is required
+                  </div>
+
+                  <div class="cp-field-error" *ngIf="!fiscalEndInvalid && fiscalRangeInvalid">
+                    End date must be after Start date.
+                  </div>
+
+                  <div class="cp-field-error"
+                    *ngIf="!fiscalEndInvalid && !fiscalRangeInvalid && fiscalEndTooLongInvalid">
+                    End date must be within 18 months from Start date.
+                  </div>
+
+                  <div class="cp-hint">
+                    Max allowed End Date: <b>{{ fiscalEndMaxIso }}</b>.
+                  </div>
+                </label>
+
+                <!-- Actual Data Start Date -->
+                <label class="cp-field">
+                  <span class="lbl">Actual Data Start Date</span>
+
+                  <input type="date" class="inp" [disabled]="!isEdit" [(ngModel)]="form.actualDataStartDate"
+                    (blur)="openingDateTouched = true"
+                    [class.invalid]="openingDateRequiredInvalid || openingDateRangeInvalid" />
+
+                  <div class="cp-field-error" *ngIf="openingDateRequiredInvalid">
+                    Actual data start date is required
+                  </div>
+
+                  <div class="cp-field-error" *ngIf="!openingDateRequiredInvalid && openingDateRangeInvalid">
+                    Actual Data Start Date must be between Fiscal Year Start and Fiscal Year End Date.
+                  </div>
+
+                  <div class="cp-hint">
+                    Specify the start date of the actual data to be entered in this account
+                    book. If Actual Data Start Date is greater than Fiscal Year Start Date,
+                    then you can maintain current year account balance in Year To Date
+                    Maintenance.
+                  </div>
+                </label>
+
+              </div>
+            </section>
+
+            <!-- ✅ NEW SECTION: Account Code Format -->
+            <section #accFormatSection data-sec="accFormat">
+              <h3>Account Code Format</h3>
+
+              <div class="cp-grid-2">
+                <!-- Left -->
+                <label class="cp-field">
+                  <span class="lbl">Account Code Format</span>
+                  <input type="text" class="inp" [(ngModel)]="form.accountCodeFormat" [readonly]="!isEdit"
+                    placeholder="AAA-AAAA" />
+                  <div class="cp-hint">
+                    (Note: To use free format, leave the Account Code Format field empty.)
+                  </div>
+                </label>
+
+                <!-- Right -->
+                <div class="cp-field">
+                  <span class="lbl">Character meaning</span>
+                  <div class="cp-table-wrap">
+                    <table class="ac-table ac-table-sm">
+                      <thead>
+                        <tr>
+                          <th style="width: 120px">Character</th>
+                          <th>Meaning</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr>
+                          <td><b>L</b></td>
+                          <td>An <b>L</b> character requires an uppercase alphabetic character only in this position
+                            (A–Z).</td>
+                        </tr>
+                        <tr>
+                          <td><b>A</b></td>
+                          <td>An <b>A</b> character requires an alphanumeric character only in this position (A–Z, 0–9).
+                          </td>
+                        </tr>
+                        <tr>
+                          <td><b>0</b></td>
+                          <td>A <b>0</b> character requires a numeric character only in this position.</td>
+                        </tr>
+                        <tr>
+                          <td>/ - ( ) &#123; &#125;</td>
+                          <td>Literal.</td>
+                        </tr>
+                      </tbody>
+                    </table>
                   </div>
                 </div>
               </div>
-            </div>
-          </div>
+            </section>
 
-          <div class="group">
-            <div class="group-title">Contact & Address</div>
-            <div class="form-grid">
-              <div class="col-span-2">
-                <label class="lbl">Address</label>
-                <input
-                  class="inp"
-                  [(ngModel)]="form.address1"
-                  [readonly]="!isEdit"
-                />
-              </div>
-              <div>
-                <label class="lbl">Post Code</label>
-                <input
-                  class="inp"
-                  [(ngModel)]="form.postcode"
-                  [readonly]="!isEdit"
-                />
-              </div>
-              <div>
-                <label class="lbl">Phone</label>
-                <input
-                  class="inp"
-                  [(ngModel)]="form.phone"
-                  [readonly]="!isEdit"
-                />
-              </div>
-              <div>
-                <label class="lbl">Fax</label>
-                <input
-                  class="inp"
-                  [(ngModel)]="form.fax"
-                  [readonly]="!isEdit"
-                />
-              </div>
-              <div>
-                <label class="lbl">Email</label>
-                <input
-                  class="inp"
-                  [(ngModel)]="form.email"
-                  [readonly]="!isEdit"
-                />
-              </div>
-              <div class="col-span-2">
-                <label class="lbl">Contact Person</label>
-                <input
-                  class="inp"
-                  [(ngModel)]="form.contactPerson"
-                  [readonly]="!isEdit"
-                />
-              </div>
-            </div>
-          </div>
+            <!-- ✅ NEW SECTION: Sample Chart of Account -->
+            <section #sampleCoaSection data-sec="sampleCoa">
+              <h3>Sample Chart of Account</h3>
 
-          <!-- Delivery Info -->
-          <div class="group">
-            <div class="group-title">Delivery Info</div>
-            <div class="form-grid two-cols">
-              <div>
-                <label class="lbl">Delivery Address</label>
-                <input
-                  class="inp"
-                  [(ngModel)]="form.deliveryAddress1"
-                  [readonly]="!isEdit"
-                />
+              <div class="form-grid">
+                <label class="cp-field">
+                  <span class="lbl">Create sample Chart of Accounts</span>
+                  <select class="inp" [(ngModel)]="form.coaTemplate" [disabled]="!canEditField('sampleCoa')">
+                    <option *ngFor="let t of coaTemplates" [ngValue]="t.value">
+                      {{ t.label }}
+                    </option>
+                  </select>
+                </label>
               </div>
-              <div>
-                <label class="lbl">Phone</label>
-                <input
-                  class="inp"
-                  [(ngModel)]="form.deliveryPhone"
-                  [readonly]="!isEdit"
-                />
-              </div>
-              <div>
-                <label class="lbl">Fax</label>
-                <input
-                  class="inp"
-                  [(ngModel)]="form.deliveryFax"
-                  [readonly]="!isEdit"
-                />
-              </div>
+            </section>
 
-              <div class="col-span-2">
-                <label class="lbl">Post Code</label>
-                <input
-                  class="inp"
-                  [(ngModel)]="form.deliveryPostcode"
-                  [readonly]="!isEdit"
-                />
-              </div>
+            <!-- SECTION: Contact & Address -->
+            <section #contactSection data-sec="contact">
+              <h3>Contact & Address</h3>
+              <div class="form-grid">
+                <div class="col-span-2">
+                  <label class="lbl">Address</label>
+                  <input class="inp" [(ngModel)]="form.address1" [readonly]="!isEdit" />
+                </div>
 
-              <div class="col-span-2">
-                <label class="lbl">Delivery Contact Person</label>
-                <input
-                  class="inp"
-                  [(ngModel)]="form.deliveryContactPerson"
-                  [readonly]="!isEdit"
-                />
-              </div>
-            </div>
-          </div>
-        </div>
+                <div>
+                  <label class="lbl">Post Code</label>
+                  <input class="inp" [(ngModel)]="form.postcode" [readonly]="!isEdit" />
+                </div>
 
-        <!-- Right -->
-        <div class="col side">
-          <div class="group sticky">
-            <div class="group-title title-stack">
-              <div class="title-main">Company Logo</div>
-              <div class="title-sub">(96×96 px)</div>
-            </div>
-            <!-- THÊM LỚP BỌC group-content -->
-            <div class="group-content">
+                <div>
+                  <label class="lbl">Phone</label>
+                  <input class="inp" [(ngModel)]="form.phone" [readonly]="!isEdit" />
+                </div>
+
+                <div>
+                  <label class="lbl">Fax</label>
+                  <input class="inp" [(ngModel)]="form.fax" [readonly]="!isEdit" />
+                </div>
+
+                <div>
+                  <label class="lbl">Email</label>
+                  <input class="inp" [(ngModel)]="form.email" [readonly]="!isEdit" />
+                </div>
+
+                <div class="col-span-2">
+                  <label class="lbl">Contact Person</label>
+                  <input class="inp" [(ngModel)]="form.contactPerson" [readonly]="!isEdit" />
+                </div>
+              </div>
+            </section>
+
+            <!-- SECTION: Delivery -->
+            <section #deliverySection data-sec="delivery">
+              <h3>Delivery Info</h3>
+              <div class="form-grid">
+                <div class="col-span-2">
+                  <label class="lbl">Delivery Address</label>
+                  <input class="inp" [(ngModel)]="form.deliveryAddress1" [readonly]="!isEdit" />
+                </div>
+
+                <div>
+                  <label class="lbl">Phone</label>
+                  <input class="inp" [(ngModel)]="form.deliveryPhone" [readonly]="!isEdit" />
+                </div>
+
+                <div>
+                  <label class="lbl">Fax</label>
+                  <input class="inp" [(ngModel)]="form.deliveryFax" [readonly]="!isEdit" />
+                </div>
+
+                <div>
+                  <label class="lbl">Post Code</label>
+                  <input class="inp" [(ngModel)]="form.deliveryPostcode" [readonly]="!isEdit" />
+                </div>
+
+                <div class="col-span-2">
+                  <label class="lbl">Delivery Contact Person</label>
+                  <input class="inp" [(ngModel)]="form.deliveryContactPerson" [readonly]="!isEdit" />
+                </div>
+              </div>
+            </section>
+
+            <!-- SECTION: Logo -->
+            <section #logoSection data-sec="logo">
+              <h3>Company Logo <span class="muted">(96×96 px)</span></h3>
+
               <div class="logo-box">
                 <ng-container *ngIf="form.logoDataUrl; else noLogo">
                   <img [src]="form.logoDataUrl" alt="logo" />
                 </ng-container>
-                <ng-template #noLogo
-                  ><div class="logo-ph">No logo</div></ng-template
-                >
+                <ng-template #noLogo>
+                  <div class="logo-ph">No logo</div>
+                </ng-template>
               </div>
 
               <div class="logo-actions">
-                <label
-                  class="ac-btn ac-btn-primary"
-                  [class.disabled]="!isEdit"
-                >
+                <label class="ac-btn ac-btn-primary" [class.disabled]="!isEdit">
                   Upload
-                  <input
-                    #logoInput
-                    type="file"
-                    accept="image/*"
-                    hidden
-                    [disabled]="!isEdit"
-                    (click)="resetFileInput(logoInput)"
-                    (change)="onLogoSelected($event)"
-                    aria-label="Choose logo image"
-                  />
+                  <input #logoInput type="file" accept="image/*" hidden [disabled]="!isEdit"
+                    (click)="resetFileInput(logoInput)" (change)="onLogoSelected($event)" />
                 </label>
 
-                <button
-                  class="ac-btn ac-btn-danger"
-                  (click)="clearLogo()"
-                  [disabled]="!isEdit || !form.logoDataUrl"
-                >
+                <button class="ac-btn ac-btn-danger" (click)="clearLogo()" [disabled]="!isEdit || !form.logoDataUrl">
                   Remove
                 </button>
               </div>
-            </div>
-          </div>
+            </section>
 
-          <div class="group">
-            <div class="group-title">Report Header</div>
-
-            <div class="group-content report-hdr">
-              <!-- Quick start -->
-              <div class="header-actions">
-                <div class="hint-strong">Quick start:</div>
-                <button
-                  type="button"
-                  class="btn primary lg"
-                  (click)="setDefaultHeader()"
-                  [disabled]="!isEdit"
-                >
-                  <span class="icon">↻</span>
-                  Set Default Report Header
-                </button>
-              </div>
-
-              <!-- Toolbar + Editor của Quill -->
-              <!-- <quill-editor
-                theme="snow"
-                [modules]="quillModules"
-                [readOnly]="!isEdit"
-                (onEditorCreated)="onQuillReady($event)"
-                (onContentChanged)="onQuillChangeHtml($event.html)"
-              >
-              </quill-editor> -->
-            </div>
-          </div>
-
-          <div class="print-note">
-            <div class="muted">Hint:</div>
-            <ul>
-              <li>
-                This information is used for printing invoices and documents..
-              </li>
-              <li>
-                Fields with white background are editable when enabled.
-                <b>Edit</b>.
-              </li>
-              <li>
-                The <b>Print</b> button will print the page in “Preview” format.
-              </li>
-            </ul>
           </div>
         </div>
       </div>
     </div>
 
     <div class="panel-foot">
-      <div class="muted">Last saved locally (localStorage).</div>
-      <div class="spacer"></div>
+      <div class="toolbar">
+        <!-- Ẩn Edit khi mode=new -->
+        <button class="ac-btn ac-btn-primary" *ngIf="mode !== 'new'" (click)="edit()" [disabled]="isEdit">
+          Edit
+        </button>
+
+        <button class="ac-btn ac-btn-primary" (click)="askSave()" [disabled]="!isEdit">
+          {{ mode === 'new' ? 'Create' : 'Save' }}
+        </button>
+
+        <button class="ac-btn" (click)="cancel()"  [routerLink]="['/settings']">
+          Cancel
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- ===== CONFIRM SAVE ===== -->
+<div class="ac-dialog-backdrop" *ngIf="showSaveConfirm">
+  <div class="ac-card-no-padding ac-dialog-panel-sm">
+    <div class="ac-dialog-header">
+      Confirm
+      <button class="ac-dialog-close" (click)="cancelConfirmSave()" aria-label="Close">
+        ×
+      </button>
+    </div>
+
+    <div class="ac-dialog-body">
+      {{ confirmMsg }}
+    </div>
+
+    <div class="ac-dialog-footer">
+      <button class="ac-btn ac-btn-ghost" (click)="cancelConfirmSave()">
+        Cancel
+      </button>
+      <button class="ac-btn ac-btn-primary" (click)="doConfirmSave()">
+        OK
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== SUCCESS (QUICK) ===== -->
+<div class="ac-dialog-backdrop" *ngIf="showSuccess">
+  <div class="ac-card-no-padding ac-dialog-panel-sm ac-dialog-success" role="dialog" aria-modal="true">
+    <div class="ac-dialog-header ac-dialog-success-header">
+      <span>Success</span>
+      <button class="ac-dialog-close" (click)="closeSuccess()" aria-label="Close">
+        ×
+      </button>
+    </div>
+    <div class="ac-dialog-body">
+      <p class="ac-dialog-success-text">
+        {{ successMsg }}
+      </p>
+    </div>
+    <div class="ac-dialog-footer">
+      <button class="ac-btn ac-btn-primary" type="button" (click)="closeSuccess()">
+        OK
+      </button>
     </div>
   </div>
 </div>

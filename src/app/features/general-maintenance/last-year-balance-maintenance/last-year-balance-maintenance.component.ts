@@ -254,9 +254,6 @@ export class LastYearBalanceMaintenanceComponent implements OnInit {
     return Number.isFinite(v) ? this.nf.format(v) : this.nf.format(0);
   }
   onSave() {
-    // TODO: call API lưu số dư
-    // ví dụ: console.log(this.rows);
-    alert('Settings saved successfully.');
   }
 
   onCancel() {
@@ -323,5 +320,48 @@ export class LastYearBalanceMaintenanceComponent implements OnInit {
       }
     }
     return sum;
+  }
+  showSaveConfirm = false;
+  confirmMsg = 'Are you sure you want to save changes?';
+
+  showSuccess = false;
+  successMsg = 'Last Year Balance Maintenance saved successfully.';
+
+  saving = false; // optional nếu muốn disable khi đang save
+  openConfirmSave() {
+    this.confirmMsg = 'Are you sure you want to save changes?';
+    this.showSaveConfirm = true;
+  }
+
+  cancelConfirmSave() {
+    if (this.saving) return;
+    this.showSaveConfirm = false;
+  }
+
+  doConfirmSave() {
+    if (this.saving) return;
+    this.saving = true;
+
+    // đóng confirm
+    this.showSaveConfirm = false;
+    this.showSuccess = true;
+    // TODO: call API save thật ở đây
+    // Ví dụ payload bạn muốn save:
+    // const payload = {
+    //   year: this.selectedYear,
+    //   includeZero: this.includeZero,
+    //   rows: this._tree, // hoặc this.rows (tuỳ backend)
+    // };
+
+    // Demo giả lập call API
+    setTimeout(() => {
+      this.saving = false;
+      this.successMsg = 'Settings saved successfully.';
+      this.showSuccess = true;
+    }, 400);
+  }
+
+  closeSuccess() {
+    this.showSuccess = false;
   }
 }

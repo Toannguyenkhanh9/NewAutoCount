@@ -31,41 +31,46 @@ export class SettingsPageComponent {
           description: "Update your organisation's name, logo & contact info.",
           path: '/settings/company-profile',
         },
-        {
-          label: 'Account Type Maintenance',
-          description:
-            'Maintain account types & reporting categories in your chart of accounts.',
-          path: '/settings/account-type-maintenance',
-        },
-        {
-          label: 'Creditor Type Maintenance',
-          description: 'Maintain creditor types.',
-          path: '/settings/creditor-type-maintenance',
-        },
+        // {
+        //   label: 'Account Type Maintenance',
+        //   description:
+        //     'Maintain account types & reporting categories in your chart of accounts.',
+        //   path: '/settings/account-type-maintenance',
+        // },
+        // {
+        //   label: 'Creditor Type Maintenance',
+        //   description: 'Maintain creditor types.',
+        //   path: '/settings/creditor-type-maintenance',
+        // },
         {
           label: 'Currency Maintenance',
           description: 'Maintain foreign currencies and exchange settings.',
-          path: '/settings/currency-maintenance',
+          path: '/settings/exchange-rates',
         },
+        // {
+        //   label: 'Debtor Type Maintenance',
+        //   description: 'Maintain debtor types.',
+        //   path: '/settings/debtor-type-maintenance',
+        // },
+        // {
+        //   label: 'Document Numbering Format Maintenance',
+        //   description: 'Configure numbering formats for documents & vouchers.',
+        //   path: '/settings/document-numbering-format-maintenance',
+        // },
+        // {
+        //   label: 'Journal Type Maintenance',
+        //   description: 'Maintain journal types for G/L entries.',
+        //   path: '/settings/journal-type-maintenance',
+        // },
+        // {
+        //   label: 'Last Year Balance Maintenance',
+        //   description: 'Maintain last year opening balances.',
+        //   path: '/settings/last-year-balance-maintenance',
+        // },
         {
-          label: 'Debtor Type Maintenance',
-          description: 'Maintain debtor types.',
-          path: '/settings/debtor-type-maintenance',
-        },
-        {
-          label: 'Document Numbering Format Maintenance',
-          description: 'Configure numbering formats for documents & vouchers.',
-          path: '/settings/document-numbering-format-maintenance',
-        },
-        {
-          label: 'Journal Type Maintenance',
-          description: 'Maintain journal types for G/L entries.',
-          path: '/settings/journal-type-maintenance',
-        },
-        {
-          label: 'Last Year Balance Maintenance',
-          description: 'Maintain last year opening balances.',
-          path: '/settings/last-year-balance-maintenance',
+          label: 'MSIC Code & Business Activities',
+          description: 'MSIC Code & Business Activities',
+          path: '/settings/msic-code',
         },
       ],
     },
