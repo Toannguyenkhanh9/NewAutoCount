@@ -37,8 +37,8 @@
       <div class="upto">
       </div>
 
-      <div class="search">
-        <input type="text" [(ngModel)]="findText" placeholder="Search description/ acc no..." (keyup.enter)="doFind()"
+      <div class="">
+        <input type="text" class="ac-form-control ac-page-search" [(ngModel)]="findText" placeholder="Search description/ acc no..." (keyup.enter)="doFind()"
           (ngModelChange)="activeFilter=$event" />
       </div>
     </div>
